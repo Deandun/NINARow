@@ -22,7 +22,8 @@ public class Main {
 
         do {
             selectedOption = scanner.next();
-            isInputValid = selectedOption.contentEquals("y") || selectedOption.contentEquals("n");
+            isInputValid = selectedOption.contentEquals("y") || selectedOption.contentEquals("n")
+                           || selectedOption.contentEquals("Y") || selectedOption.contentEquals("N");
         } while(!isInputValid);
 
         return selectedOption.contentEquals("y");

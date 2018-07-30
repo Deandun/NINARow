@@ -7,16 +7,16 @@ import java.util.List;
 
 // This class will contain all of the game related details that were read from the XML file.
 public class GameSettings {
-    private static GameSettings ourInstance = new GameSettings();
 
+    private static GameSettings ourInstance = new GameSettings();
     private List<Player> mPlayers = new ArrayList<>();
     //TODO: Change dummy
     private int mTarget = 4;
     private int mRows = 6;
-    private int mColumn = 7;
+    private int mColumns = 7;
     private String mVariant = "Regular";
 
-    private GameSettings() {
+    public GameSettings() {
 
     }
 
@@ -36,12 +36,16 @@ public class GameSettings {
         return mRows;
     }
 
-    public int getColumn() {
-        return mColumn;
+    public int getColumns() {
+        return mColumns;
     }
 
     public String getVariant() {
         return mVariant;
+    }
+
+    public List<Player> getPlayers() {
+        return mPlayers;
     }
 
 }
