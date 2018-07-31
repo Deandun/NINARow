@@ -1,7 +1,7 @@
 package com.DeaNoy;
 
-import Logic.Models.Configuration;
 import Logic.Enums.ePlayerType;
+import Logic.Models.GameSettings;
 import Logic.Models.Player;
 
 import java.util.InputMismatchException;
@@ -9,7 +9,6 @@ import java.util.Scanner;
 
 // Receive input from human or "computer" user.
 public class InputManager {
-
     private Scanner scanner = new Scanner(System.in);
 
     public eGameOptions GetCommandFromPlayer(Player player) {
@@ -17,39 +16,53 @@ public class InputManager {
         eGameOptions playerChoice = eGameOptions.Exit;
         int selectedOption;
 
-        if (ePlayerType.Human.equals(player.getType())) { //handel user chosen option
+        if (player == null || player.getType() == ePlayerType.Human) { // handle human user chosen option
             do {
                 selectedOption = scanner.nextInt();
-                isInputValid = playerChoice.isIndexInRange(selectedOption);
+                isInputValid = eGameOptions.isIndexInRange(selectedOption);
             } while (!isInputValid);
 
             playerChoice = convertIndexToGameOption(selectedOption);
         }
-        else{
+        else {
             playerChoice = eGameOptions.PlayTurn; // if computer's turn, always return "play turn" option.
         }
+
         return playerChoice;
     }
 
     public int GetColumnIndexFromPlayer(ePlayerType playerType) {
-        int cellInput = 0;
+        int cellInput;
         boolean isValidColumn = false;
 
         if (playerType.equals(ePlayerType.Human)){
-            do {
-                try{
-                    cellInput = scanner.nextInt();
-                    isValidColumn = cellInput >= Configuration.MIN_BOARD_COLS && cellInput <= Configuration.MAX_BOARD_COLS;
-                } catch (InputMismatchException e) {
-                    e.printStackTrace();
-                }
-           }while(!isValidColumn);
+            System.out.println("Please select the column you wish to insert the disc into (1 to " + GameSettings.getInstance().getColumns());
+            cellInput = getInputFromHumanPlayer();
+        } else {
+            // TODO: Call computer's algorithm
+            cellInput = 1;
         }
 
-        else{
-            // if computer's turn, use algorithm to determine the input.
-            cellInput = 0;
-        }
+        return cellInput;
+    }
+
+    private int getInputFromHumanPlayer() {
+        int cellInput = 0;
+        boolean isValidColumn = false;
+        do {
+            try{
+                cellInput = scanner.nextInt();
+                isValidColumn = cellInput >= 1 && cellInput <= GameSettings.getInstance().getColumns();
+
+                if (!isValidColumn) {
+                    System.out.println("Invalid input! Please enter a number between 1 and " + GameSettings.getInstance().getColumns());
+                }
+
+            } catch (InputMismatchException e) {
+                System.out.println("Invalid input! Please enter a number between 1 and " + GameSettings.getInstance().getColumns());
+            }
+        } while(!isValidColumn);
+
         return cellInput;
     }
 
@@ -70,4 +83,16 @@ public class InputManager {
         }
     }
 
+    public String GetFileNameFromPlayer() {
+        boolean isInputValid = false;
+        String inputString = new String();
+
+        while(!isInputValid) {
+            System.out.println("Please enter the game file's name (must be in xml format)");
+            inputString = scanner.next();
+            isInputValid = inputString != null && !inputString.isEmpty();
+        }
+
+        return inputString;
+    }
 }

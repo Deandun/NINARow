@@ -1,11 +1,13 @@
 package Logic;
 
+import Logic.Enums.eGameState;
 import Logic.Exceptions.InvalidFileInputException;
+import Logic.Exceptions.InvalidUserInputException;
 import Logic.Managers.FileManager;
 import Logic.Managers.HistoryManager;
 import Logic.Models.*;
 
-import java.util.List;
+import java.util.Collection;
 
 public class Logic implements ILogic {
 
@@ -20,73 +22,101 @@ public class Logic implements ILogic {
         this.mGameStatus = new GameStatus();
     }
 
+    // ILogic interface implementation.
+
     //@Override
     public void ReadGameFile(String filePath) throws InvalidFileInputException {
-        //TODO: init GameSettings by params in file from filePath
-
-        //this.mGameBoard = new Board(10, 10); //TODO: change numbers to file's input
-        this.mGameBoard = new Board(GameSettings.getInstance().getRows(), GameSettings.getInstance().getColumns());
+        mFileManager.LoadGameFile(filePath);
     }
-
 
     //@Override
     public void StartGame() {
-        if (!mGameStatus.isIsGameActive()) {
-            //TODO: ask each player if he is human or computer and update players in GameSettings
+        // Set game board
+        this.mGameBoard = new Board(GameSettings.getInstance().getRows(), GameSettings.getInstance().getColumns());
+
+        if (mFileManager.getIsFileLoaded()) {
             mGameStatus.StartNewGame(GameSettings.getInstance().getPlayers().get(0));
+        } else {
+            // File not loaded yet exception
         }
     }
 
     //@Override
-    public String GetGameStatus() {
-        return mGameStatus.toString();
+    public GameStatus GetGameStatus() {
+        return mGameStatus;
     }
 
     //@Override
-    public void PlayTurn(int column) {
+    public PlayerTurn PlayTurn(int column) throws Exception, InvalidUserInputException {
+        Cell chosenCell = mGameBoard.UpdateBoard(column, mGameStatus.getPlayer()); // send parameter to logic board
+        updateGameStatus();
+        PlayerTurn playerTurn = new PlayerTurn(chosenCell, mGameStatus.getPlayer(), mGameStatus.mGameState);
+        mHistoryManager.SaveTurn(playerTurn);
 
-        try {
-            Cell chosenCell = mGameBoard.UpdateBoard(column, mGameStatus.getPlayer()); // send parameter to logic board
-            mHistoryManager.SaveTurn(chosenCell, GameSettings.getInstance().getPlayers().get(mGameStatus.getPlayerIndex()));
-            checkIfGameFinish();
-            //update GameStatus in case succeed
-            mGameStatus.increaseTurnNumber();
-            mGameStatus.increasePlayerIndex();
-            mGameStatus.setPlayer(GameSettings.getInstance().getPlayers().get(mGameStatus.getPlayerIndex()));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        //update GameStatus in case succeed
+        mGameStatus.FinishedTurn();
+
+        return playerTurn;
     }
 
     //@Override
-    private void checkIfGameFinish() {
+    private void updateGameStatus() {
         //Check if following this turn - player won
     }
 
     //@Override
-    public List<PlayerTurn> GetTurnHistory() {
+    public Collection<PlayerTurn> GetTurnHistory() {
         // send parameters to history manager
         return mHistoryManager.GetGameHistory();
     }
 
-    private class GameStatus{
-        private boolean mIsGameActive = false;
+    public Player GetCurrentPlayer() {
+        return mGameStatus.getPlayer();
+    }
+
+    public class GameStatus {
+        private eGameState mGameState;
         private int mTurn = 0;
         private Player mPlayer;
         private int mPlayerIndex;
 
-        public void StartNewGame(Player player){
-            this.mIsGameActive = true;
+        // Getters/Setters
+        public int getTurn() {
+            return mTurn;
+        }
+
+        public Player getPlayer() {
+            return mPlayer;
+        }
+
+        public eGameState getGameState() { return mGameState; }
+
+        // API
+
+        void StartNewGame(Player player){
+            this.mGameState = eGameState.Inactive;
             this.mTurn = 0;
             this.mPlayerIndex = 0;
             this.mPlayer = player;
+        }
+
+        // Adjust game status when a player has finished his turn.
+        void FinishedTurn() {
+            mTurn++;
+            mPlayerIndex++;
+            mPlayer.FinishedTurn();
+            nextPlayer();
+        }
+
+        boolean IsIsGameActive() {
+            return mGameState != mGameState.Inactive;
         }
 
         @Override
         public String toString(){
             String gameActivation = "Game is ";
 
-            if (mIsGameActive){
+            if (mGameState != eGameState.Inactive){
                 gameActivation += "active";
             }
             else{
@@ -96,35 +126,15 @@ public class Logic implements ILogic {
             return gameActivation + ", Turn number is " + mTurn + ", Player turn is: " + this.mPlayer.getName(); //TODO: check player's get name
         }
 
-        public void increaseTurnNumber(){
-            mTurn ++;
+        // Helper functions
+
+        void nextPlayer() {
+            mPlayer = GameSettings.getInstance().getPlayers().get(getNextPlayerIndex());
         }
 
-        public void increasePlayerIndex(){
+        int getNextPlayerIndex() {
             mPlayerIndex++;
-        }
-        public boolean isIsGameActive() {
-            return mIsGameActive;
-        }
-
-        public int getTurn() {
-            return mTurn;
-        }
-
-        public Player getPlayer() {
-            return mPlayer;
-        }
-
-        public void setPlayer(Player mPlayer) {
-            this.mPlayer = mPlayer;
-        }
-
-        public int getPlayerIndex() {
-            return mPlayerIndex;
-        }
-
-        public void setPlayerIndex(int mPlayerIndex) {
-            this.mPlayerIndex = mPlayerIndex;
+            return mPlayerIndex % GameSettings.getInstance().getPlayers().size();
         }
     }
 }

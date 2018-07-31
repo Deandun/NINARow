@@ -25,7 +25,7 @@ public enum eGameOptions {
         return this.fDescription;
     }
 
-    public boolean isIndexInRange(int index) {
-        return index >= 1 && index <= 6; //TODO: think of a generic way to do this
+    public static boolean isIndexInRange(int index) {
+        return index >= 1 && index <= eGameOptions.values().length;
     }
 }

@@ -1,19 +1,123 @@
 package com.DeaNoy;
 
+import Logic.Enums.eGameState;
+import Logic.Exceptions.InvalidFileInputException;
+import Logic.Models.Cell;
+import Logic.Models.GameSettings;
+import Logic.Logic;
+import Logic.Models.PlayerTurn;
+
+import java.awt.*;
+
 public class NINARowGame {
+    private InputManager mInputManager;
+    private Board mBoard;
+    private Logic mLogic;
+
+    public NINARowGame() {
+        this.mInputManager = new InputManager();
+        this.mLogic = new Logic();
+    }
 
     public void RunGame() {
         boolean shouldContinuePlaying = true;
+        eGameOptions currentOption;
+
+        //TODO: read player details from user
 
         while(shouldContinuePlaying) {
-            // Get valid input from user
-
-            // Parse input from user (get the selected option)
-
-            // Do selected option.
-
-            // Check if should continue playing
+            GameMenu.PrintMenu();
+            currentOption = getCommandFromPlayer();
+            shouldContinuePlaying = executeOption(currentOption);
         }
+    }
+
+    private eGameOptions getCommandFromPlayer() {
+        // TODO: check if the selected option is valid (e.g. selected start game before game was loaded, etc).
+        return mInputManager.GetCommandFromPlayer(mLogic.GetCurrentPlayer());
+    }
+
+    // Game commands implemenetation
+
+    private void showTurnHistory() {
+
+    }
+
+    private boolean playTurn() {
+        boolean shouldContinueGame = true;
+        int selectedColumn = mInputManager.GetColumnIndexFromPlayer(mLogic.GetCurrentPlayer().getType());
+
+        try {
+            PlayerTurn playerTurn = mLogic.PlayTurn(selectedColumn);
+            char currentPlayerSign = ConsoleConfig.GetSignForPlayerID(playerTurn.getPlayer().getID());
+
+            if(playerTurn.getGameState() == eGameState.Won) {
+                System.out.println("Player " + playerTurn.getPlayer().getName() + " has won the game!");
+                shouldContinueGame = false;
+            } else if (playerTurn.getGameState() == eGameState.Draw) {
+                System.out.println("The game has ended in a draw. Everyone's a winner!");
+                shouldContinueGame = false;
+            }
+
+            mBoard.UpdateBoard(playerTurn.getCellRow(), playerTurn.getCellColumn(), currentPlayerSign);
+        } catch (Exception e) {
+            // TODO:
+        }
+
+        return shouldContinueGame;
+    }
+
+    private void showGameStatus() {
+        //Logic.Logic.GameStatus gameStatus = mLogic.GetGameStatus();
+
+        //TODO: Change GameMenu.PrintGameStatus to receive gameStatus and print the required details
+    }
+
+    private void startGame() {
+        mLogic.StartGame();
+        ConsoleConfig.InitPlayerSigns(GameSettings.getInstance().getPlayers());
+        mBoard = new Board(GameSettings.getInstance().getRows(), GameSettings.getInstance().getColumns());
+    }
+
+    private void readGameFile() {
+        String fileName = mInputManager.GetFileNameFromPlayer();
+        try {
+            mLogic.ReadGameFile(fileName);
+        } catch (InvalidFileInputException e) {
+            //TODO: informative message to the user.
+        }
+    }
+
+
+    // Helper functions
+
+    private boolean executeOption(eGameOptions currentOption) {
+        boolean shouldContinueGame = true;
+
+        switch(currentOption) {
+            case ReadGameFile:
+                readGameFile();
+                break;
+            case StartGame:
+                startGame();
+                mBoard.PrintBoard(); // TODO: temp print, for debugging.
+                break;
+            case ShowGameStatus:
+                showGameStatus();
+                break;
+            case PlayTurn:
+                shouldContinueGame = playTurn();
+                mBoard.PrintBoard(); // TODO: temp print, for debugging.
+                break;
+            case ShowTurnHistory:
+                showTurnHistory();
+                break;
+            case Exit:
+                shouldContinueGame = false;
+                break;
+        }
+
+        return shouldContinueGame;
     }
 
     // Private inner static class that prints the game menu and notifications.
