@@ -4,6 +4,8 @@ import Logic.Exceptions.InvalidUserInputException;
 
 public class Cell {
     private Player mPlayer;
+    private int mColumnIndex;
+    private int mRowIndex;
 
     public boolean isEmpty() {
         return mPlayer == null;
@@ -20,5 +22,25 @@ public class Cell {
 
     public void Clear(){
         mPlayer = null;
+    }
+
+    public int getColumnIndex() {
+        return mColumnIndex;
+    }
+
+    public void setColumnIndex(int columnIndex) {
+        this.mColumnIndex = columnIndex;
+    }
+
+    public int getRowIndex() {
+        return mRowIndex;
+    }
+
+    public void setRowIndex(int rowIndex) {
+        this.mRowIndex = rowIndex;
+    }
+
+    public Player getPlayer() {
+        return mPlayer;
     }
 }

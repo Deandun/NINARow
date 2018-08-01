@@ -1,4 +1,6 @@
-package Logic;
+package Logic.Interfaces;
+
+import Logic.Logic;
 
 public interface ILogic {
 

@@ -20,6 +20,7 @@ public class NINARowGame {
     }
 
     public void RunGame() {
+        GameSettings.getInstance().DummyInit();
         boolean shouldContinuePlaying = true;
         eGameOptions currentOption;
 
@@ -45,7 +46,7 @@ public class NINARowGame {
 
     private boolean playTurn() {
         boolean shouldContinueGame = true;
-        int selectedColumn = mInputManager.GetColumnIndexFromPlayer(mLogic.GetCurrentPlayer().getType());
+        int selectedColumn = mInputManager.GetColumnIndexFromPlayer(mLogic.GetCurrentPlayer().getType()) - 1;
 
         try {
             PlayerTurn playerTurn = mLogic.PlayTurn(selectedColumn);
@@ -59,9 +60,9 @@ public class NINARowGame {
                 shouldContinueGame = false;
             }
 
-            mBoard.UpdateBoard(playerTurn.getCellRow(), playerTurn.getCellColumn(), currentPlayerSign);
+            mBoard.UpdateBoard(playerTurn.getUpdatedCell().getRowIndex(), playerTurn.getUpdatedCell().getColumnIndex(), currentPlayerSign);
         } catch (Exception e) {
-            // TODO:
+            System.out.println(e.getMessage());
         }
 
         return shouldContinueGame;

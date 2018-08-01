@@ -1,5 +1,6 @@
 package Logic.Models;
 
+import Logic.Enums.ePlayerType;
 import org.w3c.dom.Document;
 
 import java.util.ArrayList;
@@ -25,12 +26,22 @@ public class GameSettings {
     private int mColumns = 17;
     private String mVariant = "Regular";
 
-    public GameSettings() {
-
+    private GameSettings() {
     }
 
     public static GameSettings getInstance() {
         return ourInstance;
+    }
+
+    public void DummyInit() {
+        //TODO: dummy impl! get players from input or file
+        Player player1 = new Player();
+        player1.init("1", "Aviad", ePlayerType.Human);
+        Player player2 = new Player();
+        player2.init("2", "Guy", ePlayerType.Human);
+
+        mPlayers.add(player1);
+        mPlayers.add(player2);
     }
 
     public int getTarget() {

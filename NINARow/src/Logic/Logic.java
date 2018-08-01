@@ -3,6 +3,7 @@ package Logic;
 import Logic.Enums.eGameState;
 import Logic.Exceptions.InvalidFileInputException;
 import Logic.Exceptions.InvalidUserInputException;
+import Logic.Interfaces.ILogic;
 import Logic.Managers.FileManager;
 import Logic.Managers.HistoryManager;
 import Logic.Models.*;
@@ -33,9 +34,10 @@ public class Logic implements ILogic {
     public void StartGame() {
         // Set game board
         this.mGameBoard = new Board(GameSettings.getInstance().getRows(), GameSettings.getInstance().getColumns());
+        //TODO: mGameStatus.Reset()
 
         if (mFileManager.getIsFileLoaded()) {
-            mGameStatus.StartNewGame(GameSettings.getInstance().getPlayers().get(0));
+            mGameStatus.StartNewGame();
         } else {
             // File not loaded yet exception
         }
@@ -49,19 +51,20 @@ public class Logic implements ILogic {
     //@Override
     public PlayerTurn PlayTurn(int column) throws Exception, InvalidUserInputException {
         Cell chosenCell = mGameBoard.UpdateBoard(column, mGameStatus.getPlayer()); // send parameter to logic board
-        updateGameStatus();
-        PlayerTurn playerTurn = new PlayerTurn(chosenCell, mGameStatus.getPlayer(), mGameStatus.mGameState);
-        mHistoryManager.SaveTurn(playerTurn);
+        PlayerTurn playerTurn  = updateGameStatus(chosenCell);
 
-        //update GameStatus in case succeed
+        // Update game state when turn ends.
+        mGameStatus.mGameState = playerTurn.getGameState();
+        mHistoryManager.SaveTurn(playerTurn);
         mGameStatus.FinishedTurn();
 
         return playerTurn;
     }
 
     //@Override
-    private void updateGameStatus() {
-        //Check if following this turn - player won
+    private PlayerTurn updateGameStatus(Cell updatedCell) {
+        eGameState currentGameState = mGameBoard.getCurrentGameState(updatedCell);
+        return new PlayerTurn(updatedCell, updatedCell.getPlayer(), currentGameState);
     }
 
     //@Override
@@ -93,23 +96,18 @@ public class Logic implements ILogic {
 
         // API
 
-        void StartNewGame(Player player){
+        void StartNewGame(){
             this.mGameState = eGameState.Inactive;
             this.mTurn = 0;
             this.mPlayerIndex = 0;
-            this.mPlayer = player;
+            this.mPlayer = GameSettings.getInstance().getPlayers().get(mPlayerIndex);
         }
 
         // Adjust game status when a player has finished his turn.
         void FinishedTurn() {
             mTurn++;
-            mPlayerIndex++;
             mPlayer.FinishedTurn();
             nextPlayer();
-        }
-
-        boolean IsIsGameActive() {
-            return mGameState != mGameState.Inactive;
         }
 
         @Override
@@ -133,8 +131,7 @@ public class Logic implements ILogic {
         }
 
         int getNextPlayerIndex() {
-            mPlayerIndex++;
-            return mPlayerIndex % GameSettings.getInstance().getPlayers().size();
+            return ++mPlayerIndex % GameSettings.getInstance().getPlayers().size();
         }
     }
 }

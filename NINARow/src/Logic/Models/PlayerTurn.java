@@ -3,9 +3,7 @@ package Logic.Models;
 
 import Logic.Enums.eGameState;
 
-public class PlayerTurn{
-    private int mCellRow;
-    private int mCellColumn;
+public class PlayerTurn {
     private Cell mUpdatedCell;
     private Player mPlayerTurn;
     private eGameState mGameState;
@@ -23,22 +21,6 @@ public class PlayerTurn{
 
     public Player getPlayer() {
         return mPlayerTurn;
-    }
-
-    public int getCellRow() {
-        return mCellRow;
-    }
-
-    void setCellRow(int cellRow) {
-        this.mCellRow = cellRow;
-    }
-
-    public int getCellColumn() {
-        return mCellColumn;
-    }
-
-    void setCellColumn(int cellColumn) {
-        this.mCellColumn = cellColumn;
     }
 
     public eGameState getGameState() {

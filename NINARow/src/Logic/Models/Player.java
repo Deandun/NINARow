@@ -23,6 +23,13 @@ public class Player {
                 " Name: " + mName +
                 " Type: " + mType.name();
     }
+
+    @Override
+    public boolean equals(Object otherPlayer) {
+        // Check if other player is not null and IDs match.
+        return otherPlayer != null && mID.contentEquals(((Player)otherPlayer).mID);
+    }
+
     public String getID() {
         return mID;
     }
