@@ -3,11 +3,14 @@ package Logic;
 import Logic.Enums.eGameState;
 import Logic.Exceptions.InvalidFileInputException;
 import Logic.Exceptions.InvalidUserInputException;
+import Logic.Interfaces.IGameStatus;
 import Logic.Interfaces.ILogic;
 import Logic.Managers.FileManager;
 import Logic.Managers.HistoryManager;
 import Logic.Models.*;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Collection;
 
 public class Logic implements ILogic {
@@ -34,12 +37,12 @@ public class Logic implements ILogic {
     public void StartGame() {
         // Set game board
         this.mGameBoard = new Board(GameSettings.getInstance().getRows(), GameSettings.getInstance().getColumns());
-        //TODO: mGameStatus.Reset()
+        this.mHistoryManager.Clear();
 
         if (mFileManager.getIsFileLoaded()) {
             mGameStatus.StartNewGame();
         } else {
-            // File not loaded yet exception
+            // TODO: File not loaded yet exception
         }
     }
 
@@ -77,11 +80,12 @@ public class Logic implements ILogic {
         return mGameStatus.getPlayer();
     }
 
-    public class GameStatus {
+    public class GameStatus implements IGameStatus {
         private eGameState mGameState;
         private int mTurn = 0;
         private Player mPlayer;
         private int mPlayerIndex;
+        private Instant mGameStart;
 
         // Getters/Setters
         public int getTurn() {
@@ -97,10 +101,11 @@ public class Logic implements ILogic {
         // API
 
         void StartNewGame(){
-            this.mGameState = eGameState.Inactive;
+            this.mGameState = eGameState.Active;
             this.mTurn = 0;
             this.mPlayerIndex = 0;
             this.mPlayer = GameSettings.getInstance().getPlayers().get(mPlayerIndex);
+            this.mGameStart = Instant.now();
         }
 
         // Adjust game status when a player has finished his turn.
@@ -132,6 +137,16 @@ public class Logic implements ILogic {
 
         int getNextPlayerIndex() {
             return ++mPlayerIndex % GameSettings.getInstance().getPlayers().size();
+        }
+
+        @Override
+        public String getNameOfPlayerCurrentlyPlaying() {
+            return mPlayer.getName();
+        }
+
+        @Override
+        public Duration getGameDuration() {
+            return Duration.between(mGameStart, Instant.now());
         }
     }
 }

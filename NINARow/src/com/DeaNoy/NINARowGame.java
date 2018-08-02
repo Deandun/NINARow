@@ -2,12 +2,15 @@ package com.DeaNoy;
 
 import Logic.Enums.eGameState;
 import Logic.Exceptions.InvalidFileInputException;
+import Logic.Interfaces.IGameStatus;
 import Logic.Models.Cell;
 import Logic.Models.GameSettings;
 import Logic.Logic;
+import Logic.Models.Player;
 import Logic.Models.PlayerTurn;
 
 import java.awt.*;
+import java.util.Collection;
 
 public class NINARowGame {
     private InputManager mInputManager;
@@ -34,14 +37,23 @@ public class NINARowGame {
     }
 
     private eGameOptions getCommandFromPlayer() {
-        // TODO: check if the selected option is valid (e.g. selected start game before game was loaded, etc).
-        return mInputManager.GetCommandFromPlayer(mLogic.GetCurrentPlayer());
+        return mInputManager.GetCommandFromPlayer();
     }
 
-    // Game commands implemenetation
+    // Game commands implementation
 
     private void showTurnHistory() {
-
+        // Create a new board to display the changes between turns.
+        Board board = new Board(GameSettings.getInstance().getRows(), GameSettings.getInstance().getColumns());
+        System.out.println("Showing turn history:");
+        mLogic.GetTurnHistory().forEach(
+                (turn) -> {
+                    Player player = turn.getPlayer();
+                    System.out.println(player.getName() + " has inserted into column: " + turn.getUpdatedCell().getColumnIndex() + " (row " + turn.getUpdatedCell().getRowIndex() + ").");
+                    board.UpdateBoard(turn.getUpdatedCell().getRowIndex(), turn.getUpdatedCell().getColumnIndex(), ConsoleConfig.GetSignForPlayerID(player.getID()));
+                    board.PrintBoard();
+                }
+        );
     }
 
     private boolean playTurn() {
@@ -69,15 +81,16 @@ public class NINARowGame {
     }
 
     private void showGameStatus() {
-        //Logic.Logic.GameStatus gameStatus = mLogic.GetGameStatus();
+        IGameStatus gameStatus = mLogic.GetGameStatus();
 
-        //TODO: Change GameMenu.PrintGameStatus to receive gameStatus and print the required details
+        GameMenu.PrintGameStatus(gameStatus);
     }
 
     private void startGame() {
         mLogic.StartGame();
         ConsoleConfig.InitPlayerSigns(GameSettings.getInstance().getPlayers());
         mBoard = new Board(GameSettings.getInstance().getRows(), GameSettings.getInstance().getColumns());
+        // Todo: Set computer algo
     }
 
     private void readGameFile() {
@@ -101,14 +114,14 @@ public class NINARowGame {
                 break;
             case StartGame:
                 startGame();
-                mBoard.PrintBoard(); // TODO: temp print, for debugging.
+                mBoard.PrintBoard(); // TODO: temp print, for debugging. Find a better place to print
                 break;
             case ShowGameStatus:
                 showGameStatus();
                 break;
             case PlayTurn:
                 shouldContinueGame = playTurn();
-                mBoard.PrintBoard(); // TODO: temp print, for debugging.
+                mBoard.PrintBoard(); // TODO: temp print, for debugging. Find a better place to print
                 break;
             case ShowTurnHistory:
                 showTurnHistory();
@@ -140,14 +153,17 @@ public class NINARowGame {
             System.out.println("The game has ended in a draw. This means every one's a winner!");
         }
 
-        public static void PrintGameStatus(int activePlayerIndex, String[] playerNames, char[] playerBoardSigns, int player1TurnCounter, int player2TurnCounter, String timeSinceGameStarted) {
+        public static void PrintGameStatus(IGameStatus gameStatus) {
+            // Print player that's currently playing
             System.out.println("Game status:" + System.lineSeparator() +
-                                "Player " + playerNames[activePlayerIndex] + " is currently playing." + System.lineSeparator() +
-                                playerNames[0] + "'s board sign: " + playerBoardSigns[0] + "." + System.lineSeparator() +
-                                playerNames[1] + "'s board sign: " + playerBoardSigns[1] + "." + System.lineSeparator() +
-                                playerNames[0] + " has played " + player1TurnCounter + " turns." + System.lineSeparator() +
-                                playerNames[1] + " has played " + player2TurnCounter + " turns." + System.lineSeparator() +
-                                "Time since game started: " + timeSinceGameStarted + ".");
+                        gameStatus.getNameOfPlayerCurrentlyPlaying() + ": is currently playing.");
+
+            // Print player names and their signs
+            GameSettings.getInstance().getPlayers().forEach(
+                    (player) -> System.out.println(player.getName() + "'s sign is: " + ConsoleConfig.GetSignForPlayerID(player.getID()))
+            );
+            // Print elapsed time
+            System.out.println("Elapsed game time: " + gameStatus.getGameDuration());
         }
     }
 }

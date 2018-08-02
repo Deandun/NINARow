@@ -11,22 +11,17 @@ import java.util.Scanner;
 public class InputManager {
     private Scanner scanner = new Scanner(System.in);
 
-    public eGameOptions GetCommandFromPlayer(Player player) {
+    public eGameOptions GetCommandFromPlayer() {
         boolean isInputValid;
         eGameOptions playerChoice = eGameOptions.Exit;
         int selectedOption;
 
-        if (player == null || player.getType() == ePlayerType.Human) { // handle human user chosen option
-            do {
-                selectedOption = scanner.nextInt();
-                isInputValid = eGameOptions.isIndexInRange(selectedOption);
-            } while (!isInputValid);
+        do {
+            selectedOption = scanner.nextInt();
+            isInputValid = eGameOptions.isIndexInRange(selectedOption);
+        } while (!isInputValid);
 
-            playerChoice = convertIndexToGameOption(selectedOption);
-        }
-        else {
-            playerChoice = eGameOptions.PlayTurn; // if computer's turn, always return "play turn" option.
-        }
+        playerChoice = convertIndexToGameOption(selectedOption);
 
         return playerChoice;
     }
