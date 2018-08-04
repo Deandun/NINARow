@@ -2,9 +2,9 @@ package Logic;
 
 import Logic.Enums.eGameState;
 import Logic.Exceptions.InvalidFileInputException;
-import Logic.Exceptions.InvalidUserInputException;
 import Logic.Interfaces.IGameStatus;
 import Logic.Interfaces.ILogic;
+import Logic.Managers.HistoryFileManager;
 import Logic.Managers.FileManager;
 import Logic.Managers.HistoryManager;
 import Logic.Models.*;
@@ -54,32 +54,45 @@ public class Logic implements ILogic {
     }
 
     //@Override
-    public PlayerTurn PlayTurn(int column) throws Exception, InvalidUserInputException {
+    public PlayerTurn PlayTurn(int column) throws Exception {
         Cell chosenCell = mGameBoard.UpdateBoard(column, mGameStatus.getPlayer()); // send parameter to logic board
         PlayerTurn playerTurn  = updateGameStatus(chosenCell);
 
         // Update game state when turn ends.
         mGameStatus.mGameState = playerTurn.getGameState();
-        mHistoryManager.SaveTurn(playerTurn);
+        mHistoryManager.SetCurrentTurn(playerTurn);
         mGameStatus.FinishedTurn();
-
         return playerTurn;
     }
 
     //@Override
-    private PlayerTurn updateGameStatus(Cell updatedCell) {
+    private PlayerTurn updateGameStatus(Cell updatedCell) throws Exception {
         eGameState currentGameState = mGameBoard.getCurrentGameState(updatedCell);
-        return new PlayerTurn(updatedCell, updatedCell.getPlayer(), currentGameState);
+        PlayerTurn playerTurn = new PlayerTurn();
+        playerTurn.setUpdatedCell(updatedCell);
+        playerTurn.setPlayerTurn(updatedCell.getPlayer());
+        playerTurn.setGameState(currentGameState);
+
+        return playerTurn;
+        //return new PlayerTurn() ;//updatedCell, updatedCell.getPlayer(), currentGameState);
     }
 
     //@Override
     public Collection<PlayerTurn> GetTurnHistory() {
         // send parameters to history manager
-        return mHistoryManager.GetGameHistory();
+        return this.mHistoryManager.GetGameHistory();
     }
 
     public Player GetCurrentPlayer() {
-        return mGameStatus.getPlayer();
+        return this.mGameStatus.getPlayer();
+    }
+
+    public void saveGame(String path) throws Exception {
+        HistoryFileManager.saveGameHistorInXMLFile(path, mHistoryManager);
+    }
+
+    public Player loadExistsGame(String path){
+        return HistoryFileManager.readGameHistoryFromXMLFile(path);
     }
 
     public class GameStatus implements IGameStatus {
@@ -128,7 +141,7 @@ public class Logic implements ILogic {
                 gameActivation += "not active";
             }
 
-            return gameActivation + ", Turn number is " + mTurn + ", Player turn is: " + this.mPlayer.getName(); //TODO: check player's get name
+            return gameActivation + ", Turn number is " + mTurn + ", Player turn is: " + this.mPlayer.getName();
         }
 
         // Helper functions

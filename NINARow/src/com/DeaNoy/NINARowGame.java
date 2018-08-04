@@ -3,14 +3,11 @@ package com.DeaNoy;
 import Logic.Enums.eGameState;
 import Logic.Exceptions.InvalidFileInputException;
 import Logic.Interfaces.IGameStatus;
-import Logic.Models.Cell;
+import Logic.Managers.HistoryFileManager;
 import Logic.Models.GameSettings;
 import Logic.Logic;
 import Logic.Models.Player;
 import Logic.Models.PlayerTurn;
-
-import java.awt.*;
-import java.util.Collection;
 
 public class NINARowGame {
     private InputManager mInputManager;
@@ -23,11 +20,8 @@ public class NINARowGame {
     }
 
     public void RunGame() {
-        GameSettings.getInstance().DummyInit();
         boolean shouldContinuePlaying = true;
         eGameOptions currentOption;
-
-        //TODO: read player details from user
 
         while(shouldContinuePlaying) {
             GameMenu.PrintMenu();
@@ -87,10 +81,31 @@ public class NINARowGame {
     }
 
     private void startGame() {
+       // System.out.println("Succeed! " + mLogic.loadExistsGame("Noy123.xml").toString()); //TODO: TEMP _ TO relocate
+       // System.out.println(mLogic.GetTurnHistory().toString());
+
+        if (mLogic.GetGameStatus().getGameState() != null && mLogic.GetGameStatus().getGameState().equals(eGameState.Active)){
+            saveGame();
+        }
+        String computerPlayer = mInputManager.GetPlayersType();
+        initPlayer(computerPlayer);
         mLogic.StartGame();
+
         ConsoleConfig.InitPlayerSigns(GameSettings.getInstance().getPlayers());
         mBoard = new Board(GameSettings.getInstance().getRows(), GameSettings.getInstance().getColumns());
         // Todo: Set computer algo
+    }
+
+    private void initPlayer(String computerPlayer) { //initialize players in game settings
+        if (computerPlayer.contains("1")){
+            GameSettings.getInstance().InitPlayers("Computer" , "Human");
+        }
+        else if (computerPlayer.contains("2")){
+            GameSettings.getInstance().InitPlayers("Human", "Computer");
+        }
+        else{
+            GameSettings.getInstance().InitPlayers("Human", "Human");
+        }
     }
 
     private void readGameFile() {
@@ -99,9 +114,9 @@ public class NINARowGame {
             mLogic.ReadGameFile(fileName);
         } catch (InvalidFileInputException e) {
             //TODO: informative message to the user.
+            System.out.println("Couldn't find " + fileName + " file!");
         }
     }
-
 
     // Helper functions
 
@@ -127,11 +142,22 @@ public class NINARowGame {
                 showTurnHistory();
                 break;
             case Exit:
+                saveGame();
                 shouldContinueGame = false;
                 break;
         }
 
         return shouldContinueGame;
+    }
+
+    private void saveGame() {
+        if (mInputManager.IsUserWantToSaveTheGame()){
+            try {
+                mLogic.saveGame(mInputManager.getHistoryFileName() + ".xml");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     // Private inner static class that prints the game menu and notifications.

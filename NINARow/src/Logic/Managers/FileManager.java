@@ -27,11 +27,17 @@ public class FileManager {
         return mIsFileLoaded;
     }
 
+<<<<<<< HEAD
     public void LoadGameFile(String filePath) throws InvalidFileInputException, FileNotFoundException, IOException, JAXBException {
         Game gameInfo = getDataFromFile(filePath);
+
         checkIfFileInputIsValid(gameInfo); // Throws if input is invalid
         setData(gameInfo);
+        mIsFileLoaded = true;
+
     }
+
+    public boolean isFileLoaded() {return mIsFileLoaded;}
 
     private Game getDataFromFile(String filePath) throws FileNotFoundException, IOException, JAXBException {
         Game game;
@@ -78,7 +84,5 @@ public class FileManager {
             throw new InvalidFileInputException("Target in file is invalid. Must be bellow " +
                                                 Math.min(gameInfo.getBoard().getColumns().intValue(), gameInfo.getBoard().getRows()));
         }
-
-        mIsFileLoaded = true; // No exceptions thrown, file loaded successfully
     }
 }

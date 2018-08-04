@@ -32,17 +32,17 @@ public class GameSettings {
         return ourInstance;
     }
 
-    public void DummyInit() {
-        //TODO: dummy impl! get players from input or file
+    public void InitPlayers(String player1Type, String player2Type) {
+        //TODO: Should we get players name from user as well?
         Player player1 = new Player();
-        player1.init("1", "Aviad", ePlayerType.Human);
+        player1.init("1", "Aviad", ePlayerType.ConvertStringToePlayerType(player1Type));
         Player player2 = new Player();
-        player2.init("2", "Guy", ePlayerType.Human);
+        player2.init("2", "Guy", ePlayerType.ConvertStringToePlayerType(player2Type));
 
         mPlayers.add(player1);
         mPlayers.add(player2);
-    }
 
+    }
     public int getTarget() {
         return mTarget;
     }

@@ -2,6 +2,11 @@ package Logic.Models;
 
 import Logic.Enums.ePlayerType;
 
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement
 public class Player {
 
     private String mID;
@@ -9,12 +14,11 @@ public class Player {
     private String mName;
     private ePlayerType mType;
 
-
     public void init(String ID, String name, ePlayerType type) {
-        this.mID = ID;
-        this.mTurnCounter = 0;
-        this.mName = name;
-        this.mType = type;
+        setID(ID);
+        setTurnCounter(0);
+        setName(name);
+        setType(type);
     }
 
     @Override
@@ -44,5 +48,26 @@ public class Player {
 
     public ePlayerType getType() {
         return mType;
+    }
+
+    public int getTurnCounter(){return mTurnCounter;}
+
+    @XmlAttribute
+    public void setID(String ID) {
+        this.mID = ID;
+    }
+
+    @XmlElement
+    public void setTurnCounter(int turnCounter) {
+        this.mTurnCounter = turnCounter;
+    }
+
+    @XmlElement
+    public void setName(String name) {
+        this.mName = name;
+    }
+
+    public void setType(ePlayerType mType) {
+        this.mType = mType;
     }
 }
