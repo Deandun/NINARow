@@ -9,6 +9,8 @@ import Logic.Managers.FileManager;
 import Logic.Managers.HistoryManager;
 import Logic.Models.*;
 
+import javax.xml.bind.JAXBException;
+import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Collection;
@@ -29,7 +31,7 @@ public class Logic implements ILogic {
     // ILogic interface implementation.
 
     //@Override
-    public void ReadGameFile(String filePath) throws InvalidFileInputException {
+    public void ReadGameFile(String filePath) throws InvalidFileInputException, IOException, JAXBException {
         mFileManager.LoadGameFile(filePath);
     }
 
