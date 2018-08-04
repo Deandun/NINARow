@@ -16,9 +16,6 @@ public class HistoryManager {
         mPlayerTurns.add(playerTurn); //Add new turn to history collection
     }
 
-    public PlayerTurn getCurrentTurn(){
-        return this.mPlayerTurns.get(0); //TODO: temp
-    }
     public void Clear() {
         mPlayerTurns.clear();
     }

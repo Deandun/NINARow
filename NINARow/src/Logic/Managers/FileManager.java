@@ -6,6 +6,7 @@ import Logic.Models.GameSettings;
 import Logic.Models.Player;
 import Logic.jaxb.schema.generated.Board;
 import Logic.jaxb.schema.generated.Game;
+import Logic.jaxb.schema.generated.GameDescriptor;
 import Logic.jaxb.schema.generated.Players;
 
 import javax.xml.bind.JAXBContext;
@@ -27,36 +28,35 @@ public class FileManager {
         return mIsFileLoaded;
     }
 
-<<<<<<< HEAD
     public void LoadGameFile(String filePath) throws InvalidFileInputException, FileNotFoundException, IOException, JAXBException {
-        Game gameInfo = getDataFromFile(filePath);
+        mIsFileLoaded = false; // Reset flag before checking if current file loaded successfully.
+        GameDescriptor gameDescriptor = getDataFromFile(filePath);
 
-        checkIfFileInputIsValid(gameInfo); // Throws if input is invalid
-        setData(gameInfo);
+        checkIfFileInputIsValid(gameDescriptor); // Throws if input is invalid
+        setData(gameDescriptor);
         mIsFileLoaded = true;
 
     }
 
-    public boolean isFileLoaded() {return mIsFileLoaded;}
-
-    private Game getDataFromFile(String filePath) throws FileNotFoundException, IOException, JAXBException {
-        Game game;
+    private GameDescriptor getDataFromFile(String filePath) throws FileNotFoundException, IOException, JAXBException {
+        GameDescriptor gameDescriptor;
 
         try(InputStream inputStream = new FileInputStream(filePath)) {
-            game = deserializeFrom(inputStream);
+            gameDescriptor = deserializeFrom(inputStream);
         }
 
-        return game;
+        return gameDescriptor;
     }
 
-    private Game deserializeFrom(InputStream in) throws JAXBException {
+    private GameDescriptor deserializeFrom(InputStream in) throws JAXBException {
         JAXBContext jc = JAXBContext.newInstance(JAXB_XML_GAME_PACKAGE_NAME);
         Unmarshaller u = jc.createUnmarshaller();
 
-        return (Game) u.unmarshal(in);
+        return (GameDescriptor) u.unmarshal(in);
     }
 
-    private void setData(Game gameInfo) {
+    private void setData(GameDescriptor gameDescriptor) {
+        Game gameInfo = gameDescriptor.getGame();
         GameSettings gameSettings = GameSettings.getInstance();
         Board boardInfo = gameInfo.getBoard();
 
@@ -66,8 +66,8 @@ public class FileManager {
         gameSettings.setVariant(eVariant.valueOf(gameInfo.getVariant()));
     }
 
-    private void checkIfFileInputIsValid(Game gameInfo) throws InvalidFileInputException {
-        mIsFileLoaded = false; // Reset this boolean for the new file that is being loaded.
+    private void checkIfFileInputIsValid(GameDescriptor gameDescriptor) throws InvalidFileInputException {
+        Game gameInfo = gameDescriptor.getGame();
 
         //check validation of rows number
         if (gameInfo.getBoard().getRows() < GameSettings.MIN_BOARD_ROWS || gameInfo.getBoard().getRows() > GameSettings.MAX_BOARD_ROWS) {

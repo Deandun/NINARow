@@ -95,6 +95,10 @@ public class Logic implements ILogic {
         return HistoryFileManager.readGameHistoryFromXMLFile(path);
     }
 
+    public Board getBoard() {
+        return mGameBoard;
+    }
+
     public class GameStatus implements IGameStatus {
         private eGameState mGameState;
         private int mTurn = 0;

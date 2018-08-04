@@ -3,11 +3,13 @@ package com.DeaNoy;
 import Logic.Enums.eGameState;
 import Logic.Exceptions.InvalidFileInputException;
 import Logic.Interfaces.IGameStatus;
-import Logic.Managers.HistoryFileManager;
 import Logic.Models.GameSettings;
 import Logic.Logic;
 import Logic.Models.Player;
 import Logic.Models.PlayerTurn;
+
+import javax.xml.bind.JAXBException;
+import java.io.IOException;
 
 public class NINARowGame {
     private InputManager mInputManager;
@@ -87,13 +89,13 @@ public class NINARowGame {
         if (mLogic.GetGameStatus().getGameState() != null && mLogic.GetGameStatus().getGameState().equals(eGameState.Active)){
             saveGame();
         }
+
+        mBoard = new Board(GameSettings.getInstance().getRows(), GameSettings.getInstance().getColumns());
         String computerPlayer = mInputManager.GetPlayersType();
         initPlayer(computerPlayer);
         mLogic.StartGame();
 
         ConsoleConfig.InitPlayerSigns(GameSettings.getInstance().getPlayers());
-        mBoard = new Board(GameSettings.getInstance().getRows(), GameSettings.getInstance().getColumns());
-        // Todo: Set computer algo
     }
 
     private void initPlayer(String computerPlayer) { //initialize players in game settings
@@ -113,8 +115,11 @@ public class NINARowGame {
         try {
             mLogic.ReadGameFile(fileName);
         } catch (InvalidFileInputException e) {
-            //TODO: informative message to the user.
             System.out.println("Couldn't find " + fileName + " file!");
+        } catch (JAXBException e) {
+            // TODO: add message to user
+        } catch (IOException e) {
+            // TODO: add message to user
         }
     }
 

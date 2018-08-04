@@ -19,10 +19,9 @@ public class GameSettings {
     public static final int MIN_BOARD_COLS = 6;
 
     private List<Player> mPlayers = new ArrayList<>();
-    //TODO: Change dummy
-    private int mTarget = 4;
-    private int mRows = 6;
-    private int mColumns = 17;
+    private int mTarget;
+    private int mRows;
+    private int mColumns;
     private eVariant mVariant;
 
     private GameSettings() {

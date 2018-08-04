@@ -22,7 +22,7 @@ public class Board {
         }
     }
 
-    public Cell[][] getBoard() {
+    public Cell[][] getCellArray() {
         return mBoard;
     }
 
@@ -170,7 +170,7 @@ public class Board {
         return isBoardFull;
     }
 
-    private boolean isColumnFull(int columnIndex) {
+    public boolean isColumnFull(int columnIndex) {
         return !mBoard[0][columnIndex].isEmpty();
     }
 }
