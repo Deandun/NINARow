@@ -13,7 +13,7 @@ public class InputManager {
 
     public eGameOptions GetCommandFromPlayer() {
         boolean isInputValid;
-        eGameOptions playerChoice = eGameOptions.Exit;
+        eGameOptions playerChoice;
         int selectedOption;
 
         do {
@@ -28,13 +28,12 @@ public class InputManager {
 
     public int GetColumnIndexFromPlayer(ePlayerType playerType) {
         int cellInput;
-        boolean isValidColumn = false;
 
         if (playerType.equals(ePlayerType.Human)){
-            System.out.println("Please select the column you wish to insert the disc into (1 to " + GameSettings.getInstance().getColumns());
+            System.out.println("Please select the column you wish to insert the disc into (1 to " + GameSettings.getInstance().getColumns() + ')');
             cellInput = getInputFromHumanPlayer();
         } else {
-            // TODO: Call computer's algorithm
+            System.out.println("Computer");
             cellInput = 1;
         }
 
@@ -79,15 +78,68 @@ public class InputManager {
     }
 
     public String GetFileNameFromPlayer() {
+        return GetInputFromUser("Please enter the game file's name (must be in xml format)");
+    }
+
+    public String GetPlayersType() {
+        int playerInd = 1;
+        String playerType;
+        String computerPlayers;
+
+        playerType = getPlayerType(playerInd); //get player1's type from user
+
+        if (playerType.equals("computer")){ //in case player1 is computer - second player is automatically human
+            System.out.println("Player1 is a computer and Player2 is a human");
+            computerPlayers = "player 1";
+        }
+        else{
+            playerType = getPlayerType(++playerInd);
+            System.out.println("Player1 is a human and Player2 is a " + playerType);
+            computerPlayers = playerType.equals("computer") ? "player2" : "none";
+        }
+
+        return computerPlayers;
+    }
+
+    private String getPlayerType(int playerInd) { //get player type from user
+        boolean isInputValid;
+        String playerType;
+
+        do{
+            playerType = GetInputFromUser("Please insert the type of player " + playerInd + " (Human/Computer)");
+            isInputValid = playerType.toLowerCase().equals("human") || playerType.toLowerCase().equals("computer") ;
+        }while(!isInputValid);
+
+        return playerType.toLowerCase();
+    }
+
+    public String GetInputFromUser(String output) { //generic method that gets non empty input from user
+
         boolean isInputValid = false;
         String inputString = new String();
 
         while(!isInputValid) {
-            System.out.println("Please enter the game file's name (must be in xml format)");
+            System.out.println(output);
             inputString = scanner.next();
             isInputValid = inputString != null && !inputString.isEmpty();
         }
 
         return inputString;
+    }
+
+    public String getHistoryFileName() {
+        return GetInputFromUser("Please insert file name to save the game");
+    }
+
+    public boolean IsUserWantToSaveTheGame() {
+        String selectedOption;
+        boolean isInputValid;
+        do {
+            selectedOption = GetInputFromUser("Do you want to save game? (y/n)");
+            isInputValid = selectedOption.contentEquals("y") || selectedOption.contentEquals("n")
+                    || selectedOption.contentEquals("Y") || selectedOption.contentEquals("N");
+        } while(!isInputValid);
+
+        return selectedOption.contentEquals("y");
     }
 }

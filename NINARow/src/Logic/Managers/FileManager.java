@@ -15,9 +15,13 @@ public class FileManager {
     public void LoadGameFile(String filePath) throws InvalidFileInputException {
         readDataFromFile(filePath);
         checkIfFileInputIsValid(); // Throws if input is invalid
+        mIsFileLoaded = true;
     }
 
+    public boolean isFileLoaded() {return mIsFileLoaded;}
+
     private void readDataFromFile(String filePath) {
+
         // TODO: Don't forget to close file when done
     }
 
@@ -43,6 +47,5 @@ public class FileManager {
                                                 Math.min(gameSettings.getColumns(), gameSettings.getRows()));
         }
 
-        mIsFileLoaded = true; // File loaded successfully
     }
 }
