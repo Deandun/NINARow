@@ -2,8 +2,6 @@ package com.DeaNoy;
 
 import Logic.Enums.ePlayerType;
 import Logic.Models.GameSettings;
-import Logic.Models.Player;
-
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
@@ -12,13 +10,16 @@ public class InputManager {
     private Scanner scanner = new Scanner(System.in);
 
     public eGameOptions GetCommandFromPlayer() {
-        boolean isInputValid;
+        boolean isInputValid = false;
         eGameOptions playerChoice;
-        int selectedOption;
-
+        int selectedOption = 6; //TODO change initialise
         do {
-            selectedOption = scanner.nextInt();
-            isInputValid = eGameOptions.isIndexInRange(selectedOption);
+            try{ //handle exception in case input is not an integer
+                selectedOption = scanner.nextInt();
+                isInputValid = eGameOptions.isIndexInRange(selectedOption);
+
+            }catch (InputMismatchException e){}
+
         } while (!isInputValid);
 
         playerChoice = convertIndexToGameOption(selectedOption);
@@ -72,6 +73,10 @@ public class InputManager {
                 return eGameOptions.PlayTurn;
             case 5:
                 return eGameOptions.ShowTurnHistory;
+            case 7:
+                return eGameOptions.SaveGame;
+            case 8:
+                return eGameOptions.LoadExitsGame;
             default:
                 return eGameOptions.Exit;
         }
@@ -127,19 +132,18 @@ public class InputManager {
         return inputString;
     }
 
-    public String getHistoryFileName() {
-        return GetInputFromUser("Please insert file name to save the game");
-    }
-
     public boolean IsUserWantToSaveTheGame() {
         String selectedOption;
         boolean isInputValid;
         do {
-            selectedOption = GetInputFromUser("Do you want to save game? (y/n)");
-            isInputValid = selectedOption.contentEquals("y") || selectedOption.contentEquals("n")
-                    || selectedOption.contentEquals("Y") || selectedOption.contentEquals("N");
+            selectedOption = GetInputFromUser("Do you want to save game? (y/n)").toLowerCase();
+            isInputValid = GetYesOrNotAnswer(selectedOption);
         } while(!isInputValid);
 
         return selectedOption.contentEquals("y");
+    }
+
+    public boolean GetYesOrNotAnswer(String input){
+        return input.toLowerCase().contentEquals("y") || input.toLowerCase().contentEquals("n");
     }
 }

@@ -5,9 +5,9 @@ import Logic.Enums.ePlayerType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.io.Serializable;
 
-@XmlRootElement
-public class Player {
+public class Player implements Serializable {
 
     private String mID;
     private int mTurnCounter;
@@ -52,17 +52,14 @@ public class Player {
 
     public int getTurnCounter(){return mTurnCounter;}
 
-    @XmlAttribute
     public void setID(String ID) {
         this.mID = ID;
     }
 
-    @XmlElement
     public void setTurnCounter(int turnCounter) {
         this.mTurnCounter = turnCounter;
     }
 
-    @XmlElement
     public void setName(String name) {
         this.mName = name;
     }

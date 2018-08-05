@@ -9,6 +9,7 @@ import Logic.Models.Player;
 import Logic.Models.PlayerTurn;
 
 import javax.xml.bind.JAXBException;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 public class NINARowGame {
@@ -83,13 +84,6 @@ public class NINARowGame {
     }
 
     private void startGame() {
-       // System.out.println("Succeed! " + mLogic.loadExistsGame("Noy123.xml").toString()); //TODO: TEMP _ TO relocate
-       // System.out.println(mLogic.GetTurnHistory().toString());
-
-        if (mLogic.GetGameStatus().getGameState() != null && mLogic.GetGameStatus().getGameState().equals(eGameState.Active)){
-            saveGame();
-        }
-
         mBoard = new Board(GameSettings.getInstance().getRows(), GameSettings.getInstance().getColumns());
         String computerPlayer = mInputManager.GetPlayersType();
         initPlayer(computerPlayer);
@@ -146,23 +140,49 @@ public class NINARowGame {
             case ShowTurnHistory:
                 showTurnHistory();
                 break;
-            case Exit:
+            case SaveGame:
                 saveGame();
+                break;
+            case LoadExitsGame:
+                loadExistsGame();
+                break;
+            default:
                 shouldContinueGame = false;
                 break;
         }
-
         return shouldContinueGame;
     }
 
     private void saveGame() {
         if (mInputManager.IsUserWantToSaveTheGame()){
             try {
-                mLogic.saveGame(mInputManager.getHistoryFileName() + ".xml");
-            } catch (Exception e) {
+                mLogic.saveGame();
+            } catch (Exception e) { //TODO
                 e.printStackTrace();
             }
         }
+    }
+
+    private void loadExistsGame(){
+        boolean isFileLoaded = false;
+
+        do {
+            try {
+                mLogic.loadExistsGame();
+                isFileLoaded = true;
+                System.out.println("File Loaded Successfully! ");
+            } catch (FileNotFoundException e){
+                System.out.println(e.getMessage() + "ERROR couldn't find the file");
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                System.out.println(e.getMessage() + " ERROR reading from file :(");
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+
+        }while(!isFileLoaded);
+
     }
 
     // Private inner static class that prints the game menu and notifications.
@@ -176,11 +196,11 @@ public class NINARowGame {
             }
         }
 
-        public static void PrintVictoryMessage(String winnerName) {
+        public static void PrintVictoryMessage(String winnerName) { //TODO: use
             System.out.println(winnerName + " has won the game. Congratulations!");
         }
 
-        public static void PrintDrawMessage() {
+        public static void PrintDrawMessage() { //TODO: use
             System.out.println("The game has ended in a draw. This means every one's a winner!");
         }
 

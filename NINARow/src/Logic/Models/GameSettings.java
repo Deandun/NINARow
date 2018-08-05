@@ -17,6 +17,7 @@ public class GameSettings {
     public static final int MIN_BOARD_ROWS = 5;
     public static final int MAX_BOARD_COLS = 60;
     public static final int MIN_BOARD_COLS = 6;
+    private static final String SAVED_GAME_FILE_NAME = "DeaNoy_Game.txt";
 
     private List<Player> mPlayers = new ArrayList<>();
     private int mTarget;
@@ -29,6 +30,10 @@ public class GameSettings {
 
     public static GameSettings getInstance() {
         return ourInstance;
+    }
+
+    public static String getSavedGameFileName() {
+        return SAVED_GAME_FILE_NAME;
     }
 
     public void InitPlayers(String player1Type, String player2Type) {

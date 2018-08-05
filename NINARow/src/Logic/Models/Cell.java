@@ -3,10 +3,10 @@ package Logic.Models;
 import Logic.Exceptions.InvalidUserInputException;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.io.Serializable;
 
 
-@XmlRootElement
-public class Cell {
+public class Cell implements Serializable {
 
     private Player mPlayer;
     private int mColumnIndex;
@@ -24,7 +24,6 @@ public class Cell {
         return mColumnIndex;
     }
 
-    @XmlElement
     public void setColumnIndex(int columnIndex) {
         this.mColumnIndex = columnIndex;
     }
@@ -33,12 +32,10 @@ public class Cell {
         return mRowIndex;
     }
 
-    @XmlElement
     public void setRowIndex(int rowIndex) {
         this.mRowIndex = rowIndex;
     }
 
-    @XmlElement
     public void setPlayer(Player player) throws Exception {
         if (this.isEmpty()){
             this.mPlayer = player;
@@ -51,5 +48,4 @@ public class Cell {
     public Player getPlayer() {
         return mPlayer;
     }
-
 }

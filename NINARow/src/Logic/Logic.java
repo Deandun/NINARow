@@ -10,10 +10,13 @@ import Logic.Managers.HistoryManager;
 import Logic.Models.*;
 
 import javax.xml.bind.JAXBException;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Collection;
+import java.util.List;
 
 public class Logic implements ILogic {
 
@@ -62,6 +65,7 @@ public class Logic implements ILogic {
         mGameStatus.mGameState = playerTurn.getGameState();
         mHistoryManager.SetCurrentTurn(playerTurn);
         mGameStatus.FinishedTurn();
+
         return playerTurn;
     }
 
@@ -87,12 +91,28 @@ public class Logic implements ILogic {
         return this.mGameStatus.getPlayer();
     }
 
-    public void saveGame(String path) throws Exception {
-        HistoryFileManager.saveGameHistorInXMLFile(path, mHistoryManager);
+    public void saveGame() throws  IOException, ClassNotFoundException, Exception {
+        HistoryFileManager.saveGameHistoryInXMLFile(GameSettings.getSavedGameFileName(), mHistoryManager.GetGameHistory());
     }
 
-    public Player loadExistsGame(String path){
-        return HistoryFileManager.readGameHistoryFromXMLFile(path);
+    public void loadExistsGame() throws IOException, ClassNotFoundException, Exception {
+        String path = GameSettings.getSavedGameFileName();
+        File loadedFile = new File(path);
+
+        if (!loadedFile.exists()) {
+            throw new FileNotFoundException("Cannot find file: " + path);
+        }
+
+        if (loadedFile.exists()) {
+            List<PlayerTurn> currentGame = HistoryFileManager.readGameHistoryFromXMLFile(path);
+
+            if (currentGame != null) {
+                mGameBoard.Clear();
+                for (PlayerTurn turn : currentGame) {
+                    this.PlayTurn(turn.getUpdatedCell().getColumnIndex());
+                }
+            }
+        }
     }
 
     public Board getBoard() {

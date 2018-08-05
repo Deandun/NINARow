@@ -7,7 +7,9 @@ public enum eGameOptions {
     ShowGameStatus(3, "Show current game status."),
     PlayTurn(4, "Play turn."),
     ShowTurnHistory(5, "Show turn history."),
-    Exit(6, "Exit.");
+    Exit(6, "Exit."),
+    SaveGame(7, "Save game"),
+    LoadExitsGame(8, "Load exists game");
 
     private final int fIndex;
     private final String fDescription;

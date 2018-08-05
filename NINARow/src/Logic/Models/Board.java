@@ -5,9 +5,10 @@ import Logic.Exceptions.InvalidUserInputException;
 import Logic.Interfaces.ISequenceSearcher;
 import Logic.SequenceSearchers.*;
 
+import java.io.Serializable;
 import java.util.Arrays;
 
-public class Board {
+public class Board{
     private Cell[][] mBoard;
 
     public Board(int numRows, int numCols) {

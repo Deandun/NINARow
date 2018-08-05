@@ -2,11 +2,9 @@ package Logic.Models;
 
 import Logic.Enums.eGameState;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
+import java.io.Serializable;
 
-@XmlRootElement
-public class PlayerTurn {
+public class PlayerTurn  implements Serializable {
     private Cell mUpdatedCell;
     private Player mPlayer;
     private eGameState mGameState;
@@ -23,7 +21,6 @@ public class PlayerTurn {
         return mGameState;
     }
 
-    @XmlElement
     public void setGameState(eGameState gameState) {
         this.mGameState = gameState;
     }
@@ -34,13 +31,10 @@ public class PlayerTurn {
                 ", Chosen column = " + mUpdatedCell; //mUpdatedCell.getColumnIndex();
     }
 
-    @XmlElement
     public void setUpdatedCell(Cell updatedCell) {
         this.mUpdatedCell = updatedCell;
     }
 
-
-    @XmlElement
     public void setPlayerTurn(Player player) {
         this.mPlayer = player;
     }

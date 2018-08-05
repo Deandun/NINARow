@@ -35,7 +35,6 @@ public class FileManager {
         checkIfFileInputIsValid(gameDescriptor); // Throws if input is invalid
         setData(gameDescriptor);
         mIsFileLoaded = true;
-
     }
 
     private GameDescriptor getDataFromFile(String filePath) throws FileNotFoundException, IOException, JAXBException {
