@@ -1,6 +1,8 @@
 package Logic.Enums;
 
-public enum eVariant {
+import java.io.Serializable;
+
+public enum eVariant implements Serializable {
     Regular,
     Popout,
     Circular;

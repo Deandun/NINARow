@@ -1,6 +1,5 @@
 package com.DeaNoy;
 
-import Logic.Models.Cell;
 import Logic.Models.GameSettings;
 
 // The console UI board
@@ -8,7 +7,7 @@ public class Board {
 
     private static final char sfSeparator = '|';
     private static final int sfSeparatorStartIndex = 2; // The separator start in this index in every row
-    private static final int sfSeparatorsIncreamentor = 4; // The distance between 2 separators
+    private static final int sfSeparatorsIncrementer = 4; // The distance between 2 separators
     private char[][] mBoard;
     private int mPhysicRowsSize;
     private int mPhysicColsSize;
@@ -29,17 +28,22 @@ public class Board {
     }
 
     public void PrintBoard() {
+        System.out.println();
+
         for(char[] row: mBoard){
             System.out.println(row);
         }
+        System.out.println();
     }
 
     public void Clear() {
-        for (char[] column : mBoard) {
-            for (char cell : column) {
-                cell = ' ';
+
+        for(int i = 0; i < mPhysicRowsSize; i++) {
+            for(int j = 0; j < mPhysicColsSize; j++) {
+                mBoard[i][j] = ' ';
             }
         }
+
     }
 
     // Helper function
@@ -57,7 +61,7 @@ public class Board {
 
     private void setBoardSeparators() {
         for(char[] boardRow: mBoard) {
-            for(int i = sfSeparatorStartIndex; i < mPhysicColsSize; i += sfSeparatorsIncreamentor) {
+            for(int i = sfSeparatorStartIndex; i < mPhysicColsSize; i += sfSeparatorsIncrementer) {
                 boardRow[i] = sfSeparator;
             }
         }

@@ -12,10 +12,7 @@ import Logic.jaxb.schema.generated.Players;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.math.BigInteger;
 import java.util.List;
 
@@ -39,6 +36,10 @@ public class FileManager {
 
     private GameDescriptor getDataFromFile(String filePath) throws FileNotFoundException, IOException, JAXBException {
         GameDescriptor gameDescriptor;
+
+        if (!(new File(filePath)).exists()){
+            throw new FileNotFoundException("Couldn't find " + filePath + " file!");
+        }
 
         try(InputStream inputStream = new FileInputStream(filePath)) {
             gameDescriptor = deserializeFrom(inputStream);

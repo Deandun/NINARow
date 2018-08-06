@@ -8,23 +8,31 @@ import java.util.Scanner;
 // Receive input from human or "computer" user.
 public class InputManager {
     private Scanner scanner = new Scanner(System.in);
+    private static final int mErroInd = -1;
 
     public eGameOptions GetCommandFromPlayer() {
-        boolean isInputValid = false;
+        boolean isInputValid;
         eGameOptions playerChoice;
-        int selectedOption = 6; //TODO change initialise
+        int selectedOption;
+
         do {
-            try{ //handle exception in case input is not an integer
-                selectedOption = scanner.nextInt();
-                isInputValid = eGameOptions.isIndexInRange(selectedOption);
-
-            }catch (InputMismatchException e){}
-
+            System.out.println("What would you like to do? ");
+            selectedOption = getIntegerInput();
+            isInputValid = (selectedOption == mErroInd) ? false : eGameOptions.isIndexInRange(selectedOption);
         } while (!isInputValid);
 
         playerChoice = convertIndexToGameOption(selectedOption);
 
         return playerChoice;
+    }
+
+    private int getIntegerInput() {
+        try { //handle exception in case input is not an integer
+            return scanner.nextInt();
+        }catch (InputMismatchException e){
+            System.out.println("INVALID INPUT! Please choose a legal option");
+            return mErroInd;
+        }
     }
 
     public int GetColumnIndexFromPlayer(ePlayerType playerType) {

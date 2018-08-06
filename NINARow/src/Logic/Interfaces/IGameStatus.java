@@ -1,5 +1,6 @@
 package Logic.Interfaces;
 
+import Logic.Enums.eGameState;
 import Logic.Models.Player;
 
 import java.time.Duration;
@@ -10,4 +11,6 @@ public interface IGameStatus {
     String getNameOfPlayerCurrentlyPlaying();
 
     Duration getGameDuration();
+
+    eGameState getGameState();
 }

@@ -1,6 +1,8 @@
 package Logic.Enums;
 
-public enum ePlayerType {
+import java.io.Serializable;
+
+public enum ePlayerType implements Serializable {
     Human,
     Computer;
 

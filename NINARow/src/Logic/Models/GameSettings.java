@@ -2,14 +2,14 @@ package Logic.Models;
 
 import Logic.Enums.ePlayerType;
 import Logic.Enums.eVariant;
-import org.w3c.dom.Document;
 
+import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 // This class will contain all of the game related details that were read from the XML file.
-public class GameSettings {
+
+public class GameSettings implements Serializable {
 
     private static GameSettings ourInstance = new GameSettings();
 
@@ -36,8 +36,11 @@ public class GameSettings {
         return SAVED_GAME_FILE_NAME;
     }
 
+    public static void LoadNewInstance(GameSettings gameSettings) {
+        ourInstance = gameSettings;
+    }
+
     public void InitPlayers(String player1Type, String player2Type) {
-        //TODO: Should we get players name from user as well?
         Player player1 = new Player();
         player1.init("1", "Aviad", ePlayerType.ConvertStringToePlayerType(player1Type));
         Player player2 = new Player();
@@ -45,7 +48,6 @@ public class GameSettings {
 
         mPlayers.add(player1);
         mPlayers.add(player2);
-
     }
     public int getTarget() {
         return mTarget;
@@ -81,5 +83,9 @@ public class GameSettings {
 
     public void setVariant(eVariant variant) {
         this.mVariant = variant;
+    }
+
+    public void clear(){
+        mPlayers.clear();
     }
 }

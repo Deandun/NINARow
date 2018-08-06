@@ -34,12 +34,12 @@ public class Logic implements ILogic {
     // ILogic interface implementation.
 
     //@Override
-    public void ReadGameFile(String filePath) throws InvalidFileInputException, IOException, JAXBException {
+    public void ReadGameFile(String filePath) throws FileNotFoundException, InvalidFileInputException, IOException, JAXBException {
         mFileManager.LoadGameFile(filePath);
     }
 
     //@Override
-    public void StartGame() {
+    public void StartGame() throws NoSuchFieldException {
         // Set game board
         this.mGameBoard = new Board(GameSettings.getInstance().getRows(), GameSettings.getInstance().getColumns());
         this.mHistoryManager.Clear();
@@ -47,7 +47,7 @@ public class Logic implements ILogic {
         if (mFileManager.getIsFileLoaded()) {
             mGameStatus.StartNewGame();
         } else {
-            // TODO: File not loaded yet exception
+            throw new NoSuchFieldException("File is not loaded yet");
         }
     }
 
@@ -57,7 +57,7 @@ public class Logic implements ILogic {
     }
 
     //@Override
-    public PlayerTurn PlayTurn(int column) throws Exception {
+    public PlayerTurn PlayTurn(int column) throws  NullPointerException, Exception {
         Cell chosenCell = mGameBoard.UpdateBoard(column, mGameStatus.getPlayer()); // send parameter to logic board
         PlayerTurn playerTurn  = updateGameStatus(chosenCell);
 
@@ -69,6 +69,10 @@ public class Logic implements ILogic {
         return playerTurn;
     }
 
+    public boolean isGameActive(){
+        return (mGameStatus != null && mGameStatus.getGameState().equals(eGameState.Active));
+    }
+
     //@Override
     private PlayerTurn updateGameStatus(Cell updatedCell) throws Exception {
         eGameState currentGameState = mGameBoard.getCurrentGameState(updatedCell);
@@ -78,7 +82,6 @@ public class Logic implements ILogic {
         playerTurn.setGameState(currentGameState);
 
         return playerTurn;
-        //return new PlayerTurn() ;//updatedCell, updatedCell.getPlayer(), currentGameState);
     }
 
     //@Override
@@ -99,19 +102,19 @@ public class Logic implements ILogic {
         String path = GameSettings.getSavedGameFileName();
         File loadedFile = new File(path);
 
-        if (!loadedFile.exists()) {
-            throw new FileNotFoundException("Cannot find file: " + path);
-        }
-
         if (loadedFile.exists()) {
+            mGameBoard.Clear();
+
             List<PlayerTurn> currentGame = HistoryFileManager.readGameHistoryFromXMLFile(path);
 
             if (currentGame != null) {
-                mGameBoard.Clear();
                 for (PlayerTurn turn : currentGame) {
                     this.PlayTurn(turn.getUpdatedCell().getColumnIndex());
                 }
             }
+        }
+        else{
+            throw new FileNotFoundException("Cannot find file: " + path);
         }
     }
 
@@ -119,8 +122,12 @@ public class Logic implements ILogic {
         return mGameBoard;
     }
 
+    public eGameState GetGameState() {
+        return mGameStatus.getGameState();
+    }
+
     public class GameStatus implements IGameStatus {
-        private eGameState mGameState;
+        private eGameState mGameState = eGameState.Inactive;
         private int mTurn = 0;
         private Player mPlayer;
         private int mPlayerIndex;
@@ -135,6 +142,7 @@ public class Logic implements ILogic {
             return mPlayer;
         }
 
+        @Override
         public eGameState getGameState() { return mGameState; }
 
         // API
@@ -187,5 +195,6 @@ public class Logic implements ILogic {
         public Duration getGameDuration() {
             return Duration.between(mGameStart, Instant.now());
         }
+
     }
 }

@@ -7,6 +7,7 @@ public class Main {
     public static void main(String[] args) {
         NINARowGame ninaRowGame = new NINARowGame();
         System.out.println("Start a new game? (y/n)");
+
         while(shouldContinuePlaying()) {
             ninaRowGame.RunGame();
             System.out.println("Start a new game? (y/n)");
@@ -22,8 +23,10 @@ public class Main {
 
         do {
             selectedOption = scanner.next();
-            isInputValid = selectedOption.contentEquals("y") || selectedOption.contentEquals("n")
-                           || selectedOption.contentEquals("Y") || selectedOption.contentEquals("N");
+            isInputValid = selectedOption.toLowerCase().contentEquals("y") || selectedOption.toLowerCase().contentEquals("n");
+            if (!isInputValid){
+                System.out.println("Please choose y/n");
+            }
         } while(!isInputValid);
 
         return selectedOption.contentEquals("y");
