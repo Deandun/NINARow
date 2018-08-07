@@ -17,6 +17,8 @@ public class GameSettings implements Serializable {
     public static final int MIN_BOARD_ROWS = 5;
     public static final int MAX_BOARD_COLS = 60;
     public static final int MIN_BOARD_COLS = 6;
+    public static final int Min_TARGET = 2;
+
     private static final String SAVED_GAME_FILE_NAME = "DeaNoy_Game.txt";
 
     private List<Player> mPlayers = new ArrayList<>();

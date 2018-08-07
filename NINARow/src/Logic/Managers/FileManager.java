@@ -3,18 +3,14 @@ package Logic.Managers;
 import Logic.Enums.eVariant;
 import Logic.Exceptions.InvalidFileInputException;
 import Logic.Models.GameSettings;
-import Logic.Models.Player;
 import Logic.jaxb.schema.generated.Board;
 import Logic.jaxb.schema.generated.Game;
 import Logic.jaxb.schema.generated.GameDescriptor;
-import Logic.jaxb.schema.generated.Players;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import java.io.*;
-import java.math.BigInteger;
-import java.util.List;
 
 public class FileManager {
 
@@ -80,8 +76,9 @@ public class FileManager {
                     GameSettings.MIN_BOARD_COLS + " and " + GameSettings.MAX_BOARD_COLS);
         }
         //check validation of target
-        if (gameInfo.getTarget().intValue() >= gameInfo.getBoard().getRows() || gameInfo.getTarget().intValue() >= gameInfo.getBoard().getColumns().intValue()) {
-            throw new InvalidFileInputException("Target in file is invalid. Must be bellow " +
+        if (gameInfo.getTarget().intValue() >= gameInfo.getBoard().getRows() || gameInfo.getTarget().intValue() >= gameInfo.getBoard().getColumns().intValue()
+                || gameInfo.getTarget().intValue() < GameSettings.Min_TARGET) {
+            throw new InvalidFileInputException("Target in file is invalid. Must be between " + GameSettings.Min_TARGET + " and " +
                                                 Math.min(gameInfo.getBoard().getColumns().intValue(), gameInfo.getBoard().getRows()));
         }
     }

@@ -1,6 +1,7 @@
 package com.DeaNoy;
 
 import Logic.Enums.ePlayerType;
+import Logic.Interfaces.IComputerPlayerAlgo;
 import Logic.Models.GameSettings;
 import java.util.InputMismatchException;
 import java.util.Scanner;
@@ -8,7 +9,13 @@ import java.util.Scanner;
 // Receive input from human or "computer" user.
 public class InputManager {
     private Scanner scanner = new Scanner(System.in);
+    private IComputerPlayerAlgo mComputerPlayerAlgo;
     private static final int mErroInd = -1;
+
+    public void setComputerPlayerAlgo(IComputerPlayerAlgo computerPlayerAlgo) {
+        this.mComputerPlayerAlgo = computerPlayerAlgo;
+    }
+
 
     public eGameOptions GetCommandFromPlayer() {
         boolean isInputValid;
@@ -30,7 +37,9 @@ public class InputManager {
         try { //handle exception in case input is not an integer
             return scanner.nextInt();
         }catch (InputMismatchException e){
-            System.out.println("INVALID INPUT! Please choose a legal option");
+            String invalidInput = scanner.next();
+            System.out.println("INVALID INPUT! Please choose a legal option" + System.lineSeparator()
+            + "Expected a numeric value, received: " + invalidInput + ".");
             return mErroInd;
         }
     }
@@ -42,8 +51,9 @@ public class InputManager {
             System.out.println("Please select the column you wish to insert the disc into (1 to " + GameSettings.getInstance().getColumns() + ')');
             cellInput = getInputFromHumanPlayer();
         } else {
-            System.out.println("Computer");
-            cellInput = 1;
+            System.out.println("Computer playing turn...");
+            cellInput = mComputerPlayerAlgo.getNextPlay() + 1;
+            System.out.println("Computer has selected cell " + cellInput);
         }
 
         return cellInput;
@@ -62,7 +72,9 @@ public class InputManager {
                 }
 
             } catch (InputMismatchException e) {
-                System.out.println("Invalid input! Please enter a number between 1 and " + GameSettings.getInstance().getColumns());
+                String invalidInput = scanner.next();
+                System.out.println("Invalid input (" + invalidInput + ")!" + System.lineSeparator()
+                        +"Please enter a number between 1 and " + GameSettings.getInstance().getColumns());
             }
         } while(!isValidColumn);
 

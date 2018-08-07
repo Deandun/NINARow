@@ -17,6 +17,6 @@ public class TopRightSequenceSearcher implements ISequenceSearcher {
 
     @Override
     public boolean shouldStopLooking(int row, int column) {
-        return row <= 0 || column >= GameSettings.getInstance().getColumns();
+        return row < 0 || column >= GameSettings.getInstance().getColumns();
     }
 }

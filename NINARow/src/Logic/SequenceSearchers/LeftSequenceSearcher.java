@@ -15,6 +15,6 @@ public class LeftSequenceSearcher implements ISequenceSearcher {
 
     @Override
     public boolean shouldStopLooking(int row, int column) {
-        return column <= 0;
+        return column < 0;
     }
 }

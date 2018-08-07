@@ -15,6 +15,6 @@ public class TopSequenceSearcher implements ISequenceSearcher {
 
     @Override
     public boolean shouldStopLooking(int row, int column) {
-        return row <= 0;
+        return row < 0;
     }
 }

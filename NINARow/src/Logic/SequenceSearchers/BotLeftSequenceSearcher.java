@@ -16,6 +16,6 @@ public class BotLeftSequenceSearcher implements ISequenceSearcher {
 
     @Override
     public boolean shouldStopLooking(int row, int column) {
-        return row >= GameSettings.getInstance().getRows() || column <= 0;
+        return row >= GameSettings.getInstance().getRows() || column < 0;
     }
 }

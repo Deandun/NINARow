@@ -1,16 +1,22 @@
 package com.DeaNoy;
 
 import Logic.Enums.eGameState;
+import Logic.Enums.ePlayerType;
 import Logic.Exceptions.InvalidFileInputException;
+import Logic.Exceptions.InvalidUserInputException;
+import Logic.Interfaces.IComputerPlayerAlgo;
 import Logic.Interfaces.IGameStatus;
 import Logic.Models.GameSettings;
 import Logic.Logic;
 import Logic.Models.Player;
 import Logic.Models.PlayerTurn;
+import Logic.ComputerPlayerAlgo;
 
 import javax.xml.bind.JAXBException;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.time.Duration;
+import java.util.List;
 
 public class NINARowGame {
     private InputManager mInputManager;
@@ -62,53 +68,59 @@ public class NINARowGame {
 
     private boolean playTurn() {
         boolean shouldContinueGame = true;
+        if(mLogic.isGameActive()) {
+            try {
+                if(mLogic.GetCurrentPlayer().getType() == ePlayerType.Human) {
+                    mBoard.PrintBoard(); // Print board before turn only for human player.
+                }
 
-        try {
-            int selectedColumn = mInputManager.GetColumnIndexFromPlayer(mLogic.GetCurrentPlayer().getType()) - 1;
-            PlayerTurn playerTurn = mLogic.PlayTurn(selectedColumn);
-            char currentPlayerSign = ConsoleConfig.GetSignForPlayerID(playerTurn.getPlayer().getID());
+                int selectedColumn = mInputManager.GetColumnIndexFromPlayer(mLogic.GetCurrentPlayer().getType()) - 1;
+                PlayerTurn playerTurn = mLogic.PlayTurn(selectedColumn);
+                char currentPlayerSign = ConsoleConfig.GetSignForPlayerID(playerTurn.getPlayer().getID());
 
-            if (playerTurn.getGameState() == eGameState.Won) {
-                System.out.println("Player " + playerTurn.getPlayer().getName() + " has won the game!");
-                shouldContinueGame = false;
-            } else if (playerTurn.getGameState() == eGameState.Draw) {
-                System.out.println("The game has ended in a draw. Everyone's a winner!");
-                shouldContinueGame = false;
+                if (playerTurn.getGameState() == eGameState.Won) {
+                    GameMenu.PrintVictoryMessage(playerTurn.getPlayer().getName());
+                    shouldContinueGame = false;
+                } else if (playerTurn.getGameState() == eGameState.Draw) {
+                    GameMenu.PrintDrawMessage();
+                    shouldContinueGame = false;
+                }
+
+                mBoard.UpdateBoard(playerTurn.getUpdatedCell().getRowIndex(), playerTurn.getUpdatedCell().getColumnIndex(), currentPlayerSign);
+            } catch (InvalidUserInputException e) {
+                GameMenu.PrintErrorMsg(e.getMessage());
+            } catch (Exception e) {
+                GameMenu.PrintErrorMsg(e.getMessage());
             }
-
-            mBoard.UpdateBoard(playerTurn.getUpdatedCell().getRowIndex(), playerTurn.getUpdatedCell().getColumnIndex(), currentPlayerSign);
-        }catch (NullPointerException e){
-            printErrorMsg("Game is not active");
-        }catch (Exception e) {
-            printErrorMsg(e.getMessage());
+        } else {
+            GameMenu.GameNotActiveErrorMessage("play turn");
         }
+
+        mBoard.PrintBoard(); // Print board after turn.
 
         return shouldContinueGame;
     }
 
     private void showGameStatus() {
-       try{
-            IGameStatus gameStatus = mLogic.GetGameStatus();
-
-            GameMenu.PrintGameStatus(gameStatus, mLogic.GetGameState());
-        }catch (NullPointerException e){
-            printErrorMsg("Game is not active");
-        }
+        IGameStatus gameStatus = mLogic.GetGameStatus();
+        GameMenu.PrintGameStatus(gameStatus, mBoard);
     }
 
     private void startGame() {
-        GameSettings.getInstance().clear(); //clear all previous game settings
-        mBoard = new Board(GameSettings.getInstance().getRows(), GameSettings.getInstance().getColumns());
+        GameSettings.getInstance().clear();
         String computerPlayer = mInputManager.GetPlayersType();
+
         initPlayer(computerPlayer);
-
-        try {
-            mLogic.StartGame();
-        } catch (NoSuchFieldException e) {
-            System.out.println(e.getMessage());
-        }
-
+        mBoard.InitBoard();
+        mLogic.StartGame();
+        setComputerAlgo();
         ConsoleConfig.InitPlayerSigns(GameSettings.getInstance().getPlayers());
+    }
+
+    private void setComputerAlgo() {
+        IComputerPlayerAlgo computerAlgo = new ComputerPlayerAlgo();
+        computerAlgo.Init(mLogic.getBoard());
+        mInputManager.setComputerPlayerAlgo(computerAlgo);
     }
 
     private void initPlayer(String computerPlayer) { //initialize players in game settings
@@ -124,29 +136,28 @@ public class NINARowGame {
     }
 
     private void readGameFile() {
-        if (!mLogic.isGameActive()) {
-            String fileName = mInputManager.GetFileNameFromPlayer();
+        String fileName = mInputManager.GetFileNameFromPlayer();
 
-            if (fileName.endsWith(".xml")) {
-                try {
-                    mLogic.ReadGameFile(fileName);
-                    isConfigurationFileLoaded = true;
-                } catch (FileNotFoundException e) {
-                    printErrorMsg("Couldn't find " + fileName + " file!");
-                } catch (InvalidFileInputException e) {
-                    printErrorMsg("Couldn't find " + fileName + " file!");
-                } catch (JAXBException e) {
-                    printErrorMsg("The " + fileName + "is in a wrong format, couldn't convert it to object");
-                } catch (IOException e) {
-                    printErrorMsg("DEBUG ERROR: General exception"); //TODO: add message to user
-                }
-            } else {
-                printErrorMsg("Couldn't load file! File name should ends with .xml");
+        if(mLogic.GetGameState() != eGameState.Inactive) { // Game is not inactive, meaning game file already loaded.
+            GameMenu.PrintErrorMsg("Cannot load game file - A game file has already been loaded.");
+        } else if (fileName.endsWith(".xml")) {
+            try {
+                mLogic.ReadGameFile(fileName);
                 isConfigurationFileLoaded = true;
+                System.out.println("File " + fileName + " loaded successfully!");
+                mBoard = new Board(GameSettings.getInstance().getRows(), GameSettings.getInstance().getColumns());
+                GameMenu.PrintGameStatus(mLogic.GetGameStatus(), mBoard);
+            } catch (FileNotFoundException e) {
+                GameMenu.PrintErrorMsg("Couldn't find " + fileName + " file!");
+            } catch (InvalidFileInputException e) {
+                GameMenu.PrintErrorMsg(e.getMessage());
+            } catch (JAXBException e) {
+                GameMenu.PrintErrorMsg("The " + fileName + " is in a wrong format.");
+            } catch (IOException e) {
+                GameMenu.PrintErrorMsg("Error reading from file.");
             }
-        }
-        else{
-            printErrorMsg("Sorry, you cannot load a new file when game is active");
+        } else {
+            GameMenu.PrintErrorMsg("Couldn't load file! File name should ends with .xml");
         }
     }
 
@@ -166,6 +177,7 @@ public class NINARowGame {
         else { //lock options to choose commands when user hasn't chose 1 yet
             shouldContinueGame = executeFirstOptionOnly(currentOption);
         }
+
         return shouldContinueGame;
     }
 
@@ -180,9 +192,8 @@ public class NINARowGame {
                 shouldContinueGame = false;
                 break;
             default:
-                printErrorMsg("Cannot execute ." + currentOption.getDescription() + " now because game details file is not loaded yet");
+                GameMenu.PrintErrorMsg("Cannot execute - " + currentOption.getDescription() + " now because game details file is not loaded yet");
                 break;
-
         }
         return shouldContinueGame;
     }
@@ -193,17 +204,15 @@ public class NINARowGame {
         switch(currentOption) {
             case StartGame:
                 startGame();
-                mBoard.PrintBoard(); // TODO: temp print, for debugging. Find a better place to print
                 break;
             case ShowGameStatus:
                 showGameStatus();
-                //todo: Print board // ?
                 break;
             case LoadExitsGame:
                 loadExistsGame();
                 break;
             default:
-                printErrorMsg("Cannot execute " + currentOption.getDescription() + "now because game is not active");
+                GameMenu.PrintErrorMsg("Cannot execute " + currentOption.getDescription() + "now because game is not active");
                 break;
         }
         return shouldContinueGame;
@@ -218,14 +227,12 @@ public class NINARowGame {
                 break;
             case StartGame:
                 startGame();
-                mBoard.PrintBoard(); // TODO: temp print, for debugging. Find a better place to print
                 break;
             case ShowGameStatus:
                 showGameStatus();
                 break;
             case PlayTurn:
                 shouldContinueGame = playTurn();
-                mBoard.PrintBoard();
                 break;
             case ShowTurnHistory:
                 showTurnHistory();
@@ -246,9 +253,10 @@ public class NINARowGame {
     private void saveGame() {
         if (mInputManager.IsUserWantToSaveTheGame()){
             try {
-                mLogic.saveGame();
-            } catch (Exception e) { //TODO
-                e.printStackTrace();
+                mLogic.SaveGame();
+                System.out.println("Game saved successfully!");
+            } catch (Exception e) {
+                GameMenu.PrintErrorMsg("There has been a problem saving the game.");
             }
         }
     }
@@ -258,17 +266,15 @@ public class NINARowGame {
 
         do {
             try {
-                mLogic.loadExistsGame();
+                mLogic.LoadExistsGame();
+                resetBoardFromHistory();
+                mBoard.PrintBoard();
                 isFileLoaded = true;
-                System.out.println("File Loaded Successfully! ");
-            } catch (FileNotFoundException e){
-                printErrorMsg(e.getMessage() + "ERROR couldn't find the file");
-            } catch (IOException e) {
-                printErrorMsg(e.getMessage()); //TODO
-            } catch (ClassNotFoundException e) {
-                printErrorMsg(e.getMessage() + " ERROR reading from file :(");
+                System.out.println("Game loaded successfully!");
+            } catch (FileNotFoundException e) {
+                GameMenu.PrintErrorMsg("Cannot load game - no game to load (need to save a game before loading one).");
             } catch (Exception e) {
-                printErrorMsg(e.getMessage()); //TODO
+                GameMenu.PrintErrorMsg("There has been a problem loading the game.");
             }
 
         }while(!isFileLoaded);
@@ -276,57 +282,84 @@ public class NINARowGame {
         showGameStatus();
     }
 
+    private void resetBoardFromHistory() {
+        mBoard = new Board(GameSettings.getInstance().getRows(), GameSettings.getInstance().getColumns());
+        mLogic.GetTurnHistory().forEach(
+            (turn) -> mBoard.UpdateBoard(turn.getUpdatedCell().getRowIndex(), turn.getUpdatedCell().getColumnIndex(),
+                    ConsoleConfig.GetSignForPlayerID(turn.getPlayer().getID()))
+        );
+    }
+
     // Private inner static class that prints the game menu and notifications.
     private static class GameMenu {
 
-        public static void PrintstartGameMenu(){ //display only start and exit menu options TODO: use
+        public static void PrintStartGameMenu(){ //display only start and exit menu options TODO: use
             System.out.println(eGameOptions.SaveGame.getIndex() + ". " + eGameOptions.SaveGame.getDescription());
             System.out.println(eGameOptions.Exit.getIndex() + ". " + eGameOptions.Exit.getDescription());
         }
 
-        public static void PrintWholeMenu() {
-            System.out.println("\nPlease choose from the following options:");
+        private static void PrintWholeMenu() {
+            System.out.println(System.lineSeparator() + "Please choose from the following options:");
 
             for (eGameOptions gameOption: eGameOptions.values()) {
                 System.out.println(gameOption.getIndex() + ". " + gameOption.getDescription());
             }
         }
 
-        public static void PrintVictoryMessage(String winnerName) { //TODO: use
+        private static void PrintVictoryMessage(String winnerName) {
             System.out.println(winnerName + " has won the game. Congratulations!");
         }
 
-        public static void PrintDrawMessage() { //TODO: use
+        private static void PrintDrawMessage() {
             System.out.println("The game has ended in a draw. This means every one's a winner!");
         }
 
-        public static void PrintGameStatus(IGameStatus gameStatus, eGameState gameState){
-            //TODO: print board
-            if (gameState.equals(eGameState.Active)){
-                System.out.println("Game is active");
+        private static void PrintGameStatus(IGameStatus gameStatus, Board board){
+            //TODO
+            System.out.println("Game Status:");
+            System.out.println("Board:");
+            board.PrintBoard();
+            System.out.format("Sequence required to win: %d%s", GameSettings.getInstance().getTarget(), System.lineSeparator());
+            String gameStateString = gameStatus.getGameState() == eGameState.Active ? "Active" : "Inactive";
+            System.out.println("Game state: " + gameStateString);
+
+            if (gameStatus.getGameState() == eGameState.Active){
                 PrintActiveGameStatus(gameStatus);
             }
-            else{
-                System.out.println("Game is not active");
-            }
         }
-        public static void PrintActiveGameStatus(IGameStatus gameStatus) {
-            // Print player that's currently playing
 
-            System.out.println("Game status:" + System.lineSeparator() +
-                        gameStatus.getNameOfPlayerCurrentlyPlaying() + ": is currently playing.");
+        private static void PrintActiveGameStatus(IGameStatus gameStatus) {
+            // Print player that's currently playing
+            System.out.println(gameStatus.getNameOfPlayerCurrentlyPlaying() + ": is currently playing.");
 
             // Print player names and their signs
             GameSettings.getInstance().getPlayers().forEach(
-                    (player) -> System.out.println(player.getName() + "'s sign is: " + ConsoleConfig.GetSignForPlayerID(player.getID()))
+                    (player) ->
+                        System.out.println(player.getName() + "'s sign is " + ConsoleConfig.GetSignForPlayerID(player.getID())
+                                + ", and has played " + player.getTurnCounter() + " turns.")
             );
+
             // Print elapsed time
-            System.out.println("Elapsed game time: " + gameStatus.getGameDuration());
+            printElapsedGameTime(gameStatus.getGameDuration());
          }
+
+        private static void PrintErrorMsg(String str){
+            System.out.println("***********************************************************************************");
+            System.out.println(str);
+            System.out.println("***********************************************************************************");
+         }
+
+        private static void GameNotActiveErrorMessage(String attemptedAction) {
+            PrintErrorMsg("Cannot" + attemptedAction + " - Game is not active.");
+         }
+
+        private static void printElapsedGameTime(Duration gameDuration) {
+            long minutes = gameDuration.toMinutes();
+            long seconds = (gameDuration.toMillis() / 1000) % 60;
+
+            System.out.format("Elapsed game time: %d:%d", minutes, seconds);
+        }
+
     }
-    private void printErrorMsg(String str){
-        System.out.println("***********************************************************************************");
-        System.out.println(str);
-        System.out.println("***********************************************************************************");
-    }
+
 }

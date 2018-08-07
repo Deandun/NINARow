@@ -15,7 +15,8 @@ public class Board {
     public Board(int rows, int columns) {
         this.mPhysicRowsSize = getActualRow(rows);
         this.mPhysicColsSize = getActualColumn(columns);
-        initBoard();
+        mBoard = new char[mPhysicRowsSize][mPhysicColsSize];
+        InitBoard();
     }
 
     // API
@@ -33,31 +34,18 @@ public class Board {
         for(char[] row: mBoard){
             System.out.println(row);
         }
+
         System.out.println();
     }
 
-    public void Clear() {
-
-        for(int i = 0; i < mPhysicRowsSize; i++) {
-            for(int j = 0; j < mPhysicColsSize; j++) {
-                mBoard[i][j] = ' ';
-            }
-        }
-
-    }
-
-    // Helper function
-    private void initBoard() {
-        mBoard = new char[mPhysicRowsSize][mPhysicColsSize];
-        for(int i = 0; i < mPhysicRowsSize; i++) {
-            for(int j = 0; j < mPhysicColsSize; j++) {
-                mBoard[i][j] = ' ';
-            }
-        }
+    public void InitBoard() {
+        clear();
         setBoardSeparators();
         setBoardRowIndexes();
         setBoardColumnIndexes();
     }
+
+    // Helper function
 
     private void setBoardSeparators() {
         for(char[] boardRow: mBoard) {
@@ -91,7 +79,7 @@ public class Board {
         for(int i = 0; i < GameSettings.getInstance().getColumns(); i++) {
             actualColumnIndex = getActualColumn(i);
 
-            if(i < 10) {
+            if(i < 9) {
                 firstRow[actualColumnIndex] = getNumberSecondDigitAsChar(i + 1);
             } else {
                 firstRow[actualColumnIndex - 1] = getNumberFirstDigitAsChar(i + 1);
@@ -116,5 +104,13 @@ public class Board {
 
     private int getActualColumn(int column) {
         return (column + 1) * 4 ;
+    }
+
+    private void clear() {
+        for(int i = 0; i < mBoard.length; i++) {
+            for(int j = 0; j < mBoard[i].length; j++) {
+                mBoard[i][j] = ' ';
+            }
+        }
     }
 }

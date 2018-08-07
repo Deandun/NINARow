@@ -1,11 +1,11 @@
 package Logic.Models;
 
 import Logic.Enums.eGameState;
+import Logic.Enums.eSequenceSearcherType;
 import Logic.Exceptions.InvalidUserInputException;
 import Logic.Interfaces.ISequenceSearcher;
-import Logic.SequenceSearchers.*;
+import Logic.SequenceSearchers.SequenceSearcherFactory;
 
-import java.io.Serializable;
 import java.util.Arrays;
 
 public class Board{
@@ -105,11 +105,11 @@ public class Board{
     // Check horizontal sequence: "---"
     private boolean checkHorizontalSequence(Cell sequenceStartingCell) {
         // Check for sequence to the right
-        ISequenceSearcher rightSequenceSearcher = new RightSequenceSearcher();
+        ISequenceSearcher rightSequenceSearcher = SequenceSearcherFactory.CreateSequenceSearcher(eSequenceSearcherType.Right);
         int rightSequence = getSequence(sequenceStartingCell, rightSequenceSearcher);
 
         // Check for sequence to the left
-        ISequenceSearcher leftSequenceSearcher = new LeftSequenceSearcher();
+        ISequenceSearcher leftSequenceSearcher = SequenceSearcherFactory.CreateSequenceSearcher(eSequenceSearcherType.Left);
         int leftSequence = getSequence(sequenceStartingCell, leftSequenceSearcher);
 
         return rightSequence + leftSequence - 1 >= GameSettings.getInstance().getTarget();
@@ -121,11 +121,11 @@ public class Board{
     //      |
     private boolean checkVerticalSequence(Cell sequenceStartingCell) {
         // Check for sequence to the top
-        ISequenceSearcher topSequenceSearcher = new TopSequenceSearcher();
+        ISequenceSearcher topSequenceSearcher = SequenceSearcherFactory.CreateSequenceSearcher(eSequenceSearcherType.Top);
         int topSequence = getSequence(sequenceStartingCell, topSequenceSearcher);
 
         // Check for sequence to the bottom
-        ISequenceSearcher bottomSequenceSearcher = new BottomSequenceSearcher();
+        ISequenceSearcher bottomSequenceSearcher = SequenceSearcherFactory.CreateSequenceSearcher(eSequenceSearcherType.Bottom);
         int bottomSequence = getSequence(sequenceStartingCell, bottomSequenceSearcher);
 
         return topSequence + bottomSequence - 1 >= GameSettings.getInstance().getTarget();
@@ -137,19 +137,19 @@ public class Board{
     //    \           /
     private boolean checkDiagonalSequence(Cell sequenceStartingCell) {
         // Check for sequence to the top-right
-        ISequenceSearcher topRightSequenceSearcher = new TopRightSequenceSearcher();
+        ISequenceSearcher topRightSequenceSearcher = SequenceSearcherFactory.CreateSequenceSearcher(eSequenceSearcherType.TopRight);
         int topRightSequence = getSequence(sequenceStartingCell, topRightSequenceSearcher);
 
         // Check for sequence to the bottom-left
-        ISequenceSearcher bottomLeftSequenceSearcher = new BotLeftSequenceSearcher();
+        ISequenceSearcher bottomLeftSequenceSearcher = SequenceSearcherFactory.CreateSequenceSearcher(eSequenceSearcherType.BottomLeft);
         int bottomLeftSequence = getSequence(sequenceStartingCell, bottomLeftSequenceSearcher);
 
         // Check for sequence to the top-left
-        ISequenceSearcher topLeftSequenceSearcher = new TopLeftSequenceSearcher();
+        ISequenceSearcher topLeftSequenceSearcher = SequenceSearcherFactory.CreateSequenceSearcher(eSequenceSearcherType.TopLeft);
         int topLeftSequence = getSequence(sequenceStartingCell, topLeftSequenceSearcher);
 
         // Check for sequence to the bottom-right
-        ISequenceSearcher bottomRightSequenceSearcher = new BotRightSequenceSearcher();
+        ISequenceSearcher bottomRightSequenceSearcher = SequenceSearcherFactory.CreateSequenceSearcher(eSequenceSearcherType.BottomRight);
         int bottomRightSequence = getSequence(sequenceStartingCell, bottomRightSequenceSearcher);
 
         int target = GameSettings.getInstance().getTarget();
@@ -158,12 +158,12 @@ public class Board{
     }
 
     private boolean isBoardFull() {
-        boolean isBoardFull = false;
+        boolean isBoardFull = true;
 
         // Check if all columns are full
         for(int i = 0; i < GameSettings.getInstance().getColumns(); i++) {
-            if(isColumnFull(i)) {
-                isBoardFull = true;
+            if(!isColumnFull(i)) {
+                isBoardFull = false; // Found a column that is not full.
                 break;
             }
         }
