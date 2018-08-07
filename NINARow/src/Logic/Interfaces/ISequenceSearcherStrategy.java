@@ -1,6 +1,6 @@
 package Logic.Interfaces;
 
-public interface ISequenceSearcher {
+public interface ISequenceSearcherStrategy {
     int GetNextRow(int currentRow);
 
     int GetNextColumn(int currentColumn);

@@ -9,6 +9,7 @@ import Logic.Managers.HistoryFileManager;
 import Logic.Managers.FileManager;
 import Logic.Managers.HistoryManager;
 import Logic.Models.*;
+import Logic.SequenceSearchers.SequenceSearcher;
 
 import javax.xml.bind.JAXBException;
 import java.io.File;
@@ -25,11 +26,13 @@ public class Logic implements ILogic {
     private HistoryManager mHistoryManager;
     private GameStatus mGameStatus;
     private Board mGameBoard;
+    private SequenceSearcher mSequenceSearcher;
 
     public Logic() {
         this.mFileManager = new FileManager();
         this.mHistoryManager = new HistoryManager();
         this.mGameStatus = new GameStatus();
+        this.mSequenceSearcher = new SequenceSearcher();
     }
 
     // ILogic interface implementation.
@@ -43,8 +46,10 @@ public class Logic implements ILogic {
     public void StartGame() {
         // Set game board
         this.mGameBoard = new Board(GameSettings.getInstance().getRows(), GameSettings.getInstance().getColumns());
+        this.mSequenceSearcher.Clear();
+        this.mSequenceSearcher.setBoard(mGameBoard);
         this.mHistoryManager.Clear();
-        mGameStatus.StartNewGame();
+        this.mGameStatus.StartNewGame();
     }
 
     //@Override
@@ -71,7 +76,7 @@ public class Logic implements ILogic {
 
     //@Override
     private PlayerTurn updateGameStatus(Cell updatedCell) {
-        eGameState currentGameState = mGameBoard.getCurrentGameState(updatedCell);
+        eGameState currentGameState = getCurrentGameState(updatedCell);
         PlayerTurn playerTurn = new PlayerTurn();
 
         playerTurn.setUpdatedCell(updatedCell);
@@ -79,6 +84,20 @@ public class Logic implements ILogic {
         playerTurn.setGameState(currentGameState);
 
         return playerTurn;
+    }
+
+    private eGameState getCurrentGameState(Cell updatedCell) {
+        eGameState gameState;
+
+        if(mSequenceSearcher.DidPlayerWinGameInRecentTurn(updatedCell)) {
+            gameState = eGameState.Won;
+        } else if (mGameBoard.IsBoardFull()) {
+            gameState = eGameState.Draw;
+        } else {
+            gameState = eGameState.Active;
+        }
+
+        return gameState;
     }
 
     //@Override

@@ -1,8 +1,8 @@
-package Logic.SequenceSearchers;
+package Logic.SequenceSearchers.Strategy;
 
-import Logic.Interfaces.ISequenceSearcher;
+import Logic.Interfaces.ISequenceSearcherStrategy;
 
-public class LeftSequenceSearcher implements ISequenceSearcher {
+public class LeftSequenceSearcherStrategy implements ISequenceSearcherStrategy {
     @Override
     public int GetNextRow(int currentRow) {
         return currentRow;

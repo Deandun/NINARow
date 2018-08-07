@@ -1,9 +1,9 @@
-package Logic.SequenceSearchers;
+package Logic.SequenceSearchers.Strategy;
 
-import Logic.Interfaces.ISequenceSearcher;
+import Logic.Interfaces.ISequenceSearcherStrategy;
 import Logic.Models.GameSettings;
 
-public class TopRightSequenceSearcher implements ISequenceSearcher {
+public class TopRightSequenceSearcherStrategy implements ISequenceSearcherStrategy {
 
     @Override
     public int GetNextRow(int currentRow) {

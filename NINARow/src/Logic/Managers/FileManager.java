@@ -76,10 +76,9 @@ public class FileManager {
                     GameSettings.MIN_BOARD_COLS + " and " + GameSettings.MAX_BOARD_COLS);
         }
         //check validation of target
-        if (gameInfo.getTarget().intValue() >= gameInfo.getBoard().getRows() || gameInfo.getTarget().intValue() >= gameInfo.getBoard().getColumns().intValue()
+        if (gameInfo.getTarget().intValue() >= Math.max(gameInfo.getBoard().getRows(), gameInfo.getBoard().getColumns().intValue())
                 || gameInfo.getTarget().intValue() < GameSettings.Min_TARGET) {
-            throw new InvalidFileInputException("Target in file is invalid. Must be between " + GameSettings.Min_TARGET + " and " +
-                                                Math.min(gameInfo.getBoard().getColumns().intValue(), gameInfo.getBoard().getRows()));
+            throw new InvalidFileInputException("Target in file is invalid. Must be between " + GameSettings.Min_TARGET + " and the minumum between the rows/columns.");
         }
     }
 }
