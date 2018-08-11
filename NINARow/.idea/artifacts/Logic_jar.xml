@@ -1,0 +1,10 @@
+<component name="ArtifactManager">
+  <artifact name="Logic:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/Logic_jar</output-path>
+    <root id="root">
+      <element id="archive" name="Logic.jar">
+        <element id="module-output" name="Logic" />
+      </element>
+    </root>
+  </artifact>
+</component>
