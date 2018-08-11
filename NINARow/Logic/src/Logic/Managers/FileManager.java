@@ -14,7 +14,7 @@ import java.io.*;
 
 public class FileManager {
 
-    private final static String JAXB_XML_GAME_PACKAGE_NAME = "Logic/generated";
+    private final static String JAXB_XML_GAME_PACKAGE_NAME = "Logic.jaxb.schema.generated";
     private boolean mIsFileLoaded = false;
 
     public boolean getIsFileLoaded() {
@@ -64,6 +64,7 @@ public class FileManager {
 
     private void checkIfFileInputIsValid(GameDescriptor gameDescriptor) throws InvalidFileInputException {
         Game gameInfo = gameDescriptor.getGame();
+        int numOfPlayers;
 
         //check validation of rows number
         if (gameInfo.getBoard().getRows() < GameSettings.MIN_BOARD_ROWS || gameInfo.getBoard().getRows() > GameSettings.MAX_BOARD_ROWS) {
@@ -80,5 +81,20 @@ public class FileManager {
                 || gameInfo.getTarget().intValue() < GameSettings.Min_TARGET) {
             throw new InvalidFileInputException("Target in file is invalid. Must be between " + GameSettings.Min_TARGET + " and the minumum between the rows/columns.");
         }
+
+        numOfPlayers = countNumOfPlayer(gameInfo);
+        //check validation of num of players
+        if (numOfPlayers > GameSettings.MAX_NUM_OF_PLAYERS || numOfPlayers < GameSettings.MIN_NUM_OF_PLAYERS){
+            throw new InvalidFileInputException("Number of players is invalid. Must be between " + GameSettings.MIN_NUM_OF_PLAYERS + " - " + GameSettings.MAX_NUM_OF_PLAYERS);
+
+        }
+
+    }
+
+    private int countNumOfPlayer(Game gameInfo) {
+        int counter = 0;
+
+        //TODO: implement after adding to schema new params
+        return counter;
     }
 }
