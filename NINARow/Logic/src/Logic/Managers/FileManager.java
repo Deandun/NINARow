@@ -14,7 +14,7 @@ import java.io.*;
 
 public class FileManager {
 
-    private final static String JAXB_XML_GAME_PACKAGE_NAME = "Logic.jaxb.schema.generated";
+    private final static String JAXB_XML_GAME_PACKAGE_NAME = "Logic.generated";
     private boolean mIsFileLoaded = false;
 
     public boolean getIsFileLoaded() {

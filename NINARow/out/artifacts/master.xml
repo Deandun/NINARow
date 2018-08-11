@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GameDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="NinaRow.xsd">
+	<GameType>Basic</GameType>
+	<Game target="4">
+		<Board rows="6" columns="7"/>
+		<Variant>Regular</Variant>
+	</Game>	
+</GameDescriptor>
