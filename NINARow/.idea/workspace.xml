@@ -45,8 +45,8 @@
       <file leaf-file-name="FileManager.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Logic/src/Logic/Managers/FileManager.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="80">
-              <caret line="84" column="50" lean-forward="true" selection-start-line="84" selection-start-column="50" selection-end-line="84" selection-end-column="50" />
+            <state relative-caret-position="250">
+              <caret line="94" column="23" selection-start-line="94" selection-start-column="23" selection-end-line="94" selection-end-column="23" />
             </state>
           </provider>
         </entry>
@@ -210,8 +210,8 @@
         <option value="$PROJECT_DIR$/UI/src/com/DeaNoy/Main.java" />
         <option value="$PROJECT_DIR$/Logic/src/Logic/Models/GameSettings.java" />
         <option value="$PROJECT_DIR$/Logic/src/Logic/generated/Game.java" />
-        <option value="$PROJECT_DIR$/Logic/src/Logic/Managers/FileManager.java" />
         <option value="$PROJECT_DIR$/JAVAFX/src/JavaFXPlayersApplication.java" />
+        <option value="$PROJECT_DIR$/Logic/src/Logic/Managers/FileManager.java" />
       </list>
     </option>
   </component>
@@ -347,12 +347,12 @@
       <workItem from="1533915285572" duration="3253000" />
       <workItem from="1533977491229" duration="7865000" />
       <workItem from="1533988589624" duration="5619000" />
-      <workItem from="1533996243149" duration="4870000" />
+      <workItem from="1533996243149" duration="5080000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="145910000" />
+    <option name="totallyTimeSpent" value="146120000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="-7" width="1295" height="695" extended-state="6" />
@@ -367,7 +367,7 @@
       <window_info anchor="bottom" id="Event Log" order="7" side_tool="true" />
       <window_info anchor="right" id="Maven Projects" order="3" />
       <window_info anchor="bottom" id="Database Changes" order="7" show_stripe_button="false" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.46690518" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.32200357" />
       <window_info anchor="bottom" id="Version Control" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Terminal" order="7" />
       <window_info id="Capture Tool" order="2" />
@@ -643,8 +643,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Logic/src/Logic/Managers/FileManager.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="80">
-          <caret line="84" column="50" lean-forward="true" selection-start-line="84" selection-start-column="50" selection-end-line="84" selection-end-column="50" />
+        <state relative-caret-position="250">
+          <caret line="94" column="23" selection-start-line="94" selection-start-column="23" selection-end-line="94" selection-end-column="23" />
         </state>
       </provider>
     </entry>

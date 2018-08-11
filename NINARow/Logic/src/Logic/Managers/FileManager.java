@@ -92,7 +92,7 @@ public class FileManager {
     }
 
     private int countNumOfPlayer(Game gameInfo) {
-        int counter = 0;
+        int counter = 2;
 
         //TODO: implement after adding to schema new params
         return counter;
