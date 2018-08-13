@@ -107,38 +107,6 @@ public class InputManager {
         return GetInputFromUser("Please enter the game file's name (must be in xml format)");
     }
 
-    public String GetPlayersType() {
-        int playerInd = 1;
-        String playerType;
-        String computerPlayers;
-
-        playerType = getPlayerType(playerInd); //get player1's type from user
-
-        if (playerType.equals("computer")){ //in case player1 is computer - second player is automatically human
-            System.out.println("Player1 is a computer and Player2 is a human");
-            computerPlayers = "player 1";
-        }
-        else{
-            playerType = getPlayerType(++playerInd);
-            System.out.println("Player1 is a human and Player2 is a " + playerType);
-            computerPlayers = playerType.equals("computer") ? "player2" : "none";
-        }
-
-        return computerPlayers;
-    }
-
-    private String getPlayerType(int playerInd) { //get player type from user
-        boolean isInputValid;
-        String playerType;
-
-        do{
-            playerType = GetInputFromUser("Please insert the type of player " + playerInd + " (Human/Computer)");
-            isInputValid = playerType.toLowerCase().equals("human") || playerType.toLowerCase().equals("computer") ;
-        }while(!isInputValid);
-
-        return playerType.toLowerCase();
-    }
-
     public String GetInputFromUser(String output) { //generic method that gets non empty input from user
 
         boolean isInputValid = false;

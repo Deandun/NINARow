@@ -15,7 +15,7 @@ public class ComputerPlayerAlgo implements IComputerPlayerAlgo {
         int selectedColumn;
 
         for(int i = 0; i < GameSettings.getInstance().getColumns(); i++) {
-            if(!mBoard.isColumnFull(i)) {
+            if(!mBoard.IsColumnFull(i)) {
                 selectedColumn = i;
                 return selectedColumn;
             }

@@ -7,6 +7,15 @@ import Logic.SequenceSearchers.Strategy.*;
 import java.util.HashMap;
 import java.util.Map;
 
+import Logic.Enums.eSequenceSearcherType;
+import Logic.Enums.eVariant;
+import Logic.Interfaces.ISequenceSearcherStrategy;
+import Logic.Models.GameSettings;
+import Logic.SequenceSearchers.Strategy.*;
+
+import java.util.HashMap;
+import java.util.Map;
+
 public class SequenceSearcherStrategyFactory {
     private static Map<eSequenceSearcherType, ISequenceSearcherStrategy> strategyMap = new HashMap<>();
 
@@ -21,38 +30,56 @@ public class SequenceSearcherStrategyFactory {
         return selectedStrategy;
     }
 
-    public static ISequenceSearcherStrategy createSequenceSearcherForType(eSequenceSearcherType type) {
-        ISequenceSearcherStrategy sequenceSearcher;
+    private static ISequenceSearcherStrategy createSequenceSearcherForType(eSequenceSearcherType type) {
+        boolean isCircularGameMode = GameSettings.getInstance().getVariant() == eVariant.Circular;
+        ISequenceSearcherStrategy sequenceSearcherStrategy;
 
         switch(type) {
             case Top:
-                sequenceSearcher = new TopSequenceSearcherStrategy();
+                sequenceSearcherStrategy = new TopSequenceSearcherStrategy();
                 break;
             case Bottom:
-                sequenceSearcher = new BottomSequenceSearcherStrategy();
+                sequenceSearcherStrategy = new BottomSequenceSearcherStrategy();
                 break;
             case Right:
-                sequenceSearcher = new RightSequenceSearcherStrategy();
+                sequenceSearcherStrategy = new RightSequenceSearcherStrategy();
                 break;
             case Left:
-                sequenceSearcher = new LeftSequenceSearcherStrategy();
+                sequenceSearcherStrategy = new LeftSequenceSearcherStrategy();
                 break;
             case TopRight:
-                sequenceSearcher = new TopRightSequenceSearcherStrategy();
+                sequenceSearcherStrategy = new TopRightSequenceSearcherStrategy();
                 break;
             case TopLeft:
-                sequenceSearcher = new TopLeftSequenceSearcherStrategy();
+                sequenceSearcherStrategy = new TopLeftSequenceSearcherStrategy();
                 break;
             case BottomRight:
-                sequenceSearcher = new BotRightSequenceSearcherStrategy();
+                sequenceSearcherStrategy = new BotRightSequenceSearcherStrategy();
                 break;
             case BottomLeft:
-                sequenceSearcher = new BotLeftSequenceSearcherStrategy();
+                sequenceSearcherStrategy = new BotLeftSequenceSearcherStrategy();
                 break;
             default:
-                sequenceSearcher = null;
+                sequenceSearcherStrategy = null;
         }
 
-        return sequenceSearcher;
+        // If needed, wrap strategy with a circular strategy.
+        if(isCircularGameMode && doesStrategySupportCircularGameMode(type)) {
+            ISequenceSearcherStrategy innerStrategy = sequenceSearcherStrategy;
+            sequenceSearcherStrategy = new CircularSequenceSearcherStrategy(innerStrategy, GameSettings.getInstance().getRows(),
+                    GameSettings.getInstance().getColumns());
+        }
+
+        return sequenceSearcherStrategy;
+    }
+
+    //TODO: use when switching game file
+    public void ClearCache() {
+        strategyMap.clear();
+    }
+
+    private static boolean doesStrategySupportCircularGameMode(eSequenceSearcherType type) {
+        return type == eSequenceSearcherType.Bottom || type == eSequenceSearcherType.Top
+                || type == eSequenceSearcherType.Right || type == eSequenceSearcherType.Left;
     }
 }

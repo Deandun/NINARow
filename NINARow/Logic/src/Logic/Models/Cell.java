@@ -35,13 +35,8 @@ public class Cell implements Serializable {
         this.mRowIndex = rowIndex;
     }
 
-    public void setPlayer(Player player) throws Exception {
-        if (this.isEmpty()){
-            this.mPlayer = player;
-        }
-        else{
-            throw new InvalidUserInputException("Cell is already taken!");
-        }
+    public void setPlayer(Player player) {
+        this.mPlayer = player;
     }
 
     public Player getPlayer() {

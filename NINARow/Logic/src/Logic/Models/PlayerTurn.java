@@ -1,13 +1,23 @@
 package Logic.Models;
 
 import Logic.Enums.eGameState;
+import Logic.Enums.eTurnType;
 
 import java.io.Serializable;
 
 public class PlayerTurn  implements Serializable {
     private Cell mUpdatedCell;
     private Player mPlayer;
-    private eGameState mGameState;
+    private eGameState mGameStateAfterTurn;
+    private eTurnType mTurnType;
+
+    public eTurnType getTurnType() {
+        return mTurnType;
+    }
+
+    public void setTurnType(eTurnType turnType) {
+        this.mTurnType = turnType;
+    }
 
     public Cell getUpdatedCell() {
         return mUpdatedCell;
@@ -18,15 +28,15 @@ public class PlayerTurn  implements Serializable {
     }
 
     public eGameState getGameState() {
-        return mGameState;
+        return mGameStateAfterTurn;
     }
 
     public void setGameState(eGameState gameState) {
-        this.mGameState = gameState;
+        this.mGameStateAfterTurn = gameState;
     }
 
     public String toString(){
-        return  "Game state = " + mGameState.name() +
+        return  "Game state = " + mGameStateAfterTurn.name() +
                 ", Play turn = " + mUpdatedCell.getPlayer().toString() +
                 ", Chosen column = " + mUpdatedCell; //mUpdatedCell.getColumnIndex();
     }

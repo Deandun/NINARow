@@ -6,9 +6,7 @@ import Logic.Models.Board;
 import Logic.Models.Cell;
 import Logic.Models.GameSettings;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class SequenceSearcher {
     private Cell[][] mBoard;
@@ -28,21 +26,18 @@ public class SequenceSearcher {
     }
 
     public boolean DidPlayerWinGameInRecentTurn(Cell updatedCell) {
-        boolean isHorizontalSequence = checkHorizontalSequence(updatedCell);
-        boolean isVerticalSequence = checkVerticalSequence(updatedCell);
-        boolean isDiagonalSequence = checkDiagonalSequence(updatedCell);
-
-        return isHorizontalSequence || isVerticalSequence || isDiagonalSequence;
+        return checkHorizontalSequence(updatedCell) || checkVerticalSequence(updatedCell) || checkDiagonalSequence(updatedCell);
     }
 
-    private int getSequence(Cell updatedCell, ISequenceSearcherStrategy sequenceSearcher) {
+    // Returns the sequence of cells that belong to the same player. The sequence's direction is determined by the chosen strategy.
+    private Set<Cell> getSequence(Cell updatedCell, ISequenceSearcherStrategy sequenceSearcher) {
         boolean isSamePlayer = true;
-        int sequence = 0;
+        Set<Cell> cellSequence = new HashSet<>();
         int currentRow = updatedCell.getRowIndex();
         int currentColumn = updatedCell.getColumnIndex();
 
         while(isSamePlayer) {
-            sequence++;
+            cellSequence.add(mBoard[currentRow][currentColumn]);
             currentRow = sequenceSearcher.GetNextRow(currentRow);
             currentColumn = sequenceSearcher.GetNextColumn(currentColumn);
 
@@ -53,20 +48,31 @@ public class SequenceSearcher {
             }
         }
 
-        return sequence;
+        return cellSequence;
+    }
+
+    // Connects the sequences from both the first and second strategies. Duplicate cells are dealt with by using a set.
+    private Set<Cell> getSequenceFinalSet(Cell sequenceStartingCell, ISequenceSearcherStrategy firstStrategy, ISequenceSearcherStrategy secondStrategy) {
+        Set<Cell> firstSequence = getSequence(sequenceStartingCell, firstStrategy);
+        Set<Cell> secondSequence = getSequence(sequenceStartingCell, secondStrategy);
+        firstSequence.addAll(secondSequence);
+        return firstSequence;
     }
 
     // Check horizontal sequence: "---"
     private boolean checkHorizontalSequence(Cell sequenceStartingCell) {
-        // Check for sequence to the right
         ISequenceSearcherStrategy rightSequenceSearcher = SequenceSearcherStrategyFactory.getSequenceSearcherStrategyForType(eSequenceSearcherType.Right);
-        int rightSequence = getSequence(sequenceStartingCell, rightSequenceSearcher);
-
-        // Check for sequence to the left
         ISequenceSearcherStrategy leftSequenceSearcher = SequenceSearcherStrategyFactory.getSequenceSearcherStrategyForType(eSequenceSearcherType.Left);
-        int leftSequence = getSequence(sequenceStartingCell, leftSequenceSearcher);
+        Set<Cell> finalSet = getSequenceFinalSet(sequenceStartingCell, rightSequenceSearcher, leftSequenceSearcher);
 
-        return rightSequence + leftSequence - 1 >= GameSettings.getInstance().getTarget();
+        boolean isSequenceFound = false;
+
+        if(finalSet.size() >= GameSettings.getInstance().getTarget()) {
+            isSequenceFound = true;
+            mPlayerID2WinningSequence.put(sequenceStartingCell.getPlayer().getID(), finalSet);
+        }
+
+        return isSequenceFound;
     }
 
     // Check vertical sequence:
@@ -74,15 +80,18 @@ public class SequenceSearcher {
     //      |
     //      |
     private boolean checkVerticalSequence(Cell sequenceStartingCell) {
-        // Check for sequence to the top
         ISequenceSearcherStrategy topSequenceSearcher = SequenceSearcherStrategyFactory.getSequenceSearcherStrategyForType(eSequenceSearcherType.Top);
-        int topSequence = getSequence(sequenceStartingCell, topSequenceSearcher);
-
-        // Check for sequence to the bottom
         ISequenceSearcherStrategy bottomSequenceSearcher = SequenceSearcherStrategyFactory.getSequenceSearcherStrategyForType(eSequenceSearcherType.Bottom);
-        int bottomSequence = getSequence(sequenceStartingCell, bottomSequenceSearcher);
+        Set<Cell> finalSet = getSequenceFinalSet(sequenceStartingCell, topSequenceSearcher, bottomSequenceSearcher);
 
-        return topSequence + bottomSequence - 1 >= GameSettings.getInstance().getTarget();
+        boolean isSequenceFound = false;
+
+        if(finalSet.size() >= GameSettings.getInstance().getTarget()) {
+            isSequenceFound = true;
+            mPlayerID2WinningSequence.put(sequenceStartingCell.getPlayer().getID(), finalSet);
+        }
+
+        return isSequenceFound;
     }
 
     // Check diagonal sequences:
@@ -90,24 +99,27 @@ public class SequenceSearcher {
     //   \             /
     //    \           /
     private boolean checkDiagonalSequence(Cell sequenceStartingCell) {
-        // Check for sequence to the top-right
+        // Get bottom left to top right diagonal cell set.
         ISequenceSearcherStrategy topRightSequenceSearcher = SequenceSearcherStrategyFactory.getSequenceSearcherStrategyForType(eSequenceSearcherType.TopRight);
-        int topRightSequence = getSequence(sequenceStartingCell, topRightSequenceSearcher);
-
-        // Check for sequence to the bottom-left
         ISequenceSearcherStrategy bottomLeftSequenceSearcher = SequenceSearcherStrategyFactory.getSequenceSearcherStrategyForType(eSequenceSearcherType.BottomLeft);
-        int bottomLeftSequence = getSequence(sequenceStartingCell, bottomLeftSequenceSearcher);
+        Set<Cell> finalBotLeftToTopRightDiagonalSet = getSequenceFinalSet(sequenceStartingCell, topRightSequenceSearcher, bottomLeftSequenceSearcher);
 
-        // Check for sequence to the top-left
+        // Get top left to bottom right diagonal cell set.
         ISequenceSearcherStrategy topLeftSequenceSearcher = SequenceSearcherStrategyFactory.getSequenceSearcherStrategyForType(eSequenceSearcherType.TopLeft);
-        int topLeftSequence = getSequence(sequenceStartingCell, topLeftSequenceSearcher);
-
-        // Check for sequence to the bottom-right
         ISequenceSearcherStrategy bottomRightSequenceSearcher = SequenceSearcherStrategyFactory.getSequenceSearcherStrategyForType(eSequenceSearcherType.BottomRight);
-        int bottomRightSequence = getSequence(sequenceStartingCell, bottomRightSequenceSearcher);
+        Set<Cell> finalTopLeftToBotRightDiagonalSet = getSequenceFinalSet(sequenceStartingCell, bottomRightSequenceSearcher, topLeftSequenceSearcher);
 
+        boolean isSequenceFound = false;
         int target = GameSettings.getInstance().getTarget();
 
-        return topRightSequence + bottomLeftSequence - 1 >= target || topLeftSequence + bottomRightSequence - 1 >= target;
+        if(finalBotLeftToTopRightDiagonalSet.size() >= target) {
+            isSequenceFound = true;
+            mPlayerID2WinningSequence.put(sequenceStartingCell.getPlayer().getID(), finalBotLeftToTopRightDiagonalSet);
+        } else if (finalTopLeftToBotRightDiagonalSet.size() >= target) {
+            isSequenceFound = true;
+            mPlayerID2WinningSequence.put(sequenceStartingCell.getPlayer().getID(), finalTopLeftToBotRightDiagonalSet);
+        }
+
+        return isSequenceFound;
     }
 }

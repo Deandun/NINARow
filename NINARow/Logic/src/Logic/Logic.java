@@ -17,7 +17,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 public class Logic implements ILogic {
 
@@ -39,16 +41,22 @@ public class Logic implements ILogic {
     @Override
     public void ReadGameFile(String filePath) throws FileNotFoundException, InvalidFileInputException, IOException, JAXBException {
         mFileManager.LoadGameFile(filePath);
+        // TODO: when loading game file is moved to a seporate thread, create new board only when done loading file
+        this.mGameBoard = new Board(GameSettings.getInstance().getRows(), GameSettings.getInstance().getColumns());
     }
 
     @Override
     public void StartGame() {
         // Set game board
-        this.mGameBoard = new Board(GameSettings.getInstance().getRows(), GameSettings.getInstance().getColumns());
+        this.mGameBoard.Init(GameSettings.getInstance().getRows(), GameSettings.getInstance().getColumns());
         this.mSequenceSearcher.Clear();
         this.mSequenceSearcher.setBoard(mGameBoard);
         this.mHistoryManager.Clear();
         this.mGameStatus.StartNewGame();
+    }
+
+    public Map<String, Collection<Cell>> getWinningSequencesMap() {
+        return mSequenceSearcher.getWinningSequencesMap();
     }
 
     public GameStatus GetGameStatus() {
@@ -66,6 +74,21 @@ public class Logic implements ILogic {
         mGameStatus.FinishedTurn();
 
         return playerTurn;
+    }
+
+    public void Popout(int column) {
+        mGameBoard.Popout(column - 1);
+    }
+
+    public void PlayerQuit(Player player) {
+        // TODO: set the next player's index accordingly.
+        GameSettings.getInstance().getPlayers().remove(player);
+
+        if(GameSettings.getInstance().getPlayers().size() == 1) {
+            //TODO: only one player left, he won!
+        }
+
+        mGameBoard.RemoveAllPlayerDiscsFromBoard(player);
     }
 
     public boolean isGameActive(){
@@ -214,6 +237,5 @@ public class Logic implements ILogic {
         int getNextPlayerIndex() {
             return ++mPlayerIndex % GameSettings.getInstance().getPlayers().size();
         }
-
     }
 }

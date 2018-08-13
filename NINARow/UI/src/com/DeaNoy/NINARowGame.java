@@ -8,6 +8,7 @@ import Logic.Interfaces.IComputerPlayerAlgo;
 import Logic.Interfaces.IGameStatus;
 import Logic.ComputerPlayerAlgo;
 import Logic.Logic;
+import Logic.Models.Cell;
 import Logic.Models.GameSettings;
 import Logic.Models.Player;
 import Logic.Models.PlayerTurn;
@@ -16,6 +17,7 @@ import javax.xml.bind.JAXBException;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.time.Duration;
+import java.util.Arrays;
 
 public class NINARowGame {
     private InputManager mInputManager;
@@ -78,6 +80,11 @@ public class NINARowGame {
                 char currentPlayerSign = ConsoleConfig.GetSignForPlayerID(playerTurn.getPlayer().getID());
 
                 if (playerTurn.getGameState() == eGameState.Won) {
+                    mLogic.getWinningSequencesMap().values().forEach(
+                            (winningCellSequence) -> winningCellSequence.forEach(
+                                    (cell) -> mBoard.UpdateBoard(cell.getRowIndex(), cell.getColumnIndex(), '!')
+                            )
+                    );
                     GameMenu.PrintVictoryMessage(playerTurn.getPlayer().getName());
                     shouldContinueGame = false;
                 } else if (playerTurn.getGameState() == eGameState.Draw) {
@@ -86,6 +93,12 @@ public class NINARowGame {
                 }
 
                 mBoard.UpdateBoard(playerTurn.getUpdatedCell().getRowIndex(), playerTurn.getUpdatedCell().getColumnIndex(), currentPlayerSign);
+
+                //TODO: remove dummy call to poput/player quit.
+                if(playerTurn.getPlayer().getTurnCounter() % 3 == 0) {
+                    //this.Popout();
+                    this.playerQuit(playerTurn.getPlayer());
+                }
             } catch (InvalidUserInputException e) {
                 GameMenu.PrintErrorMsg(e.getMessage());
             } catch (Exception e) {
@@ -106,10 +119,6 @@ public class NINARowGame {
     }
 
     private void startGame() {
-        GameSettings.getInstance().clear();
-        String computerPlayer = mInputManager.GetPlayersType();
-
-        initPlayer(computerPlayer);
         mBoard.InitBoard();
         mLogic.StartGame();
         setComputerAlgo();
@@ -120,18 +129,6 @@ public class NINARowGame {
         IComputerPlayerAlgo computerAlgo = new ComputerPlayerAlgo();
         computerAlgo.Init(mLogic.getBoard());
         mInputManager.setComputerPlayerAlgo(computerAlgo);
-    }
-
-    private void initPlayer(String computerPlayer) { //initialize players in game settings
-        if (computerPlayer.contains("1")){
-            GameSettings.getInstance().InitPlayers("Computer" , "Human");
-        }
-        else if (computerPlayer.contains("2")){
-            GameSettings.getInstance().InitPlayers("Human", "Computer");
-        }
-        else{
-            GameSettings.getInstance().InitPlayers("Human", "Human");
-        }
     }
 
     private void readGameFile() {
@@ -362,4 +359,32 @@ public class NINARowGame {
 
     }
 
+    // TODO: remove thsi DUMMY implementation of popout (not needed in console exercise).
+    private void Popout() {
+        mLogic.Popout(1);
+        resetBoard();
+
+    }
+
+    private void playerQuit(Player quitter) {
+        mLogic.PlayerQuit(quitter);
+        resetBoard();
+    }
+
+    private void resetBoard() {
+        Cell[][] cellArr = mLogic.getBoard().getCellArray();
+        char cellSign;
+
+        for(Cell[] row: cellArr) {
+            for(Cell cell: row) {
+                if(cell.getPlayer() == null) {
+                    cellSign = ' ';
+                } else {
+                    cellSign = ConsoleConfig.GetSignForPlayerID(cell.getPlayer().getID());
+                }
+
+                mBoard.UpdateBoard(cell.getRowIndex(), cell.getColumnIndex(), cellSign);
+            }
+        }
+    }
 }

@@ -17,7 +17,7 @@ public class GameSettings implements Serializable {
     public static final int MIN_BOARD_ROWS = 5;
     public static final int MAX_BOARD_COLS = 60;
     public static final int MIN_BOARD_COLS = 6;
-    public static final int Min_TARGET = 2;
+    public static final int MIN_TARGET = 2;
     public static final int MIN_NUM_OF_PLAYERS = 2;
     public static final int MAX_NUM_OF_PLAYERS = 5;
     private static final String SAVED_GAME_FILE_NAME = "DeaNoy_Game.txt";
@@ -43,15 +43,6 @@ public class GameSettings implements Serializable {
         ourInstance = gameSettings;
     }
 
-    public void InitPlayers(String player1Type, String player2Type) {
-        Player player1 = new Player();
-        player1.init("1", "Aviad", ePlayerType.ConvertStringToePlayerType(player1Type));
-        Player player2 = new Player();
-        player2.init("2", "Guy", ePlayerType.ConvertStringToePlayerType(player2Type));
-
-        mPlayers.add(player1);
-        mPlayers.add(player2);
-    }
     public int getTarget() {
         return mTarget;
     }
@@ -88,7 +79,8 @@ public class GameSettings implements Serializable {
         this.mVariant = variant;
     }
 
-    public void clear(){
+    // TODO: use when loading a new file
+    public void Clear(){
         mPlayers.clear();
     }
 }
