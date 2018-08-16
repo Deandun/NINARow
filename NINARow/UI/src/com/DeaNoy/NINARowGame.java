@@ -13,11 +13,14 @@ import Logic.Models.GameSettings;
 import Logic.Models.Player;
 import Logic.Models.PlayerTurn;
 
+import javax.swing.*;
 import javax.xml.bind.JAXBException;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.Arrays;
+
+import static java.lang.Thread.sleep;
 
 public class NINARowGame {
     private InputManager mInputManager;
@@ -79,6 +82,7 @@ public class NINARowGame {
                 PlayerTurn playerTurn = mLogic.PlayTurn(selectedColumn);
                 char currentPlayerSign = ConsoleConfig.GetSignForPlayerID(playerTurn.getPlayer().getID());
 
+
                 if (playerTurn.getGameState() == eGameState.Won) {
                     mLogic.getWinningSequencesMap().values().forEach(
                             (winningCellSequence) -> winningCellSequence.forEach(
@@ -93,13 +97,7 @@ public class NINARowGame {
                 }
 
                 mBoard.UpdateBoard(playerTurn.getUpdatedCell().getRowIndex(), playerTurn.getUpdatedCell().getColumnIndex(), currentPlayerSign);
-
-                //TODO: remove dummy call to poput/player quit.
-                if(playerTurn.getPlayer().getTurnCounter() % 3 == 0) {
-                    //this.Popout();
-                    this.playerQuit(playerTurn.getPlayer());
-                }
-            } catch (InvalidUserInputException e) {
+             } catch (InvalidUserInputException e) {
                 GameMenu.PrintErrorMsg(e.getMessage());
             } catch (Exception e) {
                 GameMenu.PrintErrorMsg(e.getMessage());
@@ -131,32 +129,30 @@ public class NINARowGame {
         mInputManager.setComputerPlayerAlgo(computerAlgo);
     }
 
-    private void readGameFile() {
-        String fileName = mInputManager.GetFileNameFromPlayer();
+    private void loadFile(){
+        System.out.println("Start file chooser");
+        FileChooser fileChooser = new FileChooser();
 
-        if(mLogic.GetGameState() != eGameState.Inactive) { // Game is not inactive, meaning game file already loaded.
-            GameMenu.PrintErrorMsg("Cannot load game file - A game file has already been loaded.");
-        } else if (fileName.toLowerCase().endsWith(".xml")) {
-            try {
-                mLogic.ReadGameFile(fileName);
-                isConfigurationFileLoaded = true;
-                System.out.println("File " + fileName + " loaded successfully!");
-                mBoard = new Board(GameSettings.getInstance().getRows(), GameSettings.getInstance().getColumns());
-                GameMenu.PrintGameStatus(mLogic.GetGameStatus(), mBoard);
-            } catch (FileNotFoundException e) {
-                GameMenu.PrintErrorMsg("Couldn't find " + fileName + " file!");
-            } catch (InvalidFileInputException e) {
-                GameMenu.PrintErrorMsg(e.getMessage());
-            } catch (JAXBException e) {
-                GameMenu.PrintErrorMsg("The " + fileName + " is in a wrong format.");
-            } catch (IOException e) {
-                GameMenu.PrintErrorMsg("Error reading from file.");
-            }
-        } else {
-            GameMenu.PrintErrorMsg("Couldn't load file! File name should ends with .xml");
+        try {
+            mLogic.ReadGameFile(fileChooser.LoadFile());
+            isConfigurationFileLoaded = true;
+            mBoard = new Board(GameSettings.getInstance().getRows(), GameSettings.getInstance().getColumns());
+            GameMenu.PrintGameStatus(mLogic.GetGameStatus(), mBoard);
+        } catch (RuntimeException e){
+            //TODO: handle exceptions with error popout window
+            GameMenu.PrintErrorMsg(e.getMessage());
+        } catch (InvalidFileInputException e) {
+            //TODO: handle exceptions with error popout window
+            GameMenu.PrintErrorMsg(e.getMessage());
+        } catch (IOException e) {
+            //TODO: handle exceptions with error popout window
+            GameMenu.PrintErrorMsg(e.getMessage());
+        } catch (JAXBException e) {
+            //TODO: handle exceptions with error popout window
+            GameMenu.PrintErrorMsg(e.getMessage());
         }
-    }
 
+    }
     // Helper functions
 
     private boolean executeOption(eGameOptions currentOption) {
@@ -182,7 +178,7 @@ public class NINARowGame {
 
         switch (currentOption) {
             case ReadGameFile:
-                readGameFile();
+                loadFile();
                 break;
             case Exit:
                 shouldContinueGame = false;
@@ -219,7 +215,7 @@ public class NINARowGame {
 
         switch(currentOption) {
             case ReadGameFile:
-                readGameFile();
+                loadFile();
                 break;
             case StartGame:
                 startGame();
@@ -367,7 +363,8 @@ public class NINARowGame {
     }
 
     private void playerQuit(Player quitter) {
-        mLogic.PlayerQuit(quitter);
+        eGameState gameState = mLogic.PlayerQuit(quitter);
+
         resetBoard();
     }
 

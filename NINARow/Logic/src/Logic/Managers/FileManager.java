@@ -90,6 +90,7 @@ public class FileManager {
                     newPlayer.init(Short.toString(playerFromFile.getId()),
                             playerFromFile.getName(), ePlayerType.valueOf(playerFromFile.getType()));
                     GameSettings.getInstance().getPlayers().add(newPlayer);
+                    newPlayer.setIndex(GameSettings.getInstance().getPlayers().size());
                 }
         );
     }

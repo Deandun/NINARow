@@ -122,4 +122,9 @@ public class SequenceSearcher {
 
         return isSequenceFound;
     }
+
+    public boolean findSequenceAllOverBoard() {
+        //TODO: implement
+        return true;
+    }
 }

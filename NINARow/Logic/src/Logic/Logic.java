@@ -80,15 +80,22 @@ public class Logic implements ILogic {
         mGameBoard.Popout(column - 1);
     }
 
-    public void PlayerQuit(Player player) {
+    public eGameState PlayerQuit(Player player) {
         // TODO: set the next player's index accordingly.
         GameSettings.getInstance().getPlayers().remove(player);
+        GameSettings.getInstance().updateEachPlayersIndex();
 
-        if(GameSettings.getInstance().getPlayers().size() == 1) {
-            //TODO: only one player left, he won!
+        if(GameSettings.getInstance().getPlayers().size() == 1) {//only one player left, he won!
+           return eGameState.Won;
         }
 
         mGameBoard.RemoveAllPlayerDiscsFromBoard(player);
+
+        if (mSequenceSearcher.findSequenceAllOverBoard()){  //run all over board and check if someone won
+             return eGameState.Won;
+        }
+
+        return eGameState.Active;
     }
 
     public boolean isGameActive(){

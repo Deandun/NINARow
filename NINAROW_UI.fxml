@@ -1,0 +1,450 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.effect.Blend?>
+<?import javafx.scene.effect.Shadow?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1">
+   <top>
+      <GridPane prefHeight="39.0" prefWidth="408.0" BorderPane.alignment="CENTER">
+        <columnConstraints>
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="335.00001525878906" minWidth="10.0" prefWidth="104.66666666666667" />
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="499.99999999999994" minWidth="10.0" prefWidth="495.99999999999994" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints maxHeight="38.66667366027832" minHeight="10.0" prefHeight="38.66667366027832" vgrow="SOMETIMES" />
+        </rowConstraints>
+         <children>
+            <HBox prefHeight="65.0" prefWidth="96.0">
+               <children>
+                  <Button fx:id="mBtnLoadFile" mnemonicParsing="false" onAction="#handleLoadFileButtonAction" text="Load File">
+                     <HBox.margin>
+                        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                     </HBox.margin>
+                  </Button>
+               </children>
+            </HBox>
+            <Button fx:id="mBtnStartGame" mnemonicParsing="false" onAction="#handleStartGameButtonAction" text="Start Game" GridPane.columnIndex="1">
+               <GridPane.margin>
+                  <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+               </GridPane.margin>
+            </Button>
+         </children>
+      </GridPane>
+   </top>
+   <left>
+      <VBox prefHeight="361.0" prefWidth="117.0" BorderPane.alignment="CENTER">
+         <children>
+            <Label text="DETAILS">
+               <font>
+                  <Font name="System Bold" size="17.0" />
+               </font>
+               <VBox.margin>
+                  <Insets left="5.0" top="5.0" />
+               </VBox.margin>
+            </Label>
+            <Label text="Current player">
+               <padding>
+                  <Insets left="5.0" top="5.0" />
+               </padding>
+            </Label>
+            <Label text="Time for this turn">
+               <padding>
+                  <Insets left="5.0" top="5.0" />
+               </padding>
+            </Label>
+            <Label text="Time for all game">
+               <padding>
+                  <Insets left="5.0" top="5.0" />
+               </padding>
+            </Label>
+            <Label text="Turn number">
+               <padding>
+                  <Insets left="5.0" top="5.0" />
+               </padding>
+            </Label>
+            <Label text="Target size">
+               <padding>
+                  <Insets left="5.0" top="5.0" />
+               </padding>
+            </Label>
+            <Label text="Variant">
+               <padding>
+                  <Insets left="5.0" top="5.0" />
+               </padding>
+            </Label>
+            <ImageView fx:id="mIVExitGame" fitHeight="57.0" fitWidth="61.0" onMouseClicked="#handleExitGameButtonAction" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../../../Documents/Noy/Studies/Java/תרגילים/תרגיל%201/images/quit.JPG" />
+               </image>
+               <VBox.margin>
+                  <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+               </VBox.margin>
+            </ImageView>
+         </children>
+      </VBox>
+   </left>
+   <right>
+      <GridPane BorderPane.alignment="CENTER">
+        <columnConstraints>
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+         <children>
+            <VBox alignment="CENTER" prefHeight="123.0" prefWidth="94.0">
+               <children>
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Player1" wrappingWidth="49.662109375">
+                     <font>
+                        <Font name="Comic Sans MS" size="15.0" />
+                     </font>
+                     <VBox.margin>
+                        <Insets left="5.0" />
+                     </VBox.margin>
+                  </Text>
+                  <Label fx:id="mLblPlayer1Name" text="Name">
+                     <effect>
+                        <Blend>
+                           <topInput>
+                              <Shadow />
+                           </topInput>
+                        </Blend>
+                     </effect>
+                     <VBox.margin>
+                        <Insets left="5.0" />
+                     </VBox.margin>
+                  </Label>
+                  <Label fx:id="mLblPlayer1ID" text="ID">
+                     <effect>
+                        <Blend>
+                           <topInput>
+                              <Shadow />
+                           </topInput>
+                        </Blend>
+                     </effect>
+                     <VBox.margin>
+                        <Insets left="5.0" />
+                     </VBox.margin>
+                  </Label>
+                  <Label fx:id="mLblPlayer1Type" text="Type">
+                     <effect>
+                        <Blend>
+                           <topInput>
+                              <Shadow />
+                           </topInput>
+                        </Blend>
+                     </effect>
+                     <VBox.margin>
+                        <Insets left="5.0" />
+                     </VBox.margin>
+                  </Label>
+                  <ImageView fx:id="mIVPlayer1Disc" fitHeight="57.0" fitWidth="37.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@Images/1.JPG" />
+                     </image>
+                     <VBox.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </VBox.margin>
+                  </ImageView>
+               </children>
+            </VBox>
+            <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="1">
+               <children>
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Player2" wrappingWidth="55.662109375">
+                     <font>
+                        <Font name="Comic Sans MS" size="15.0" />
+                     </font>
+                     <VBox.margin>
+                        <Insets left="5.0" />
+                     </VBox.margin>
+                  </Text>
+                  <Label fx:id="mLblPlayer2Name" text="Name">
+                     <effect>
+                        <Blend>
+                           <topInput>
+                              <Shadow />
+                           </topInput>
+                        </Blend>
+                     </effect>
+                     <VBox.margin>
+                        <Insets left="5.0" />
+                     </VBox.margin>
+                  </Label>
+                  <Label fx:id="mLblPlayer2ID" text="ID">
+                     <effect>
+                        <Blend>
+                           <topInput>
+                              <Shadow />
+                           </topInput>
+                        </Blend>
+                     </effect>
+                     <VBox.margin>
+                        <Insets left="5.0" />
+                     </VBox.margin>
+                  </Label>
+                  <Label fx:id="mLblPlayer2Type" text="Type">
+                     <effect>
+                        <Blend>
+                           <topInput>
+                              <Shadow />
+                           </topInput>
+                        </Blend>
+                     </effect>
+                     <VBox.margin>
+                        <Insets left="5.0" />
+                     </VBox.margin>
+                  </Label>
+                  <ImageView fx:id="mIVPlayerDisc" fitHeight="57.0" fitWidth="37.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@Images/2.JPG" />
+                     </image>
+                     <VBox.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </VBox.margin>
+                  </ImageView>
+               </children>
+            </VBox>
+            <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.rowIndex="1">
+               <children>
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Player3" wrappingWidth="55.662109375">
+                     <font>
+                        <Font name="Comic Sans MS" size="15.0" />
+                     </font>
+                     <VBox.margin>
+                        <Insets left="5.0" />
+                     </VBox.margin>
+                  </Text>
+                  <Label fx:id="mLblPlayer3Name" text="Name">
+                     <effect>
+                        <Blend>
+                           <topInput>
+                              <Shadow />
+                           </topInput>
+                        </Blend>
+                     </effect>
+                     <VBox.margin>
+                        <Insets left="5.0" />
+                     </VBox.margin>
+                  </Label>
+                  <Label fx:id="mLblPlayer3ID" text="ID">
+                     <effect>
+                        <Blend>
+                           <topInput>
+                              <Shadow />
+                           </topInput>
+                        </Blend>
+                     </effect>
+                     <VBox.margin>
+                        <Insets left="5.0" />
+                     </VBox.margin>
+                  </Label>
+                  <Label fx:id="mLblPlayer3Type" text="Type">
+                     <effect>
+                        <Blend>
+                           <topInput>
+                              <Shadow />
+                           </topInput>
+                        </Blend>
+                     </effect>
+                     <VBox.margin>
+                        <Insets left="5.0" />
+                     </VBox.margin>
+                  </Label>
+                  <ImageView fx:id="mIVPlayer3Disc" fitHeight="57.0" fitWidth="37.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@Images/3.JPG" />
+                     </image>
+                     <VBox.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </VBox.margin>
+                  </ImageView>
+               </children>
+            </VBox>
+            <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+               <children>
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Player4" wrappingWidth="55.662109375">
+                     <font>
+                        <Font name="Comic Sans MS" size="15.0" />
+                     </font>
+                     <VBox.margin>
+                        <Insets left="5.0" />
+                     </VBox.margin>
+                  </Text>
+                  <Label fx:id="mLblPlayer4Name" text="Name">
+                     <effect>
+                        <Blend>
+                           <topInput>
+                              <Shadow />
+                           </topInput>
+                        </Blend>
+                     </effect>
+                     <VBox.margin>
+                        <Insets left="5.0" />
+                     </VBox.margin>
+                  </Label>
+                  <Label fx:id="mLblPlayer4ID" text="ID">
+                     <effect>
+                        <Blend>
+                           <topInput>
+                              <Shadow />
+                           </topInput>
+                        </Blend>
+                     </effect>
+                     <VBox.margin>
+                        <Insets left="5.0" />
+                     </VBox.margin>
+                  </Label>
+                  <Label fx:id="mLblPlayer4Type" text="Type">
+                     <effect>
+                        <Blend>
+                           <topInput>
+                              <Shadow />
+                           </topInput>
+                        </Blend>
+                     </effect>
+                     <VBox.margin>
+                        <Insets left="5.0" />
+                     </VBox.margin>
+                  </Label>
+                  <ImageView fx:id="mIVPlayer4Disc" fitHeight="57.0" fitWidth="37.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@Images/4.JPG" />
+                     </image>
+                     <VBox.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </VBox.margin>
+                  </ImageView>
+               </children>
+            </VBox>
+            <VBox alignment="CENTER" prefHeight="122.0" prefWidth="108.0" GridPane.rowIndex="2">
+               <children>
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Player5" wrappingWidth="55.662109375">
+                     <font>
+                        <Font name="Comic Sans MS" size="15.0" />
+                     </font>
+                     <VBox.margin>
+                        <Insets left="5.0" />
+                     </VBox.margin>
+                  </Text>
+                  <Label fx:id="mLblPlayer5Name" text="Name">
+                     <effect>
+                        <Blend>
+                           <topInput>
+                              <Shadow />
+                           </topInput>
+                        </Blend>
+                     </effect>
+                     <VBox.margin>
+                        <Insets left="5.0" />
+                     </VBox.margin>
+                  </Label>
+                  <Label fx:id="mLblPlayer5ID" text="ID">
+                     <effect>
+                        <Blend>
+                           <topInput>
+                              <Shadow />
+                           </topInput>
+                        </Blend>
+                     </effect>
+                     <VBox.margin>
+                        <Insets left="5.0" />
+                     </VBox.margin>
+                  </Label>
+                  <Label fx:id="mLblPlayer5Type" text="Type">
+                     <effect>
+                        <Blend>
+                           <topInput>
+                              <Shadow />
+                           </topInput>
+                        </Blend>
+                     </effect>
+                     <VBox.margin>
+                        <Insets left="5.0" />
+                     </VBox.margin>
+                  </Label>
+                  <ImageView fx:id="mIVPlayer5Disc" fitHeight="57.0" fitWidth="37.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@Images/5.JPG" />
+                     </image>
+                     <VBox.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </VBox.margin>
+                  </ImageView>
+               </children>
+            </VBox>
+            <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+               <children>
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Player6" wrappingWidth="55.662109375">
+                     <font>
+                        <Font name="Comic Sans MS" size="15.0" />
+                     </font>
+                     <VBox.margin>
+                        <Insets left="5.0" />
+                     </VBox.margin>
+                  </Text>
+                  <Label fx:id="mLblPlayer6Name" text="Name">
+                     <effect>
+                        <Blend>
+                           <topInput>
+                              <Shadow />
+                           </topInput>
+                        </Blend>
+                     </effect>
+                     <VBox.margin>
+                        <Insets left="5.0" />
+                     </VBox.margin>
+                  </Label>
+                  <Label fx:id="mLblPlayer6ID" text="ID">
+                     <effect>
+                        <Blend>
+                           <topInput>
+                              <Shadow />
+                           </topInput>
+                        </Blend>
+                     </effect>
+                     <VBox.margin>
+                        <Insets left="5.0" />
+                     </VBox.margin>
+                  </Label>
+                  <Label fx:id="mLblPlayer6Type" text="Type">
+                     <effect>
+                        <Blend>
+                           <topInput>
+                              <Shadow />
+                           </topInput>
+                        </Blend>
+                     </effect>
+                     <VBox.margin>
+                        <Insets left="5.0" />
+                     </VBox.margin>
+                  </Label>
+                  <ImageView fx:id="mIVPlayer6Disc" fitHeight="57.0" fitWidth="37.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@Images/6.JPG" />
+                     </image>
+                     <VBox.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </VBox.margin>
+                  </ImageView>
+               </children>
+            </VBox>
+         </children>
+      </GridPane>
+   </right>
+</BorderPane>

@@ -5,7 +5,7 @@ import Logic.Enums.eTurnType;
 
 import java.io.Serializable;
 
-public class PlayerTurn  implements Serializable {
+public class PlayerTurn implements Serializable {
     private Cell mUpdatedCell;
     private Player mPlayer;
     private eGameState mGameStateAfterTurn;
