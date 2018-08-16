@@ -60,15 +60,6 @@ public class FileManager {
     private void setData(GameDescriptor gameDescriptor) {
         setPlayersData(gameDescriptor.getPlayers().getPlayer());
         setGameInfoData(gameDescriptor.getGame());
-
-//        Game gameInfo = gameDescriptor.getGame();
-//        GameSettings gameSettings = GameSettings.getInstance();
-//        Board boardInfo = gameInfo.getBoard();
-//
-//        gameSettings.setColumns(boardInfo.getColumns().intValue());
-//        gameSettings.setRows(boardInfo.getRows());
-//        gameSettings.setTarget(gameInfo.getTarget().intValue());
-//        gameSettings.setVariant(eVariant.valueOf(gameInfo.getVariant()));
     }
 
     private void setGameInfoData(Game gameInfo) {
@@ -90,7 +81,6 @@ public class FileManager {
                     newPlayer.init(Short.toString(playerFromFile.getId()),
                             playerFromFile.getName(), ePlayerType.valueOf(playerFromFile.getType()));
                     GameSettings.getInstance().getPlayers().add(newPlayer);
-                    newPlayer.setIndex(GameSettings.getInstance().getPlayers().size());
                 }
         );
     }

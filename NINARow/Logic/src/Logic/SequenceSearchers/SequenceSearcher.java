@@ -25,7 +25,25 @@ public class SequenceSearcher {
         mBoard = null;
     }
 
-    public boolean DidPlayerWinGameInRecentTurn(Cell updatedCell) {
+    public boolean CheckEntireBoardForWinningSequences() {
+        // Check for winning sequences in all of the boards columns.
+        for(int i = 0; i < GameSettings.getInstance().getColumns(); i++) {
+            this.CheckColumnForWinningSequences(i);
+        }
+
+        return !mPlayerID2WinningSequence.isEmpty(); // If winning sequence is found, winning sequences map won't be empty
+    }
+
+    public boolean CheckColumnForWinningSequences(int column) {
+        // Check for winning sequences in all of the column's cells
+        for(int i = 0; i < GameSettings.getInstance().getRows(); i++) {
+            this.CheckCellForWinningSequence(mBoard[i][column]);
+        }
+
+        return !mPlayerID2WinningSequence.isEmpty(); // If winning sequence is found, winning sequences map won't be empty;
+    }
+
+    public boolean CheckCellForWinningSequence(Cell updatedCell) {
         return checkHorizontalSequence(updatedCell) || checkVerticalSequence(updatedCell) || checkDiagonalSequence(updatedCell);
     }
 
@@ -121,10 +139,5 @@ public class SequenceSearcher {
         }
 
         return isSequenceFound;
-    }
-
-    public boolean findSequenceAllOverBoard() {
-        //TODO: implement
-        return true;
     }
 }

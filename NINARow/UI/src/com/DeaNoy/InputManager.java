@@ -3,6 +3,7 @@ package com.DeaNoy;
 import Logic.Enums.ePlayerType;
 import Logic.Interfaces.IComputerPlayerAlgo;
 import Logic.Models.GameSettings;
+import Logic.Models.Player;
 
 import java.util.InputMismatchException;
 import java.util.Scanner;
@@ -45,15 +46,20 @@ public class InputManager {
         }
     }
 
-    public int GetColumnIndexFromPlayer(ePlayerType playerType) {
-        int cellInput;
+    public int GetColumnIndexFromPlayer(ePlayerType playerType, Player player) {
+        int cellInput = 0;
 
         if (playerType.equals(ePlayerType.Human)){
             System.out.println("Please select the column you wish to insert the disc into (1 to " + GameSettings.getInstance().getColumns() + ')');
             cellInput = getInputFromHumanPlayer();
         } else {
             System.out.println("Computer playing turn...");
-            cellInput = mComputerPlayerAlgo.getNextPlay() + 1;
+            try {
+                //TODO: exception not relevant here, only in new UI.
+                cellInput = mComputerPlayerAlgo.getNextPlay(player).getmSelectedColumn() + 1;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             System.out.println("Computer has selected cell " + cellInput);
         }
 

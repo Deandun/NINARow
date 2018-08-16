@@ -1,26 +1,22 @@
 package com.DeaNoy;
 
+import Logic.ComputerPlayer.ComputerPlayerAlgo;
 import Logic.Enums.eGameState;
 import Logic.Enums.ePlayerType;
 import Logic.Exceptions.InvalidFileInputException;
 import Logic.Exceptions.InvalidUserInputException;
 import Logic.Interfaces.IComputerPlayerAlgo;
 import Logic.Interfaces.IGameStatus;
-import Logic.ComputerPlayerAlgo;
 import Logic.Logic;
 import Logic.Models.Cell;
 import Logic.Models.GameSettings;
 import Logic.Models.Player;
 import Logic.Models.PlayerTurn;
 
-import javax.swing.*;
 import javax.xml.bind.JAXBException;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.time.Duration;
-import java.util.Arrays;
-
-import static java.lang.Thread.sleep;
 
 public class NINARowGame {
     private InputManager mInputManager;
@@ -78,7 +74,7 @@ public class NINARowGame {
                     mBoard.PrintBoard(); // Print board before turn only for human player.
                 }
 
-                int selectedColumn = mInputManager.GetColumnIndexFromPlayer(mLogic.GetCurrentPlayer().getType()) - 1;
+                int selectedColumn = mInputManager.GetColumnIndexFromPlayer(mLogic.GetCurrentPlayer().getType(), mLogic.GetCurrentPlayer()) - 1;
                 PlayerTurn playerTurn = mLogic.PlayTurn(selectedColumn);
                 char currentPlayerSign = ConsoleConfig.GetSignForPlayerID(playerTurn.getPlayer().getID());
 

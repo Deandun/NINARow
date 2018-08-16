@@ -1,9 +1,9 @@
 package com.DeaNoy;
 
-import java.io.File;
-
-import javax.swing.JFileChooser;
+//TODO: swing is no good, need javaFX.
+import javax.swing.*;
 import javax.swing.filechooser.FileSystemView;
+import java.io.File;
 
 public class FileChooser {
 
@@ -28,6 +28,7 @@ public class FileChooser {
         else if (returnValue == JFileChooser.ERROR_OPTION){
             throw new RuntimeException("Error while loading file with file chooser");
         }
+
         return null;
     }
 

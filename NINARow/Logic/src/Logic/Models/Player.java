@@ -10,7 +10,6 @@ public class Player implements Serializable {
     private int mTurnCounter;
     private String mName;
     private ePlayerType mType;
-    private int mIndex;
 
     public void init(String ID, String name, ePlayerType type) {
         setID(ID);
@@ -23,7 +22,6 @@ public class Player implements Serializable {
     public String toString(){
         return "ID: " + mID +
                 " Name: " + mName +
-                " Index: " + mIndex +
                 " Type: " + mType.name();
     }
 
@@ -65,13 +63,5 @@ public class Player implements Serializable {
 
     public void setType(ePlayerType mType) {
         this.mType = mType;
-    }
-
-    public int getIndex() {
-        return mIndex;
-    }
-
-    public void setIndex(int index) {
-        this.mIndex = index;
     }
 }

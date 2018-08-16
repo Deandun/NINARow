@@ -1,6 +1,5 @@
 package Logic.Models;
 
-import Logic.Enums.ePlayerType;
 import Logic.Enums.eVariant;
 
 import java.io.Serializable;
@@ -82,11 +81,5 @@ public class GameSettings implements Serializable {
     // TODO: use when loading a new file
     public void Clear(){
         mPlayers.clear();
-    }
-
-    public void updateEachPlayersIndex() {
-        for (int i=0; i<mPlayers.size(); i++){
-            mPlayers.get(i).setIndex(i++);
-        }
     }
 }

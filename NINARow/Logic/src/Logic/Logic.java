@@ -66,7 +66,7 @@ public class Logic implements ILogic {
     @Override
     public PlayerTurn PlayTurn(int column) throws InvalidUserInputException, Exception {
         Cell chosenCell = mGameBoard.UpdateBoard(column, mGameStatus.getPlayer()); // send parameter to logic board
-        PlayerTurn playerTurn  = updateGameStatus(chosenCell);
+        PlayerTurn playerTurn = updateGameStatus(chosenCell);
 
         // Update game state when turn ends.
         mGameStatus.mGameState = playerTurn.getGameState();
@@ -76,26 +76,28 @@ public class Logic implements ILogic {
         return playerTurn;
     }
 
-    public void Popout(int column) {
+    public eGameState Popout(int column) {
         mGameBoard.Popout(column - 1);
+
+        // Check if there is a winning sequence starting from a cell in the selectred column as a result of the Popout.
+        return mSequenceSearcher.CheckColumnForWinningSequences(column) ? eGameState.Won : eGameState.Active;
     }
 
     public eGameState PlayerQuit(Player player) {
-        // TODO: set the next player's index accordingly.
-        GameSettings.getInstance().getPlayers().remove(player);
-        GameSettings.getInstance().updateEachPlayersIndex();
+        mGameStatus.PlayerQuitGame(player);
+        eGameState gameState = eGameState.Active;
 
-        if(GameSettings.getInstance().getPlayers().size() == 1) {//only one player left, he won!
-           return eGameState.Won;
+        if(GameSettings.getInstance().getPlayers().size() == 1) {//only one player remains, he has won!
+           gameState = eGameState.Won;
+        } else {
+            mGameBoard.RemoveAllPlayerDiscsFromBoard(player);
+
+            if (mSequenceSearcher.CheckEntireBoardForWinningSequences()){  //run all over board and check if someone won
+                gameState =  eGameState.Won;
+            }
         }
 
-        mGameBoard.RemoveAllPlayerDiscsFromBoard(player);
-
-        if (mSequenceSearcher.findSequenceAllOverBoard()){  //run all over board and check if someone won
-             return eGameState.Won;
-        }
-
-        return eGameState.Active;
+        return gameState;
     }
 
     public boolean isGameActive(){
@@ -116,7 +118,7 @@ public class Logic implements ILogic {
     private eGameState getCurrentGameState(Cell updatedCell) {
         eGameState gameState;
 
-        if(mSequenceSearcher.DidPlayerWinGameInRecentTurn(updatedCell)) {
+        if(mSequenceSearcher.CheckCellForWinningSequence(updatedCell)) {
             gameState = eGameState.Won;
         } else if (mGameBoard.IsBoardFull()) {
             gameState = eGameState.Draw;
@@ -221,6 +223,19 @@ public class Logic implements ILogic {
             nextPlayer();
         }
 
+        public void PlayerQuitGame(Player quittingPlayer) {
+            int quittingPlayerIndex = GameSettings.getInstance().getPlayers().indexOf(quittingPlayer);
+            int currentlyPlayingPlayerIndex = GameSettings.getInstance().getPlayers().indexOf(mPlayer);
+
+            // If quitting player is currently playing, or if the index of the quitting player is greater than
+            // that of the player that is currently playing, decrement the playing player's index to accommodate.
+            if(quittingPlayer.equals(mPlayer) || quittingPlayerIndex > currentlyPlayingPlayerIndex) {
+                mPlayerIndex--;
+            }
+
+            GameSettings.getInstance().getPlayers().remove(quittingPlayer);
+        }
+
         @Override
         public String toString(){
             String gameActivation = "Game is ";
@@ -237,11 +252,11 @@ public class Logic implements ILogic {
 
         // Helper functions
 
-        void nextPlayer() {
+        private void nextPlayer() {
             mPlayer = GameSettings.getInstance().getPlayers().get(getNextPlayerIndex());
         }
 
-        int getNextPlayerIndex() {
+        private int getNextPlayerIndex() {
             return ++mPlayerIndex % GameSettings.getInstance().getPlayers().size();
         }
     }
