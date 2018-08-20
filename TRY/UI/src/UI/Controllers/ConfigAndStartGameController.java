@@ -5,7 +5,6 @@ import Logic.Logic;
 import javafx.fxml.FXML;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
@@ -21,7 +20,7 @@ public class ConfigAndStartGameController extends GridPane {
 
     private Logic mLogic = new Logic(); // TODO: remove logic from this controller, only call logic in main app controller
 
-
+/*
     @FXML
     void loadFile(ActionEvent event) {
         //TODO: move to onclick
@@ -35,7 +34,7 @@ public class ConfigAndStartGameController extends GridPane {
             mBtnStartFile.setDisable(false);
         }
     }
-
+*/
     @FXML
     void startGame(ActionEvent event) {
         mBtnLoadFile.setDisable(true);

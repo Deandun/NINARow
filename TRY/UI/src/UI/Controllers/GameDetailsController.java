@@ -24,7 +24,6 @@ public class GameDetailsController {
     private SimpleStringProperty mTurnNumber;
     private SimpleStringProperty mTargetSize;
     private SimpleStringProperty mVariant;
-
     private Logic mLogic = new Logic();
     private int mTurnCounter;
 
