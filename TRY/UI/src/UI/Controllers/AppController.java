@@ -10,7 +10,7 @@ public class AppController{
     @FXML private ConfigAndStartGameController ConfigAndStartGameControllerController;
     @FXML private GameDetailsController GameDetailsControllerController;
     @FXML private PlayerDetailsController PlayerDetailsControllerController;
-    private BoardController BoardControllerController;
+    @FXML private BoardController BoardControllerController;
 
     public AppController() {
         this.ConfigAndStartGameControllerController = new ConfigAndStartGameController();

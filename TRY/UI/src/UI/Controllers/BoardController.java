@@ -4,9 +4,9 @@ import Logic.Models.Player;
 import UI.Controllers.ControllerDelegates.ICellControllerDelegate;
 import javafx.scene.control.Button;
 import javafx.scene.layout.GridPane;
+
 import java.util.ArrayList;
 import java.util.List;
-import Logic.Logic;
 
 public class BoardController implements ICellControllerDelegate {
 
@@ -16,8 +16,6 @@ public class BoardController implements ICellControllerDelegate {
     private int mNumColumns;
     private int mNumOfDiscRows;
     private int mPopoutRowIndex;
-    private boolean mIsBoardFull;
-    private Logic mLogic;
 
     public BoardController(int numRows, int numCols) {
         this.mBoardPane = new GridPane();
@@ -26,8 +24,6 @@ public class BoardController implements ICellControllerDelegate {
         this.mNumOfDiscRows = numRows;
         this.mCellControllerList = new ArrayList<>();
         this.mPopoutRowIndex = this.mNumOfDiscRows;
-        this.mIsBoardFull = false;
-        this.mLogic = new Logic();
     }
 
     public GridPane getBoardPane() {
@@ -47,13 +43,13 @@ public class BoardController implements ICellControllerDelegate {
 
         for (i = 0; i < this.mNumColumns; i++) { //set popout list
             Button popoutBtn = new Button();
-            popoutBtn.setStyle("-fx-background-image: url('/UI/Images/popoutArrow.JPG')");
-            popoutBtn.setOnAction(
-                    event -> {
-                        int btnColumnIndex = getColumnIndexForPopoutBtn((Button) event.getSource());
-                        // mDelegate.popoutAtColumn(btnColumnIndex);
-                    }
-            );
+            //popoutBtn.setStyle("-fx-background-image: url('/UI/Images/popoutArrow.JPG')");
+//            popoutBtn.setOnAction(
+//                    event -> {
+//                        int btnColumnIndex = getColumnIndexForPopoutBtn((Button) event.getSource());
+//                        // mDelegate.popoutAtColumn(btnColumnIndex);
+//                    }
+//            );
             this.mPopOutList.add(popoutBtn);
             this.mBoardPane.add(popoutBtn, this.mPopoutRowIndex, i);
         }
@@ -68,21 +64,8 @@ public class BoardController implements ICellControllerDelegate {
 
     }
 
-    public boolean getIsBoardFull() {
-        return mIsBoardFull;
-    }
-
-    public void setIsBoardFull(boolean mIsBoardFull) {
-        this.mIsBoardFull = mIsBoardFull;
-    }
-
-    public boolean isPopupAviable(Player currPlayer){
-        for (CellController cell: mCellControllerList) {
-            if (!cell.getIsEmpty() && cell.getRow() == this.mNumOfDiscRows - 1){ //TODO: check
-                //check if the cell is taken by currPlayer
-            }
-        }
-
+    public boolean isPopoutAviable(Player currPlayer){
+        //TODO: need logic to check
         return false;
     }
 }

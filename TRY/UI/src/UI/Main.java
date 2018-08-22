@@ -5,6 +5,10 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.Shape;
 import javafx.stage.Stage;
 import java.net.URL;
 
@@ -14,13 +18,14 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
+
+
         FXMLLoader loader = new FXMLLoader();
 
         URL mainFXML = getClass().getResource("temp.fxml");
         loader.setLocation(mainFXML);
 
         StackPane root = loader.load();
-
 
         // wire up controller
         App appController = loader.getController();
