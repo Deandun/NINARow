@@ -1,7 +1,10 @@
 package UI.Controllers;
 
+import Logic.Models.Cell;
 import Logic.Models.Player;
+import Logic.Models.PlayedTurnData;
 import UI.Controllers.ControllerDelegates.ICellControllerDelegate;
+import UI.UIMisc.ImageManager;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.effect.DropShadow;
@@ -10,9 +13,11 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import UI.Controllers.ControllerDelegates.IBoardControllerDelegate;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-import static UI.FinalSettings.POPOUT_BTN_SIZE;
+import java.util.Map;
 
+import static UI.FinalSettings.POPOUT_BTN_SIZE;
 
 public class BoardController implements ICellControllerDelegate {
 
@@ -54,7 +59,6 @@ public class BoardController implements ICellControllerDelegate {
         for (i = 0; i < this.mNumColumns; i++) { //set popout list
             Button popoutBtn = new Button();
             Image img = new Image(getClass().getResourceAsStream("/UI/Images/popoutArrow.JPG"), POPOUT_BTN_SIZE, POPOUT_BTN_SIZE, true, true);
-           // popoutBtn.setDisable(true);
             popoutBtn.setGraphic(new ImageView(img));
             popoutBtn.setPrefSize(POPOUT_BTN_SIZE, POPOUT_BTN_SIZE);
             popoutBtn.setPadding(new Insets(1));
@@ -62,6 +66,21 @@ public class BoardController implements ICellControllerDelegate {
             this.mPopOutList.add(popoutBtn);
             this.mBoardPane.add(popoutBtn, i, this.mPopoutRowIndex);
             setPopoutActions(popoutBtn);
+        }
+    }
+
+    public void InsertDistAt(Collection<Cell> updatedCellsCollection) {
+        // Insert discs one by one.
+        for(Cell updatedCell: updatedCellsCollection) {
+            CellController selectedCell = this.mCellControllerList
+                    .stream()
+                    .filter(
+                            cell -> cell.getRow() == updatedCell.getRowIndex() && cell.getColumn() == updatedCell.getColumnIndex()
+                    )
+                    .findFirst()
+                    .get(); // There has to be a cell that answers the predicate above, so there is no need to check ifPresent().
+
+            selectedCell.setImage(ImageManager.getImageForPlayerID(updatedCell.getPlayer().getID()));
         }
     }
 
@@ -77,7 +96,7 @@ public class BoardController implements ICellControllerDelegate {
                 }
         );
         popoutBtn.setOnMouseEntered(
-                e ->   popoutBtn.setEffect(shadow)
+                e -> popoutBtn.setEffect(shadow)
         );
         popoutBtn.setOnMouseExited(
                 e -> popoutBtn.setEffect(null)
@@ -89,8 +108,8 @@ public class BoardController implements ICellControllerDelegate {
     }
 
     @Override
-    public void CellClicked(int column, int row) {
-
+    public void CellClicked(int row, int column) {
+        this.mDelegate.ColumnClicked(column);
     }
 
     public boolean isPopoutAviable(Player currPlayer){
@@ -105,6 +124,16 @@ public class BoardController implements ICellControllerDelegate {
 
     public void setIsBoardEnabled(boolean isEnabled) {
         this.mIsEnabled = isEnabled;
+    }
+
+    public void DisplayWinningSequences(Map<Player, Collection<Cell>> playerToWinningSequenceMap) {
+        // TODO:
+    }
+
+    public void ResetBoard() {
+        this.mCellControllerList.stream().forEach(
+                cellController -> cellController.setImage(ImageManager.getEmptyDiscSlotImage())
+        );
     }
 }
 

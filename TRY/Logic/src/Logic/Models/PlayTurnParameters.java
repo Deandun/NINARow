@@ -1,12 +1,12 @@
-package Logic.ComputerPlayer;
+package Logic.Models;
 
 import Logic.Enums.eTurnType;
 
-public class ComputerPlayerTurnData {
+public class PlayTurnParameters {
     private int mSelectedColumn;
     private eTurnType mTurnType;
 
-    public ComputerPlayerTurnData(int selectedColumn, eTurnType turnType) {
+    public PlayTurnParameters(int selectedColumn, eTurnType turnType) {
         this.mSelectedColumn = selectedColumn;
         this.mTurnType = turnType;
     }

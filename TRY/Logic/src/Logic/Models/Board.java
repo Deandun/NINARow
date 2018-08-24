@@ -2,7 +2,9 @@ package Logic.Models;
 
 import Logic.Exceptions.InvalidUserInputException;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 
 public class Board{
     private Cell[][] mBoard;
@@ -66,15 +68,15 @@ public class Board{
         return mBoard[lastRowIndex][column].getPlayer().equals(player);
     }
 
-    public void Popout(int column) {
-        removeCellFromIndex(mBoard.length - 1, column); // Remove cell from the bottom most row at the selected column.
+    public Collection<Cell> PopoutAndGetUpdatedCells(int column) {
+        return this.removeCellFromIndexAndGetUpdatedCells(mBoard.length - 1, column); // Remove cell from the bottom most row at the selected column.
     }
 
     public void RemoveAllPlayerDiscsFromBoard(Player player) {
         for(int i = 0; i < mBoard.length; i++) { // Go over rows.
             for(int j = 0; j < mBoard[i].length; j++) { // Go over columns.
                 if(mBoard[i][j].getPlayer() != null && mBoard[i][j].getPlayer().equals(player)) { // Check if the cell was set by the player that quit.
-                    removeCellFromIndex(i, j); // Remove cell from board.
+                    removeCellFromIndexAndGetUpdatedCells(i, j); // Remove cell from board.
                 }
             }
         }
@@ -110,7 +112,8 @@ public class Board{
         return !mBoard[0][columnIndex].isEmpty();
     }
 
-    private void removeCellFromIndex(int row, int column) {
+    private Collection<Cell> removeCellFromIndexAndGetUpdatedCells(int row, int column) {
+        Collection<Cell> updatedCellsList = new ArrayList<>();
         Player upperCellPlayer;
 
         // Go over the discs of the selected column starting from the selected row and update the player in the cell
@@ -118,6 +121,7 @@ public class Board{
         for(int i = row; i > 0; i--) {
             upperCellPlayer = mBoard[i - 1][column].getPlayer();
             mBoard[i][column].setPlayer(upperCellPlayer);
+            updatedCellsList.add(mBoard[i][column]);
 
             if(upperCellPlayer == null) {
                 break; // Reached the up most disc in board, break.
@@ -125,5 +129,6 @@ public class Board{
         }
 
         mBoard[0][column].setPlayer(null); // After this function, the up most disc in the column should always be null.
+        return updatedCellsList;
     }
 }

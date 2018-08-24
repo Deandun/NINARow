@@ -1,9 +1,12 @@
 package Logic;
 
+import Logic.ComputerPlayer.ComputerPlayerAlgo;
 import Logic.Enums.eGameState;
-import Logic.Enums.eVariant;
+import Logic.Enums.ePlayerType;
+import Logic.Enums.eTurnType;
 import Logic.Exceptions.InvalidFileInputException;
 import Logic.Exceptions.InvalidUserInputException;
+import Logic.Interfaces.IComputerPlayerAlgo;
 import Logic.Interfaces.IGameStatus;
 import Logic.Interfaces.ILogic;
 import Logic.Managers.FileManager;
@@ -18,6 +21,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -29,12 +33,14 @@ public class Logic implements ILogic {
     private GameStatus mGameStatus;
     private Board mGameBoard;
     private SequenceSearcher mSequenceSearcher;
+    private IComputerPlayerAlgo mComputerPlayerAlgo;
 
     public Logic() {
         this.mFileManager = new FileManager();
         this.mHistoryManager = new HistoryManager();
         this.mGameStatus = new GameStatus();
         this.mSequenceSearcher = new SequenceSearcher();
+        this.mComputerPlayerAlgo = new ComputerPlayerAlgo();
     }
 
     // ILogic interface implementation.
@@ -46,42 +52,85 @@ public class Logic implements ILogic {
         this.mGameBoard = new Board(GameSettings.getInstance().getRows(), GameSettings.getInstance().getColumns());
     }
 
+    //TODO: check if the first player is a computer player. If so, call playturn.
     @Override
     public void StartGame() {
         // Set game board
         this.mGameBoard.Init(GameSettings.getInstance().getRows(), GameSettings.getInstance().getColumns());
         this.mSequenceSearcher.Clear();
-        this.mSequenceSearcher.setBoard(mGameBoard);
+        this.mSequenceSearcher.setBoard(this.mGameBoard);
+        this.mComputerPlayerAlgo.Init(this.mGameBoard);
         this.mHistoryManager.Clear();
         this.mGameStatus.StartNewGame();
     }
 
-    public Map<String, Collection<Cell>> getWinningSequencesMap() {
-        return this.mSequenceSearcher.getWinningSequencesMap();
+    public Map<Player, Collection<Cell>> getPlayerToWinningSequencesMap() {
+        return this.mSequenceSearcher.getPlayerToWinningSequencesMap();
     }
 
     public GameStatus GetGameStatus() {
         return mGameStatus;
     }
 
+    // TODO: make this function return a list of turns (in case computer players played after human players.
     @Override
-    public PlayerTurn PlayTurn(int column) throws InvalidUserInputException, Exception {
-        Cell chosenCell = this.mGameBoard.UpdateBoard(column, this.mGameStatus.getPlayer()); // send parameter to logic board
-        PlayerTurn playerTurn = updateGameStatus(chosenCell);
+    public List<PlayedTurnData> PlayTurn(PlayTurnParameters playTurnParameters) throws InvalidUserInputException, Exception {
+        // Handle human players turn.
+        PlayedTurnData playedTurnData = playTurnParameters.getmTurnType().equals(eTurnType.AddDisc) ?
+                this.addDisc(playTurnParameters.getmSelectedColumn()) : this.popout(playTurnParameters.getmSelectedColumn());
 
         // Update game state when turn ends.
-        this.mGameStatus.mGameState = playerTurn.getGameState();
-        this.mHistoryManager.SetCurrentTurn(playerTurn);
-        this.mGameStatus.FinishedTurn();
+        this.finishedPlayingTurn(playedTurnData);
 
-        return playerTurn;
+        List<PlayedTurnData> playedTurnDataList = new ArrayList<>();
+
+        playedTurnDataList.add(playedTurnData);
+        playedTurnDataList.addAll(this.playComputerAlgoGamesIfNeededAndGetData()); // Add all of the computer algo's turns to the list.
+
+        return playedTurnDataList;
     }
 
-    public eGameState Popout(int column) {
-        this.mGameBoard.Popout(column - 1);
+    private Collection<? extends PlayedTurnData> playComputerAlgoGamesIfNeededAndGetData() throws Exception {
+        List<PlayedTurnData> playedTurnDataList = new ArrayList<>();
 
-        // Check if there is a winning sequence starting from a cell in the selectred column as a result of the Popout.
-        return this.mSequenceSearcher.CheckColumnForWinningSequences(column) ? eGameState.Won : eGameState.Active;
+        while(this.mGameStatus.mPlayer.getType().equals(ePlayerType.Computer)) { // While current player is a computer.
+            // Use algo to determine next computer turn.
+            PlayTurnParameters computerPlayTurnParams = this.mComputerPlayerAlgo.getNextPlay(this.mGameStatus.mPlayer);
+            // Play add disc or popout.
+            PlayedTurnData playedTurnData = computerPlayTurnParams.getmTurnType().equals(eTurnType.AddDisc) ?
+                    this.addDisc(computerPlayTurnParams.getmSelectedColumn()) : this.popout(computerPlayTurnParams.getmSelectedColumn());
+
+            playedTurnDataList.add(playedTurnData);
+            this.finishedPlayingTurn(playedTurnData);
+        }
+
+        return playedTurnDataList;
+    }
+
+    private void finishedPlayingTurn(PlayedTurnData playedTurnData) {
+        this.mGameStatus.mGameState = playedTurnData.getGameState();
+        this.mHistoryManager.SetCurrentTurn(playedTurnData);
+        this.mGameStatus.FinishedTurn();
+    }
+
+    private PlayedTurnData addDisc(int column) throws InvalidUserInputException, Exception {
+        Cell chosenCell = this.mGameBoard.UpdateBoard(column, this.mGameStatus.getPlayer()); // send parameter to logic board
+        return this.updateGameStatusAfterDiscAdded(chosenCell);
+    }
+
+    public PlayedTurnData popout(int column) {
+        PlayedTurnData playedTurnData = new PlayedTurnData();
+        Collection<Cell> updatedCells = this.mGameBoard.PopoutAndGetUpdatedCells(column - 1);
+
+        playedTurnData.setUpdatedCellsCollection(updatedCells);
+        playedTurnData.setGameState(this.mSequenceSearcher.CheckColumnForWinningSequences(column) ? eGameState.Won : eGameState.Active);
+        playedTurnData.setPlayerTurn(this.mGameStatus.mPlayer);
+        playedTurnData.setTurnType(eTurnType.Popout);
+
+        this.finishedPlayingTurn(playedTurnData);
+
+        // Check if there is a winning sequence starting from a cell in the selected column as a result of the Popout.
+        return playedTurnData;
     }
 
     public eGameState PlayerQuit(Player player) {
@@ -105,15 +154,17 @@ public class Logic implements ILogic {
         return (mGameStatus != null && mGameStatus.getGameState() == eGameState.Active);
     }
 
-    private PlayerTurn updateGameStatus(Cell updatedCell) {
-        eGameState currentGameState = getCurrentGameState(updatedCell);
-        PlayerTurn playerTurn = new PlayerTurn();
+    private PlayedTurnData updateGameStatusAfterDiscAdded(Cell updatedCell) {
+        eGameState currentGameState = this.getCurrentGameState(updatedCell);
+        PlayedTurnData playedTurnData = new PlayedTurnData();
+        List<Cell> updatedCells = new ArrayList<>();
 
-        playerTurn.setUpdatedCell(updatedCell);
-        playerTurn.setPlayerTurn(updatedCell.getPlayer());
-        playerTurn.setGameState(currentGameState);
+        updatedCells.add(updatedCell);
+        playedTurnData.setUpdatedCellsCollection(updatedCells);
+        playedTurnData.setPlayerTurn(updatedCell.getPlayer());
+        playedTurnData.setGameState(currentGameState);
 
-        return playerTurn;
+        return playedTurnData;
     }
 
     private eGameState getCurrentGameState(Cell updatedCell) {
@@ -129,7 +180,7 @@ public class Logic implements ILogic {
     }
 
     @Override
-    public List<PlayerTurn> GetTurnHistory() {
+    public List<PlayedTurnData> GetTurnHistory() {
         // send parameters to history manager
         return this.mHistoryManager.GetGameHistory();
     }
@@ -144,24 +195,24 @@ public class Logic implements ILogic {
         HistoryFileManager.SaveGameHistoryInXMLFile(GameSettings.getSavedGameFileName(), mHistoryManager.GetGameHistory());
     }
 
-    @Override
-    public void LoadExistsGame() throws IOException, ClassNotFoundException, Exception {
-        String path = GameSettings.getSavedGameFileName();
-        File loadedFile = new File(path);
-
-        if (loadedFile.exists()) {
-            List<PlayerTurn> loadedGameTurnHistory = HistoryFileManager.ReadGameHistoryFromXMLFile(path);
-            StartGame();
-
-            if (loadedGameTurnHistory != null) {
-                for (PlayerTurn turn : loadedGameTurnHistory) {
-                    this.PlayTurn(turn.getUpdatedCell().getColumnIndex());
-                }
-            }
-        } else {
-            throw new FileNotFoundException("Cannot find file: " + path);
-        }
-    }
+//    @Override
+//    public void LoadExistsGame() throws IOException, ClassNotFoundException, Exception {
+//        String path = GameSettings.getSavedGameFileName();
+//        File loadedFile = new File(path);
+//
+//        if (loadedFile.exists()) {
+//            List<PlayedTurnData> loadedGameTurnHistory = HistoryFileManager.ReadGameHistoryFromXMLFile(path);
+//            StartGame();
+//
+//            if (loadedGameTurnHistory != null) {
+//                for (PlayedTurnData turn : loadedGameTurnHistory) {
+//                    this.PlayTurn(turn.getUpdatedCell().getColumnIndex());
+//                }
+//            }
+//        } else {
+//            throw new FileNotFoundException("Cannot find file: " + path);
+//        }
+//    }
 
     @Override
     public Board getBoard() {

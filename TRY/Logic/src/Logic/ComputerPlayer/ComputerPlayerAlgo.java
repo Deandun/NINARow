@@ -4,6 +4,7 @@ import Logic.Enums.eTurnType;
 import Logic.Enums.eVariant;
 import Logic.Interfaces.IComputerPlayerAlgo;
 import Logic.Models.Board;
+import Logic.Models.PlayTurnParameters;
 import Logic.Models.GameSettings;
 import Logic.Models.Player;
 
@@ -16,7 +17,7 @@ public class ComputerPlayerAlgo implements IComputerPlayerAlgo {
 
     // TODO: exception is thrown when the board is full and the player can't even use popout. handle it in UI (game draw)
     @Override
-    public ComputerPlayerTurnData getNextPlay(Player playingPlayer) throws Exception {
+    public PlayTurnParameters getNextPlay(Player playingPlayer) throws Exception {
         int selectedColumn;
         eTurnType turnType;
 
@@ -28,7 +29,7 @@ public class ComputerPlayerAlgo implements IComputerPlayerAlgo {
             turnType = eTurnType.AddDisc;
         }
 
-        return new ComputerPlayerTurnData(selectedColumn, turnType);
+        return new PlayTurnParameters(selectedColumn, turnType);
     }
 
     private int getPopoutColumn(Player playingPlayer) {

@@ -4,9 +4,10 @@ import Logic.Enums.eGameState;
 import Logic.Enums.eTurnType;
 
 import java.io.Serializable;
+import java.util.Collection;
 
-public class PlayerTurn implements Serializable {
-    private Cell mUpdatedCell;
+public class PlayedTurnData implements Serializable {
+    private Collection<Cell> mUpdatedCellsCollection;
     private Player mPlayer;
     private eGameState mGameStateAfterTurn;
     private eTurnType mTurnType;
@@ -19,8 +20,8 @@ public class PlayerTurn implements Serializable {
         this.mTurnType = turnType;
     }
 
-    public Cell getUpdatedCell() {
-        return mUpdatedCell;
+    public Collection<Cell> getUpdatedCellsCollection() {
+        return mUpdatedCellsCollection;
     }
 
     public Player getPlayer() {
@@ -35,14 +36,8 @@ public class PlayerTurn implements Serializable {
         this.mGameStateAfterTurn = gameState;
     }
 
-    public String toString(){
-        return  "Game state = " + mGameStateAfterTurn.name() +
-                ", Play turn = " + mUpdatedCell.getPlayer().toString() +
-                ", Chosen column = " + mUpdatedCell; //mUpdatedCell.getColumnIndex();
-    }
-
-    public void setUpdatedCell(Cell updatedCell) {
-        this.mUpdatedCell = updatedCell;
+    public void setUpdatedCellsCollection(Collection<Cell> updatedCell) {
+        this.mUpdatedCellsCollection = updatedCell;
     }
 
     public void setPlayerTurn(Player player) {

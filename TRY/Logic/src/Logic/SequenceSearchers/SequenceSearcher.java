@@ -5,23 +5,24 @@ import Logic.Interfaces.ISequenceSearcherStrategy;
 import Logic.Models.Board;
 import Logic.Models.Cell;
 import Logic.Models.GameSettings;
+import Logic.Models.Player;
 
 import java.util.*;
 
 public class SequenceSearcher {
     private Cell[][] mBoard;
-    private Map<String, Collection<Cell>> mPlayerID2WinningSequence = new HashMap<>(); // A map between a player's ID and his winning sequence (if exists)
+    private Map<Player, Collection<Cell>> mPlayerToWinningSequenceMap = new HashMap<>(); // A map between a player's ID and his winning sequence (if exists)
 
     public void setBoard(Board board) {
         mBoard = board.getCellArray();
     }
 
-    public Map<String, Collection<Cell>> getWinningSequencesMap() {
-        return mPlayerID2WinningSequence;
+    public Map<Player, Collection<Cell>> getPlayerToWinningSequencesMap() {
+        return mPlayerToWinningSequenceMap;
     }
 
     public void Clear() {
-        mPlayerID2WinningSequence.clear();
+        mPlayerToWinningSequenceMap.clear();
         mBoard = null;
     }
 
@@ -31,7 +32,7 @@ public class SequenceSearcher {
             this.CheckColumnForWinningSequences(i);
         }
 
-        return !mPlayerID2WinningSequence.isEmpty(); // If winning sequence is found, winning sequences map won't be empty
+        return !mPlayerToWinningSequenceMap.isEmpty(); // If winning sequence is found, winning sequences map won't be empty
     }
 
     public boolean CheckColumnForWinningSequences(int column) {
@@ -40,7 +41,7 @@ public class SequenceSearcher {
             this.CheckCellForWinningSequence(mBoard[i][column]);
         }
 
-        return !mPlayerID2WinningSequence.isEmpty(); // If winning sequence is found, winning sequences map won't be empty;
+        return !mPlayerToWinningSequenceMap.isEmpty(); // If winning sequence is found, winning sequences map won't be empty;
     }
 
     public boolean CheckCellForWinningSequence(Cell updatedCell) {
@@ -87,7 +88,7 @@ public class SequenceSearcher {
 
         if(finalSet.size() >= GameSettings.getInstance().getTarget()) {
             isSequenceFound = true;
-            mPlayerID2WinningSequence.put(sequenceStartingCell.getPlayer().getID(), finalSet);
+            mPlayerToWinningSequenceMap.put(sequenceStartingCell.getPlayer(), finalSet);
         }
 
         return isSequenceFound;
@@ -106,7 +107,7 @@ public class SequenceSearcher {
 
         if(finalSet.size() >= GameSettings.getInstance().getTarget()) {
             isSequenceFound = true;
-            mPlayerID2WinningSequence.put(sequenceStartingCell.getPlayer().getID(), finalSet);
+            mPlayerToWinningSequenceMap.put(sequenceStartingCell.getPlayer(), finalSet);
         }
 
         return isSequenceFound;
@@ -132,10 +133,10 @@ public class SequenceSearcher {
 
         if(finalBotLeftToTopRightDiagonalSet.size() >= target) {
             isSequenceFound = true;
-            mPlayerID2WinningSequence.put(sequenceStartingCell.getPlayer().getID(), finalBotLeftToTopRightDiagonalSet);
+            mPlayerToWinningSequenceMap.put(sequenceStartingCell.getPlayer(), finalBotLeftToTopRightDiagonalSet);
         } else if (finalTopLeftToBotRightDiagonalSet.size() >= target) {
             isSequenceFound = true;
-            mPlayerID2WinningSequence.put(sequenceStartingCell.getPlayer().getID(), finalTopLeftToBotRightDiagonalSet);
+            mPlayerToWinningSequenceMap.put(sequenceStartingCell.getPlayer(), finalTopLeftToBotRightDiagonalSet);
         }
 
         return isSequenceFound;
