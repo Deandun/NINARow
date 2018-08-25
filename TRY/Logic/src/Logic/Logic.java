@@ -16,7 +16,6 @@ import Logic.Models.*;
 import Logic.SequenceSearchers.SequenceSearcher;
 
 import javax.xml.bind.JAXBException;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.time.Duration;
@@ -52,7 +51,6 @@ public class Logic implements ILogic {
         this.mGameBoard = new Board(GameSettings.getInstance().getRows(), GameSettings.getInstance().getColumns());
     }
 
-    //TODO: check if the first player is a computer player. If so, call playturn.
     @Override
     public void StartGame() {
         // Set game board
@@ -72,7 +70,6 @@ public class Logic implements ILogic {
         return mGameStatus;
     }
 
-    // TODO: make this function return a list of turns (in case computer players played after human players.
     @Override
     public List<PlayedTurnData> PlayTurn(PlayTurnParameters playTurnParameters) throws InvalidUserInputException, Exception {
         // Handle human players turn.
@@ -90,10 +87,12 @@ public class Logic implements ILogic {
         return playedTurnDataList;
     }
 
-    private Collection<? extends PlayedTurnData> playComputerAlgoGamesIfNeededAndGetData() throws Exception {
+    private List<PlayedTurnData> playComputerAlgoGamesIfNeededAndGetData() throws Exception {
         List<PlayedTurnData> playedTurnDataList = new ArrayList<>();
+        boolean isComputerPlayerPlayingNext = this.mGameStatus.mPlayer.getType().equals(ePlayerType.Computer);
+        boolean shouldPlayAnotherTurn = true;
 
-        while(this.mGameStatus.mPlayer.getType().equals(ePlayerType.Computer)) { // While current player is a computer.
+        while(shouldPlayAnotherTurn && isComputerPlayerPlayingNext) { // While current player is a computer.
             // Use algo to determine next computer turn.
             PlayTurnParameters computerPlayTurnParams = this.mComputerPlayerAlgo.getNextPlay(this.mGameStatus.mPlayer);
             // Play add disc or popout.
@@ -102,6 +101,9 @@ public class Logic implements ILogic {
 
             playedTurnDataList.add(playedTurnData);
             this.finishedPlayingTurn(playedTurnData);
+
+            isComputerPlayerPlayingNext = this.mGameStatus.mPlayer.getType().equals(ePlayerType.Computer);
+            shouldPlayAnotherTurn = playedTurnData.getGameState().equals(eGameState.Active); // Stop playing computer turns when game has ended.
         }
 
         return playedTurnDataList;
@@ -118,7 +120,7 @@ public class Logic implements ILogic {
         return this.updateGameStatusAfterDiscAdded(chosenCell);
     }
 
-    public PlayedTurnData popout(int column) {
+    private PlayedTurnData popout(int column) {
         PlayedTurnData playedTurnData = new PlayedTurnData();
         Collection<Cell> updatedCells = this.mGameBoard.PopoutAndGetUpdatedCells(column - 1);
 
@@ -132,6 +134,11 @@ public class Logic implements ILogic {
         // Check if there is a winning sequence starting from a cell in the selected column as a result of the Popout.
         return playedTurnData;
     }
+
+    public List<PlayedTurnData> playComputerPlayersTurns() throws Exception {
+        return this.playComputerAlgoGamesIfNeededAndGetData();
+    }
+
 
     public eGameState PlayerQuit(Player player) {
         this.mGameStatus.PlayerQuitGame(player);
@@ -226,6 +233,10 @@ public class Logic implements ILogic {
 
     public void exitGame() {
         //TODO: implement
+    }
+
+    public List<Integer> getAvailablePopoutColumnsForCurrentPlayer() {
+        return mGameBoard.getAvailablePopoutColumnsForCurrentPlayer(mGameStatus.mPlayer);
     }
 
     public class GameStatus implements IGameStatus {

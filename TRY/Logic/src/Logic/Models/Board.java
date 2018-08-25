@@ -5,6 +5,8 @@ import Logic.Exceptions.InvalidUserInputException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class Board{
     private Cell[][] mBoard;
@@ -52,12 +54,26 @@ public class Board{
         return chosenCell;
     }
 
+    public List<Integer> getAvailablePopoutColumnsForCurrentPlayer(Player mPlayer) {
+        List<Integer> popoutAvailableColumnSortedList = new ArrayList<>();
+        int lastRowIndex = mBoard.length - 1;
+
+        for(int i = 0; i < GameSettings.getInstance().getColumns(); i++) { // Go over columns.
+            if(this.mBoard[lastRowIndex][i].getPlayer() != null && this.mBoard[lastRowIndex][i].getPlayer().equals(mPlayer)) { // Check cell in column's last row.
+                popoutAvailableColumnSortedList.add(i); // If cell belongs to the current player, player can popout at column - add to list.
+            }
+        }
+
+        // Since we went from 0..."number of columns", the list will be sorted in an ascending order.
+        return popoutAvailableColumnSortedList;
+    }
+
     public boolean CanPlayerPerformPopout(Player player) {
         int lastRowIndex = mBoard.length - 1;
 
         // Check if there is a disc at the bottom of any of the columns.
         return Arrays.stream(mBoard[lastRowIndex]).anyMatch(
-                    (cell) -> cell.getPlayer().equals(player)
+                    (cell) -> cell.getPlayer() != null && cell.getPlayer().equals(player)
                 );
     }
 
@@ -112,6 +128,20 @@ public class Board{
         return !mBoard[0][columnIndex].isEmpty();
     }
 
+    public Cell getFirstAvailableCellForColumn(int columnIndex) {
+        Cell firstAvailableCell = null;
+
+        // Start bottom to top and return the first empty cell.
+        for(int i = GameSettings.getInstance().getRows() - 1; i >= 0 ; i--) {
+            if(mBoard[i][columnIndex].isEmpty()) {
+                firstAvailableCell = mBoard[i][columnIndex];
+                break;
+            }
+        }
+
+        return firstAvailableCell;
+    }
+
     private Collection<Cell> removeCellFromIndexAndGetUpdatedCells(int row, int column) {
         Collection<Cell> updatedCellsList = new ArrayList<>();
         Player upperCellPlayer;
@@ -129,6 +159,7 @@ public class Board{
         }
 
         mBoard[0][column].setPlayer(null); // After this function, the up most disc in the column should always be null.
+
         return updatedCellsList;
     }
 }

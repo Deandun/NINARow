@@ -1,6 +1,8 @@
 package UI.Controllers;
 import Logic.Enums.eGameState;
+import Logic.Enums.ePlayerType;
 import Logic.Enums.eTurnType;
+import Logic.Enums.eVariant;
 import Logic.Logic;
 import Logic.Models.*;
 import UI.Controllers.ControllerDelegates.IBoardControllerDelegate;
@@ -108,7 +110,7 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
                 this.mBorderPane.setMaxSize(300, 300);
                 // TODO: make it so setCenter doesn't "pull" top, left and right panes towards the center.
                 this.mBorderPane.setCenter(this.mBoardController.getBoardPane());
-                this.initImageManager();
+                this.initImageManagerWithPlayerImages();
             } catch(Exception e) {
                 System.out.println(e.getMessage());
                 //TODO: implement this and all of the other exceptions
@@ -117,18 +119,35 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
     }
 
     @FXML
-    void startGame() {
+    void startGame() throws Exception {
         this.mBtnLoadFile.setDisable(true); // TODO: do we really need to disable load file? I think we need to support loading a new file during a game. Need to check exercise
-        this.mBoardController.setIsBoardEnabled(true);
+        this.mBoardController.getBoardPane().setDisable(false);
         this.mBoardController.ResetBoard();
         this.mLogic.StartGame();
 //        this.mGameDetailsController.setDelegate(this); TODO: figure out why this is null when we start game.
         initDetails();
+
+        if(mLogic.GetCurrentPlayer().getType().equals(ePlayerType.Computer)) {// If first player is a computer player
+            // This method throws an exception that should'nt occure. If it does, then theres something wrong with the computer player algo.
+            List<PlayedTurnData> computerPlayersTurnDataList = this.mLogic.playComputerPlayersTurns(); // If the first players are computer players, play their turns.
+            computerPlayersTurnDataList
+                    .forEach(
+                            turnData -> this.mBoardController.InsertDiscstAt(turnData.getUpdatedCellsCollection())
+                    );
+        }
+
     }
 
     public void setOnAction() {
         this.mBtnLoadFile.setOnAction(e -> loadFile());
-        this.mBtnStartGame.setOnAction(e -> startGame());
+        this.mBtnStartGame.setOnAction(e -> {
+            try {
+                startGame();
+            } catch (Exception e1) {
+                // This method throws an exception that should'nt occure. If it does, then theres something wrong with the computer player algo.
+                e1.printStackTrace();
+            }
+        });
         this.mBtnExitGame.setOnMouseClicked(e -> exitGame());
     }
 
@@ -150,7 +169,7 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
         }
     }
 
-    private void initImageManager() {
+    private void initImageManagerWithPlayerImages() {
         List<String> playerIDs = new ArrayList<>();
 
         GameSettings
@@ -185,7 +204,7 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
 
     private void handleUIAfterPlayedTurns(List<PlayedTurnData> playedTurnDataList) {
         for(PlayedTurnData turnData: playedTurnDataList) {
-            this.mBoardController.InsertDistAt(turnData.getUpdatedCellsCollection());
+            this.mBoardController.InsertDiscstAt(turnData.getUpdatedCellsCollection());
             eGameState gameState = turnData.getGameState();
 
             if(gameState.equals(eGameState.Won)) {
@@ -197,6 +216,12 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
             } else if (gameState.equals(eGameState.Draw)) {
                 //TODO: notify players that the game has ended in a draw.
                 break;
+            }
+
+            if(GameSettings.getInstance().getVariant().equals(eVariant.Popout)) {
+                // Enable popout buttons that the user is allowed to click.
+                List<Integer> availablePopoutColumnSortedList = this.mLogic.getAvailablePopoutColumnsForCurrentPlayer();
+                this.mBoardController.DisablePopoutButtonsForColumns(availablePopoutColumnSortedList);
             }
         }
     }

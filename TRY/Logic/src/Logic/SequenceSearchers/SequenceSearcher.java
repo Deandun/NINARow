@@ -11,18 +11,18 @@ import java.util.*;
 
 public class SequenceSearcher {
     private Cell[][] mBoard;
-    private Map<Player, Collection<Cell>> mPlayerToWinningSequenceMap = new HashMap<>(); // A map between a player's ID and his winning sequence (if exists)
+    private Map<Player, Collection<Cell>> mPlayerToWinningSequencesMap = new HashMap<>(); // A map between a player's ID and his winning sequence (if exists)
 
     public void setBoard(Board board) {
         mBoard = board.getCellArray();
     }
 
     public Map<Player, Collection<Cell>> getPlayerToWinningSequencesMap() {
-        return mPlayerToWinningSequenceMap;
+        return mPlayerToWinningSequencesMap;
     }
 
     public void Clear() {
-        mPlayerToWinningSequenceMap.clear();
+        mPlayerToWinningSequencesMap.clear();
         mBoard = null;
     }
 
@@ -32,7 +32,7 @@ public class SequenceSearcher {
             this.CheckColumnForWinningSequences(i);
         }
 
-        return !mPlayerToWinningSequenceMap.isEmpty(); // If winning sequence is found, winning sequences map won't be empty
+        return !mPlayerToWinningSequencesMap.isEmpty(); // If winning sequence is found, winning sequences map won't be empty
     }
 
     public boolean CheckColumnForWinningSequences(int column) {
@@ -41,15 +41,42 @@ public class SequenceSearcher {
             this.CheckCellForWinningSequence(mBoard[i][column]);
         }
 
-        return !mPlayerToWinningSequenceMap.isEmpty(); // If winning sequence is found, winning sequences map won't be empty;
+        return !mPlayerToWinningSequencesMap.isEmpty(); // If winning sequence is found, winning sequences map won't be empty;
     }
 
     public boolean CheckCellForWinningSequence(Cell updatedCell) {
-        return checkHorizontalSequence(updatedCell) || checkVerticalSequence(updatedCell) || checkDiagonalSequence(updatedCell);
+        Player playingPlayer = updatedCell.getPlayer();
+        Collection<Cell> horizontalSequenceList = getkHorizontalSequence(updatedCell, playingPlayer);
+        Collection<Cell> verticalSequenceList = getVerticalSequence(updatedCell, playingPlayer);
+        Collection<Cell> maxDiagonalSequenceList = getMaxDiagonalSequence(updatedCell, playingPlayer);
+        Player player = updatedCell.getPlayer();
+
+        return  isSequenceBigEnough(horizontalSequenceList, player) || isSequenceBigEnough(verticalSequenceList, player)
+                || isSequenceBigEnough(maxDiagonalSequenceList, player);
+    }
+
+    public int getLargestSequenceSize(Cell cell, Player playingPlayer) {
+        int horizontalSequenceSize = getkHorizontalSequence(cell, playingPlayer).size();
+        int verticalSequenceSize = getVerticalSequence(cell, playingPlayer).size();
+        int maxDiagonalSequenceSize = getMaxDiagonalSequence(cell, playingPlayer).size();
+
+        // Return max sequence size.
+        return Math.max(Math.max(horizontalSequenceSize, verticalSequenceSize), maxDiagonalSequenceSize);
+    }
+
+    private boolean isSequenceBigEnough(Collection<Cell> cellSequence, Player player) {
+        boolean isSequenceBigEnough = cellSequence.size() >= GameSettings.getInstance().getTarget();
+
+        if(isSequenceBigEnough) {
+            mPlayerToWinningSequencesMap.put(player, cellSequence);
+        }
+
+        return isSequenceBigEnough;
     }
 
     // Returns the sequence of cells that belong to the same player. The sequence's direction is determined by the chosen strategy.
-    private Set<Cell> getSequence(Cell updatedCell, ISequenceSearcherStrategy sequenceSearcher) {
+    // The player param represents the player who we are searching the sequence for.
+    private Set<Cell> getSequence(Cell updatedCell, ISequenceSearcherStrategy sequenceSearcher, Player playerSequenceIsSearchedFor) {
         boolean isSamePlayer = true;
         Set<Cell> cellSequence = new HashSet<>();
         int currentRow = updatedCell.getRowIndex();
@@ -63,7 +90,8 @@ public class SequenceSearcher {
             if(sequenceSearcher.shouldStopLooking(currentRow, currentColumn)) {
                 break;
             } else {
-                isSamePlayer = updatedCell.getPlayer().equals(mBoard[currentRow][currentColumn].getPlayer());
+                // True if cell is not empty and cell is occupied by the same player we're sequence searching for.
+                isSamePlayer = playerSequenceIsSearchedFor.equals(mBoard[currentRow][currentColumn].getPlayer());
             }
         }
 
@@ -71,74 +99,49 @@ public class SequenceSearcher {
     }
 
     // Connects the sequences from both the first and second strategies. Duplicate cells are dealt with by using a set.
-    private Set<Cell> getSequenceFinalSet(Cell sequenceStartingCell, ISequenceSearcherStrategy firstStrategy, ISequenceSearcherStrategy secondStrategy) {
-        Set<Cell> firstSequence = getSequence(sequenceStartingCell, firstStrategy);
-        Set<Cell> secondSequence = getSequence(sequenceStartingCell, secondStrategy);
+    private Set<Cell> getSequenceFinalSet(Cell sequenceStartingCell, ISequenceSearcherStrategy firstStrategy, ISequenceSearcherStrategy secondStrategy, Player playingPlayer) {
+        Set<Cell> firstSequence = getSequence(sequenceStartingCell, firstStrategy, playingPlayer);
+        Set<Cell> secondSequence = getSequence(sequenceStartingCell, secondStrategy, playingPlayer);
         firstSequence.addAll(secondSequence);
+
         return firstSequence;
     }
 
     // Check horizontal sequence: "---"
-    private boolean checkHorizontalSequence(Cell sequenceStartingCell) {
+    private Collection<Cell> getkHorizontalSequence(Cell sequenceStartingCell, Player playingPlayer) {
         ISequenceSearcherStrategy rightSequenceSearcher = SequenceSearcherStrategyFactory.getSequenceSearcherStrategyForType(eSequenceSearcherType.Right);
         ISequenceSearcherStrategy leftSequenceSearcher = SequenceSearcherStrategyFactory.getSequenceSearcherStrategyForType(eSequenceSearcherType.Left);
-        Set<Cell> finalSet = getSequenceFinalSet(sequenceStartingCell, rightSequenceSearcher, leftSequenceSearcher);
 
-        boolean isSequenceFound = false;
-
-        if(finalSet.size() >= GameSettings.getInstance().getTarget()) {
-            isSequenceFound = true;
-            mPlayerToWinningSequenceMap.put(sequenceStartingCell.getPlayer(), finalSet);
-        }
-
-        return isSequenceFound;
+        return getSequenceFinalSet(sequenceStartingCell, rightSequenceSearcher, leftSequenceSearcher, playingPlayer);
     }
 
     // Check vertical sequence:
     //      |
     //      |
     //      |
-    private boolean checkVerticalSequence(Cell sequenceStartingCell) {
+    private Collection<Cell> getVerticalSequence(Cell sequenceStartingCell, Player playingPlayer) {
         ISequenceSearcherStrategy topSequenceSearcher = SequenceSearcherStrategyFactory.getSequenceSearcherStrategyForType(eSequenceSearcherType.Top);
         ISequenceSearcherStrategy bottomSequenceSearcher = SequenceSearcherStrategyFactory.getSequenceSearcherStrategyForType(eSequenceSearcherType.Bottom);
-        Set<Cell> finalSet = getSequenceFinalSet(sequenceStartingCell, topSequenceSearcher, bottomSequenceSearcher);
-
-        boolean isSequenceFound = false;
-
-        if(finalSet.size() >= GameSettings.getInstance().getTarget()) {
-            isSequenceFound = true;
-            mPlayerToWinningSequenceMap.put(sequenceStartingCell.getPlayer(), finalSet);
-        }
-
-        return isSequenceFound;
+        return getSequenceFinalSet(sequenceStartingCell, topSequenceSearcher, bottomSequenceSearcher, playingPlayer);
     }
 
     // Check diagonal sequences:
     //  \      OR       /
     //   \             /
     //    \           /
-    private boolean checkDiagonalSequence(Cell sequenceStartingCell) {
+    private Collection<Cell> getMaxDiagonalSequence(Cell sequenceStartingCell, Player playingPlayer) {
         // Get bottom left to top right diagonal cell set.
         ISequenceSearcherStrategy topRightSequenceSearcher = SequenceSearcherStrategyFactory.getSequenceSearcherStrategyForType(eSequenceSearcherType.TopRight);
         ISequenceSearcherStrategy bottomLeftSequenceSearcher = SequenceSearcherStrategyFactory.getSequenceSearcherStrategyForType(eSequenceSearcherType.BottomLeft);
-        Set<Cell> finalBotLeftToTopRightDiagonalSet = getSequenceFinalSet(sequenceStartingCell, topRightSequenceSearcher, bottomLeftSequenceSearcher);
+        Set<Cell> finalBotLeftToTopRightDiagonalSet = getSequenceFinalSet(sequenceStartingCell, topRightSequenceSearcher, bottomLeftSequenceSearcher, playingPlayer);
 
         // Get top left to bottom right diagonal cell set.
         ISequenceSearcherStrategy topLeftSequenceSearcher = SequenceSearcherStrategyFactory.getSequenceSearcherStrategyForType(eSequenceSearcherType.TopLeft);
         ISequenceSearcherStrategy bottomRightSequenceSearcher = SequenceSearcherStrategyFactory.getSequenceSearcherStrategyForType(eSequenceSearcherType.BottomRight);
-        Set<Cell> finalTopLeftToBotRightDiagonalSet = getSequenceFinalSet(sequenceStartingCell, bottomRightSequenceSearcher, topLeftSequenceSearcher);
+        Set<Cell> finalTopLeftToBotRightDiagonalSet = getSequenceFinalSet(sequenceStartingCell, bottomRightSequenceSearcher, topLeftSequenceSearcher, playingPlayer);
 
-        boolean isSequenceFound = false;
-        int target = GameSettings.getInstance().getTarget();
-
-        if(finalBotLeftToTopRightDiagonalSet.size() >= target) {
-            isSequenceFound = true;
-            mPlayerToWinningSequenceMap.put(sequenceStartingCell.getPlayer(), finalBotLeftToTopRightDiagonalSet);
-        } else if (finalTopLeftToBotRightDiagonalSet.size() >= target) {
-            isSequenceFound = true;
-            mPlayerToWinningSequenceMap.put(sequenceStartingCell.getPlayer(), finalTopLeftToBotRightDiagonalSet);
-        }
-
-        return isSequenceFound;
+        // Return max sequence
+        return finalBotLeftToTopRightDiagonalSet.size() > finalTopLeftToBotRightDiagonalSet.size() ?
+                finalBotLeftToTopRightDiagonalSet : finalTopLeftToBotRightDiagonalSet;
     }
 }

@@ -1,8 +1,10 @@
 package UI.Controllers;
 
+import Logic.Enums.ePlayerType;
+import Logic.Enums.eVariant;
 import Logic.Models.Cell;
+import Logic.Models.GameSettings;
 import Logic.Models.Player;
-import Logic.Models.PlayedTurnData;
 import UI.Controllers.ControllerDelegates.ICellControllerDelegate;
 import UI.UIMisc.ImageManager;
 import javafx.geometry.Insets;
@@ -22,22 +24,23 @@ import static UI.FinalSettings.POPOUT_BTN_SIZE;
 public class BoardController implements ICellControllerDelegate {
 
     private List<CellController> mCellControllerList;
-    private List<Button> mPopOutList;
+    private List<Button> mPopOutButtonList;
     private GridPane mBoardPane;
     private int mNumColumns;
     private int mNumOfDiscRows;
     private int mPopoutRowIndex;
     private IBoardControllerDelegate mDelegate;
-    private boolean mIsEnabled;
+    private boolean mIsPopoutEnabled;
 
     public BoardController(int numRows, int numCols, IBoardControllerDelegate delegate) {
         this.mBoardPane = new GridPane();
-        this.mPopOutList = new ArrayList<>();
+        this.mBoardPane.setDisable(true);
+        this.mPopOutButtonList = new ArrayList<>();
         this.mNumColumns = numCols;
         this.mNumOfDiscRows = numRows;
         this.mCellControllerList = new ArrayList<>();
         this.mPopoutRowIndex = this.mNumOfDiscRows;
-        this.mIsEnabled = false;
+        this.mIsPopoutEnabled = GameSettings.getInstance().getVariant().equals(eVariant.Popout);
         this.mDelegate = delegate;
     }
 
@@ -56,20 +59,27 @@ public class BoardController implements ICellControllerDelegate {
             }
         }
 
-        for (i = 0; i < this.mNumColumns; i++) { //set popout list
+        if(mIsPopoutEnabled) {
+            initPopoutButtons();
+        }
+    }
+
+    private void initPopoutButtons() {
+        for (int i = 0; i < this.mNumColumns; i++) { //set popout list
             Button popoutBtn = new Button();
             Image img = new Image(getClass().getResourceAsStream("/UI/Images/popoutArrow.JPG"), POPOUT_BTN_SIZE, POPOUT_BTN_SIZE, true, true);
             popoutBtn.setGraphic(new ImageView(img));
             popoutBtn.setPrefSize(POPOUT_BTN_SIZE, POPOUT_BTN_SIZE);
             popoutBtn.setPadding(new Insets(1));
+            popoutBtn.setDisable(true);
 
-            this.mPopOutList.add(popoutBtn);
+            this.mPopOutButtonList.add(popoutBtn);
             this.mBoardPane.add(popoutBtn, i, this.mPopoutRowIndex);
             setPopoutActions(popoutBtn);
         }
     }
 
-    public void InsertDistAt(Collection<Cell> updatedCellsCollection) {
+    public void InsertDiscstAt(Collection<Cell> updatedCellsCollection) {
         // Insert discs one by one.
         for(Cell updatedCell: updatedCellsCollection) {
             CellController selectedCell = this.mCellControllerList
@@ -80,6 +90,14 @@ public class BoardController implements ICellControllerDelegate {
                     .findFirst()
                     .get(); // There has to be a cell that answers the predicate above, so there is no need to check ifPresent().
 
+            if(updatedCell.getPlayer().getType().equals(ePlayerType.Computer)) {
+                try {
+                    Thread.sleep(500); // Sleep for 0.5s before showing computer player's play.
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+
             selectedCell.setImage(ImageManager.getImageForPlayerID(updatedCell.getPlayer().getID()));
         }
     }
@@ -89,10 +107,8 @@ public class BoardController implements ICellControllerDelegate {
 
         popoutBtn.setOnAction(
                 e -> {
-                    int btnColumnInd = getColumnIndexForPopoutBtn(popoutBtn);
-                    if (this.mIsEnabled){
-                        mDelegate.PopoutBtnClicked(btnColumnInd);
-                    }
+                    int btnColumnInd = this.getColumnIndexForPopoutBtn(popoutBtn);
+                    mDelegate.PopoutBtnClicked(btnColumnInd);
                 }
         );
         popoutBtn.setOnMouseEntered(
@@ -104,7 +120,7 @@ public class BoardController implements ICellControllerDelegate {
     }
 
     private int getColumnIndexForPopoutBtn(Button btn) {
-        return mPopOutList.indexOf(btn);
+        return mPopOutButtonList.indexOf(btn);
     }
 
     @Override
@@ -112,22 +128,20 @@ public class BoardController implements ICellControllerDelegate {
         this.mDelegate.ColumnClicked(column);
     }
 
-    public boolean isPopoutAviable(Player currPlayer){
-        //TODO: need logic to check
-
-        return false;
-    }
-
-    public boolean getIsBoardEnabled() {
-        return mIsEnabled;
-    }
-
-    public void setIsBoardEnabled(boolean isEnabled) {
-        this.mIsEnabled = isEnabled;
-    }
-
     public void DisplayWinningSequences(Map<Player, Collection<Cell>> playerToWinningSequenceMap) {
-        // TODO:
+        //TODO: Add an effect to the winning sequence cells! Do it by adding a style class to the buttons and adding the class and effect to the css file.
+    }
+
+    public void DisablePopoutButtonsForColumns(List<Integer> columnsToEnableSortedList) {
+        // First, disable all buttons.
+        mPopOutButtonList.forEach(
+                btn -> btn.setDisable(true)
+        );
+
+        // Enable buttons whose indexes are in the list.
+        columnsToEnableSortedList.forEach(
+                index -> mPopOutButtonList.get(index).setDisable(false)
+        );
     }
 
     public void ResetBoard() {
