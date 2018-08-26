@@ -159,8 +159,6 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
         this.initImageManagerWithPlayerImages();
     }
 
-
-
     @FXML
     void startGame() throws Exception {
         this.mBtnLoadFile.setDisable(true); // TODO: do we really need to disable load file? I think we need to support loading a new file during a game. Need to check exercise
@@ -205,11 +203,8 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
         alert.setContentText("Are you sure you want to exit game?");
         Optional<ButtonType> result = alert.showAndWait();
 
-        if (result.get() == ButtonType.OK){ //user chose ok
-            //mDelegate.ExitGameBtnClicked(true);
+        if (result.get() == ButtonType.OK){
             System.exit(0);
-        } else { //user chose cancel
-
         }
     }
 

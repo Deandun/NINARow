@@ -2,6 +2,7 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.layout.BorderPane?>
@@ -19,6 +20,7 @@
          <top>
             <GridPane fx:id="mGridPaneConfig" prefHeight="41.0" prefWidth="600.0" BorderPane.alignment="CENTER">
                <columnConstraints>
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                   <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                   <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                </columnConstraints>
@@ -39,6 +41,11 @@
                         <Insets />
                      </opaqueInsets>
                   </Button>
+                  <ComboBox fx:id="mComboBoxTheame" prefWidth="150.0" promptText="Happy Theame" GridPane.columnIndex="2">
+                     <GridPane.margin>
+                        <Insets left="5.0" />
+                     </GridPane.margin>
+                  </ComboBox>
                </children>
             </GridPane>
          </top>
@@ -136,5 +143,3 @@
       </BorderPane>
    </children>
 </StackPane>
-
-

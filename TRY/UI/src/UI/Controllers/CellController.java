@@ -1,11 +1,9 @@
 package UI.Controllers;
 
 import UI.Controllers.ControllerDelegates.ICellControllerDelegate;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
@@ -33,6 +31,15 @@ public class CellController {
         mIVSign = new ImageView(this.mEmptyCellImg);
         mIVSign.setFitHeight(CELL_SIZE);
         mIVSign.setFitWidth(CELL_SIZE);
+
+        Rectangle clip = new Rectangle(
+                mIVSign.getFitWidth(), mIVSign.getFitHeight()
+        );
+        clip.setArcWidth(40);
+        clip.setArcHeight(40);
+        mIVSign.setClip(clip);
+
+
         setOnAction();
 
         mPane = new StackPane();
