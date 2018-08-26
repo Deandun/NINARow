@@ -207,6 +207,7 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
 
         if (result.get() == ButtonType.OK){ //user chose ok
             //mDelegate.ExitGameBtnClicked(true);
+            System.exit(0);
         } else { //user chose cancel
 
         }

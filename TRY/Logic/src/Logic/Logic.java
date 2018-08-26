@@ -129,8 +129,6 @@ public class Logic{
         playedTurnData.setPlayerTurn(this.mGameStatus.mPlayer);
         playedTurnData.setTurnType(eTurnType.Popout);
 
-        this.finishedPlayingTurn(playedTurnData);
-
         // Check if there is a winning sequence starting from a cell in the selected column as a result of the Popout.
         return playedTurnData;
     }
