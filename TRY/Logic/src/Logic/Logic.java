@@ -25,7 +25,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-public class Logic implements ILogic {
+public class Logic{
 
     private FileManager mFileManager;
     private HistoryManager mHistoryManager;
@@ -44,14 +44,12 @@ public class Logic implements ILogic {
 
     // ILogic interface implementation.
 
-    @Override
-    public void ReadGameFile(String filePath) throws FileNotFoundException, InvalidFileInputException, IOException, JAXBException {
-        mFileManager.LoadGameFile(filePath);
+    public void ReadGameFile(String filePath, Runnable onLoadFileFinish, Runnable onFinishedCheckingFileValidity) throws FileNotFoundException, InvalidFileInputException, IOException, JAXBException, InterruptedException {
+        mFileManager.LoadGameFile(filePath, onLoadFileFinish, onFinishedCheckingFileValidity);
         // TODO: when loading game file is moved to a seporate thread, create new board only when done loading file
         this.mGameBoard = new Board(GameSettings.getInstance().getRows(), GameSettings.getInstance().getColumns());
     }
 
-    @Override
     public void StartGame() {
         // Set game board
         this.mGameBoard.Init(GameSettings.getInstance().getRows(), GameSettings.getInstance().getColumns());
@@ -70,11 +68,12 @@ public class Logic implements ILogic {
         return mGameStatus;
     }
 
-    @Override
     public List<PlayedTurnData> PlayTurn(PlayTurnParameters playTurnParameters) throws InvalidUserInputException, Exception {
         // Handle human players turn.
         PlayedTurnData playedTurnData = playTurnParameters.getmTurnType().equals(eTurnType.AddDisc) ?
                 this.addDisc(playTurnParameters.getmSelectedColumn()) : this.popout(playTurnParameters.getmSelectedColumn());
+
+        playedTurnData.setTurnType(playTurnParameters.getmTurnType());
 
         // Update game state when turn ends.
         this.finishedPlayingTurn(playedTurnData);
@@ -99,6 +98,7 @@ public class Logic implements ILogic {
             PlayedTurnData playedTurnData = computerPlayTurnParams.getmTurnType().equals(eTurnType.AddDisc) ?
                     this.addDisc(computerPlayTurnParams.getmSelectedColumn()) : this.popout(computerPlayTurnParams.getmSelectedColumn());
 
+            playedTurnData.setTurnType(computerPlayTurnParams.getmTurnType());
             playedTurnDataList.add(playedTurnData);
             this.finishedPlayingTurn(playedTurnData);
 
@@ -122,7 +122,7 @@ public class Logic implements ILogic {
 
     private PlayedTurnData popout(int column) {
         PlayedTurnData playedTurnData = new PlayedTurnData();
-        Collection<Cell> updatedCells = this.mGameBoard.PopoutAndGetUpdatedCells(column - 1);
+        Collection<Cell> updatedCells = this.mGameBoard.PopoutAndGetUpdatedCells(column);
 
         playedTurnData.setUpdatedCellsCollection(updatedCells);
         playedTurnData.setGameState(this.mSequenceSearcher.CheckColumnForWinningSequences(column) ? eGameState.Won : eGameState.Active);
@@ -138,7 +138,6 @@ public class Logic implements ILogic {
     public List<PlayedTurnData> playComputerPlayersTurns() throws Exception {
         return this.playComputerAlgoGamesIfNeededAndGetData();
     }
-
 
     public eGameState PlayerQuit(Player player) {
         this.mGameStatus.PlayerQuitGame(player);
@@ -186,47 +185,23 @@ public class Logic implements ILogic {
         return gameState;
     }
 
-    @Override
     public List<PlayedTurnData> GetTurnHistory() {
         // send parameters to history manager
         return this.mHistoryManager.GetGameHistory();
     }
 
-    @Override
     public Player GetCurrentPlayer() {
         return this.mGameStatus.getPlayer();
     }
 
-    @Override
-    public void SaveGame() throws  IOException, ClassNotFoundException, Exception {
+    public void SaveGame() throws IOException, ClassNotFoundException, Exception {
         HistoryFileManager.SaveGameHistoryInXMLFile(GameSettings.getSavedGameFileName(), mHistoryManager.GetGameHistory());
     }
 
-//    @Override
-//    public void LoadExistsGame() throws IOException, ClassNotFoundException, Exception {
-//        String path = GameSettings.getSavedGameFileName();
-//        File loadedFile = new File(path);
-//
-//        if (loadedFile.exists()) {
-//            List<PlayedTurnData> loadedGameTurnHistory = HistoryFileManager.ReadGameHistoryFromXMLFile(path);
-//            StartGame();
-//
-//            if (loadedGameTurnHistory != null) {
-//                for (PlayedTurnData turn : loadedGameTurnHistory) {
-//                    this.PlayTurn(turn.getUpdatedCell().getColumnIndex());
-//                }
-//            }
-//        } else {
-//            throw new FileNotFoundException("Cannot find file: " + path);
-//        }
-//    }
-
-    @Override
     public Board getBoard() {
         return mGameBoard;
     }
 
-    @Override
     public eGameState GetGameState() {
         return mGameStatus.getGameState();
     }
@@ -237,6 +212,18 @@ public class Logic implements ILogic {
 
     public List<Integer> getAvailablePopoutColumnsForCurrentPlayer() {
         return mGameBoard.getAvailablePopoutColumnsForCurrentPlayer(mGameStatus.mPlayer);
+    }
+
+    //NOY
+    public List<PlayedTurnData> HandlePopout(int index) throws Exception {
+        if (getAvailablePopoutColumnsForCurrentPlayer().contains(index)){ //check if popout available
+            try {
+               return PlayTurn(new PlayTurnParameters(index, eTurnType.Popout));
+            } catch (Exception e) {
+                throw new Exception();
+            }
+        }
+        return null;
     }
 
     public class GameStatus implements IGameStatus {

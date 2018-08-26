@@ -83,7 +83,7 @@ public class GameDetailsController{
         if (result.get() == ButtonType.OK){ //user chose ok
             mDelegate.ExitGameBtnClicked(true);
         } else { //user chose cancel
-
+            alert.close();
         }
     }
 

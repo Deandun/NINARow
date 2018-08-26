@@ -69,7 +69,7 @@ public class ComputerPlayerAlgo implements IComputerPlayerAlgo {
         Map<Cell, Integer> firstAvailableCellToMaxSequenceLengthMap = new HashMap<>(); // a list of all the cells that are available for disc insertion
 
         for(int i = 0; i < GameSettings.getInstance().getColumns(); i++) {
-            Cell firstAvailableCellInColumn = mBoard.getFirstAvailableCellForColumn(i);
+            Cell firstAvailableCellInColumn = this.mBoard.getFirstAvailableCellForColumn(i);
 
             if(firstAvailableCellInColumn == null) {
                 continue; // No first cell in column,

@@ -5,22 +5,25 @@ import Logic.Enums.eTurnType;
 import Logic.Enums.eVariant;
 import Logic.Logic;
 import Logic.Models.*;
+import Logic.Models.Cell;
+import Tasks.ReadGameFileTask;
 import UI.Controllers.ControllerDelegates.IBoardControllerDelegate;
 import UI.Controllers.ControllerDelegates.IGameSettingsControllerDelegate;
 import UI.UIMisc.ImageManager;
+import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.concurrent.Service;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
+import javax.swing.*;
 import java.io.File;
 import java.util.*;
 
@@ -45,9 +48,11 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
     @FXML private Label mLblTurnNumber;
     @FXML private Label mLblTargetSize;
     @FXML private Label mLblVariant;
+    @FXML private FlowPane mBottomProgressPane;
+    @FXML private Label mProgressTextLabel;
+    @FXML private ProgressBar mProgressBar;
 
     private BoardController mBoardController;
-
     private GameDetailsController mGameDetailsController;
     //PlayerDetails Members:
 
@@ -64,6 +69,7 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
     private SimpleStringProperty mVariant;
     private Logic mLogic;
     private int mTurnCounter;
+
 
     public App() {
         this.mLogic = new Logic();
@@ -103,20 +109,57 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
             return;
         } else {
             try {
-                this.mLogic.ReadGameFile(selectedFile.getAbsolutePath());
-                this.mBtnStartGame.setDisable(false);
-                this.mBoardController = new BoardController(GameSettings.getInstance().getRows(), GameSettings.getInstance().getColumns(), this);
-                this.mBoardController.InitBoard();
-                this.mBorderPane.setMaxSize(300, 300);
+                // DEAN change
+                Runnable onTaskFinish = this::onReadGameFileFinish;
+                this.mBottomProgressPane.setVisible(true);
+
+                ReadGameFileTask readGameFileTask = new ReadGameFileTask(selectedFile.getAbsolutePath(), this.mLogic, onTaskFinish);
+                this.bindTaskToUI(readGameFileTask);
+                new Thread(readGameFileTask).start();
                 // TODO: make it so setCenter doesn't "pull" top, left and right panes towards the center.
-                this.mBorderPane.setCenter(this.mBoardController.getBoardPane());
-                this.initImageManagerWithPlayerImages();
+
             } catch(Exception e) {
                 System.out.println(e.getMessage());
                 //TODO: implement this and all of the other exceptions
             }
         }
     }
+
+    private void bindTaskToUI(ReadGameFileTask readGameFileTask) {
+        // task message
+        this.mProgressTextLabel
+                .textProperty()
+                // Concat between "task message" + "task percentage" + "%"
+                .bind(Bindings.concat(
+                        readGameFileTask.messageProperty(),
+                        Bindings.format(
+                                " (Progress: %.0f",
+                                Bindings.multiply(
+                                        readGameFileTask.progressProperty(),
+                                        100)),
+                        " %)")
+                );
+        //.bind(readGameFileTask.messageProperty());
+
+        // task progress bar
+        this.mProgressBar.progressProperty().bind(readGameFileTask.progressProperty());
+    }
+
+    private void onReadGameFileFinish() {
+        Platform.runLater(this::updateUIAfterGameFileRead);
+    }
+
+    private void updateUIAfterGameFileRead() {
+        this.mBottomProgressPane.setVisible(false);
+        this.mBtnStartGame.setDisable(false);
+        this.mBoardController = new BoardController(GameSettings.getInstance().getRows(), GameSettings.getInstance().getColumns(), this);
+        this.mBoardController.InitBoard();
+        this.mBorderPane.setMaxSize(300, 300);
+        this.mBorderPane.setCenter(this.mBoardController.getBoardPane());
+        this.initImageManagerWithPlayerImages();
+    }
+
+
 
     @FXML
     void startGame() throws Exception {
@@ -186,8 +229,17 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
     // IBoardControllerDelegate implementation
 
     @Override
-    public void PopoutBtnClicked(int index) {
+    public void PopoutBtnClicked(int btnIndex) {
+        System.out.println("Handle popup btn clicked"); //DEBUG
 
+        try {
+            List<PlayedTurnData> playedTurnData = this.mLogic.HandlePopout(btnIndex);
+            this.handleUIAfterPlayedTurns(playedTurnData);
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println(e.getMessage());
+            //TODO: catch all of the exceptions and handle them.
+        }
     }
 
     @Override
@@ -204,7 +256,11 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
 
     private void handleUIAfterPlayedTurns(List<PlayedTurnData> playedTurnDataList) {
         for(PlayedTurnData turnData: playedTurnDataList) {
-            this.mBoardController.InsertDiscstAt(turnData.getUpdatedCellsCollection());
+            if (turnData.getTurnType().equals(eTurnType.Popout)) {
+                this.mBoardController.PopoutDisc(turnData.getUpdatedCellsCollection());
+            } else {
+                this.mBoardController.InsertDiscstAt(turnData.getUpdatedCellsCollection());
+            }
             eGameState gameState = turnData.getGameState();
 
             if(gameState.equals(eGameState.Won)) {
@@ -228,6 +284,10 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
 
     @Override
     public void ExitGameBtnClicked(boolean doExit) {
+        System.out.println("Handle exit game btn clicked"); //DEBUG
+        if (doExit){
+            this.mLogic.exitGame();
 
+        }
     }
 }

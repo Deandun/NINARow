@@ -45,14 +45,23 @@ public class SequenceSearcher {
     }
 
     public boolean CheckCellForWinningSequence(Cell updatedCell) {
-        Player playingPlayer = updatedCell.getPlayer();
-        Collection<Cell> horizontalSequenceList = getkHorizontalSequence(updatedCell, playingPlayer);
-        Collection<Cell> verticalSequenceList = getVerticalSequence(updatedCell, playingPlayer);
-        Collection<Cell> maxDiagonalSequenceList = getMaxDiagonalSequence(updatedCell, playingPlayer);
-        Player player = updatedCell.getPlayer();
+        //TODO: check if logic works for all flow
+        boolean didPlayerWin;
 
-        return  isSequenceBigEnough(horizontalSequenceList, player) || isSequenceBigEnough(verticalSequenceList, player)
-                || isSequenceBigEnough(maxDiagonalSequenceList, player);
+        if(updatedCell.getPlayer() != null) {
+            Player playingPlayer = updatedCell.getPlayer();
+            Collection<Cell> horizontalSequenceList = getkHorizontalSequence(updatedCell, playingPlayer);
+            Collection<Cell> verticalSequenceList = getVerticalSequence(updatedCell, playingPlayer);
+            Collection<Cell> maxDiagonalSequenceList = getMaxDiagonalSequence(updatedCell, playingPlayer);
+            Player player = updatedCell.getPlayer();
+
+            didPlayerWin = isSequenceBigEnough(horizontalSequenceList, player) || isSequenceBigEnough(verticalSequenceList, player)
+                    || isSequenceBigEnough(maxDiagonalSequenceList, player);
+        } else {
+            didPlayerWin = false;
+        }
+
+        return didPlayerWin;
     }
 
     public int getLargestSequenceSize(Cell cell, Player playingPlayer) {

@@ -90,7 +90,7 @@ public class BoardController implements ICellControllerDelegate {
                     .findFirst()
                     .get(); // There has to be a cell that answers the predicate above, so there is no need to check ifPresent().
 
-            if(updatedCell.getPlayer().getType().equals(ePlayerType.Computer)) {
+                if(updatedCell.getPlayer().getType().equals(ePlayerType.Computer)) {
                 try {
                     Thread.sleep(500); // Sleep for 0.5s before showing computer player's play.
                 } catch (InterruptedException e) {
@@ -148,6 +148,25 @@ public class BoardController implements ICellControllerDelegate {
         this.mCellControllerList.stream().forEach(
                 cellController -> cellController.setImage(ImageManager.getEmptyDiscSlotImage())
         );
+    }
+
+    public void PopoutDisc(Collection<Cell> updatedColumnCellsCollection) {
+
+        for (Cell updatedCellInColumn : updatedColumnCellsCollection) {
+            CellController selectedCell = this.mCellControllerList
+                    .stream()
+                    .filter(
+                        cell -> cell.getRow() == updatedCellInColumn.getRowIndex() && cell.getColumn() == updatedCellInColumn.getColumnIndex()
+            ).findFirst()
+            .get();
+
+            if (updatedCellInColumn.isEmpty()){
+                selectedCell.setImage(ImageManager.getEmptyDiscSlotImage());
+            }
+            else{
+                selectedCell.setImage(ImageManager.getImageForPlayerID(updatedCellInColumn.getPlayer().getID()));
+            }
+        }
     }
 }
 

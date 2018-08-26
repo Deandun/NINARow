@@ -27,11 +27,15 @@ public class FileManager {
         return mIsFileLoaded;
     }
 
-    public void LoadGameFile(String filePath) throws InvalidFileInputException, FileNotFoundException, IOException, JAXBException {
+    public void LoadGameFile(String filePath, Runnable onLoadFileFinish, Runnable onFinishedCheckingFileValidity) throws InvalidFileInputException, FileNotFoundException, IOException, JAXBException, InterruptedException {
         mIsFileLoaded = false; // Reset flag before checking if current file loaded successfully.
         GameDescriptor gameDescriptor = getDataFromFile(filePath);
+        onLoadFileFinish.run();
+        Thread.sleep(1000);
 
         checkIfFileInputIsValid(gameDescriptor); // Throws if input is invalid
+        onFinishedCheckingFileValidity.run();
+        Thread.sleep(1000);
         setData(gameDescriptor);
         mIsFileLoaded = true;
     }

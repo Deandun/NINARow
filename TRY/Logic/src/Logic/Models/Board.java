@@ -79,7 +79,6 @@ public class Board{
 
     public boolean CanPlayerPerformPopoutForColumn(Player player, int column) {
         int lastRowIndex = mBoard.length - 1;
-
         // Check the bottom most disc of the column.
         return mBoard[lastRowIndex][column].getPlayer().equals(player);
     }
@@ -89,8 +88,8 @@ public class Board{
     }
 
     public void RemoveAllPlayerDiscsFromBoard(Player player) {
-        for(int i = 0; i < mBoard.length; i++) { // Go over rows.
-            for(int j = 0; j < mBoard[i].length; j++) { // Go over columns.
+        for(int i = mBoard.length - 1; i >= 0; i--) { // Go over rows.
+            for(int j = mBoard[i].length - 1; j >= 0; j--) { // Go over columns.
                 if(mBoard[i][j].getPlayer() != null && mBoard[i][j].getPlayer().equals(player)) { // Check if the cell was set by the player that quit.
                     removeCellFromIndexAndGetUpdatedCells(i, j); // Remove cell from board.
                 }

@@ -18,26 +18,19 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-
-
         FXMLLoader loader = new FXMLLoader();
 
         URL mainFXML = getClass().getResource("temp.fxml");
         loader.setLocation(mainFXML);
-
         StackPane root = loader.load();
 
         // wire up controller
         App appController = loader.getController();
-
         primaryStage.setTitle("DeaNoy Game - NinARow");
         Scene scene = new Scene(root, 670, 575);
 
-
         primaryStage.setScene(scene);
         primaryStage.show();
-
-
         /*
           FXMLLoader loader = new FXMLLoader();
 
@@ -53,9 +46,6 @@ public class Main extends Application {
         Scene scene = new Scene(root, 670, 575);
         primaryStage.setScene(scene);
         primaryStage.show();
-
-
-
          */
     }
 
