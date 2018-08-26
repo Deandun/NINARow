@@ -24,28 +24,26 @@ public class ReadGameFileTask extends Task<Void> {
         // Open file.
         this.updateMessage("Preparing to load file...");
         this.updateProgress(0, 100);
-        Thread.sleep(1000);
+        Thread.sleep(300);
 
         // Set callbacks
         Runnable onLoadFileFinish = () -> {
             // Check if file is valid.
             this.updateProgress(33, 100);
             this.updateMessage("Checking file content validation...");
-            //Thread.sleep(1000);
         };
 
         Runnable onFinishedCheckingFileValidity = () -> {
             // Apply file content to game settings.
             this.updateMessage("Reading from file...");
             this.updateProgress(66, 100);
-            //Thread.sleep(1000);
         };
 
         this.mLogic.ReadGameFile(mAbsoluteGameFilePath, onLoadFileFinish, onFinishedCheckingFileValidity);
 
         this.updateMessage("Finished reading from file :)");
         this.updateProgress(100, 100);
-        Thread.sleep(1000);
+        Thread.sleep(300);
 
         this.mOnFinish.run();
 

@@ -31,11 +31,11 @@ public class FileManager {
         mIsFileLoaded = false; // Reset flag before checking if current file loaded successfully.
         GameDescriptor gameDescriptor = getDataFromFile(filePath);
         onLoadFileFinish.run();
-        Thread.sleep(1000);
+        Thread.sleep(300);
 
         checkIfFileInputIsValid(gameDescriptor); // Throws if input is invalid
         onFinishedCheckingFileValidity.run();
-        Thread.sleep(1000);
+        Thread.sleep(300);
         setData(gameDescriptor);
         mIsFileLoaded = true;
     }

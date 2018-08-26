@@ -7,13 +7,21 @@ import java.util.function.Consumer;
 
 public class PlayComputerPlayerTask extends Task<Void> {
 
-    private Consumer<PlayedTurnData> mOnComputerPlayerFinishedPlayingTurn;
     private Logic mLogic;
+    private Runnable mOnFinishedPlayingAllComputerPlayers;
+    private Consumer<PlayedTurnData> mOnComputerPlayerFinishedPlayingTurn;
+
+    public PlayComputerPlayerTask(Logic logic, Runnable onFinishedPlayingAllComputerPlayers, Consumer<PlayedTurnData> onComputerPlayerFinishedPlayingTurn) {
+        this.mLogic = logic;
+        this.mOnFinishedPlayingAllComputerPlayers = onFinishedPlayingAllComputerPlayers;
+        this.mOnComputerPlayerFinishedPlayingTurn = onComputerPlayerFinishedPlayingTurn;
+    }
 
     @Override
     protected Void call() throws Exception {
 
-        this.mLogic.playComputerAlgoGamesIfNeededAndGetData(mOnComputerPlayerFinishedPlayingTurn);
+        this.mLogic.playComputerAlgoGamesIfNeededAndGetData(mOnComputerPlayerFinishedPlayingTurn); // Play all of the computer players turns.
+        this.mOnFinishedPlayingAllComputerPlayers.run();
 
         return null;
     }

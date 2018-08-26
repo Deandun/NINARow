@@ -145,9 +145,15 @@ public class Board{
         Collection<Cell> updatedCellsList = new ArrayList<>();
         Player upperCellPlayer;
 
+
         // Go over the discs of the selected column starting from the selected row and update the player in the cell
         // until reaching null or the start of the column.
-        for(int i = row; i > 0; i--) {
+        for(int i = row; i >= 0; i--) {
+            if(i == 0) { // At top most cell.
+                updatedCellsList.add(mBoard[i][column]); // Add top most cell to list and break.
+                mBoard[i][column].setPlayer(null); // No cell above this one, set player to null.
+                break;
+            }
             upperCellPlayer = mBoard[i - 1][column].getPlayer();
             mBoard[i][column].setPlayer(upperCellPlayer);
             updatedCellsList.add(mBoard[i][column]);
@@ -157,7 +163,6 @@ public class Board{
             }
         }
 
-        mBoard[0][column].setPlayer(null); // After this function, the up most disc in the column should always be null.
 
         return updatedCellsList;
     }

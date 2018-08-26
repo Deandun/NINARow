@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 public class Logic{
 
@@ -68,7 +69,7 @@ public class Logic{
         return mGameStatus;
     }
 
-    public List<PlayedTurnData> PlayTurn(PlayTurnParameters playTurnParameters) throws InvalidUserInputException, Exception {
+    public PlayedTurnData PlayTurn(PlayTurnParameters playTurnParameters) throws InvalidUserInputException, Exception {
         // Handle human players turn.
         PlayedTurnData playedTurnData = playTurnParameters.getmTurnType().equals(eTurnType.AddDisc) ?
                 this.addDisc(playTurnParameters.getmSelectedColumn()) : this.popout(playTurnParameters.getmSelectedColumn());
@@ -78,16 +79,10 @@ public class Logic{
         // Update game state when turn ends.
         this.finishedPlayingTurn(playedTurnData);
 
-        List<PlayedTurnData> playedTurnDataList = new ArrayList<>();
-
-        playedTurnDataList.add(playedTurnData);
-        playedTurnDataList.addAll(this.playComputerAlgoGamesIfNeededAndGetData()); // Add all of the computer algo's turns to the list.
-
-        return playedTurnDataList;
+        return playedTurnData;
     }
 
-    private List<PlayedTurnData> playComputerAlgoGamesIfNeededAndGetData() throws Exception {
-        List<PlayedTurnData> playedTurnDataList = new ArrayList<>();
+    public void playComputerAlgoGamesIfNeededAndGetData(Consumer<PlayedTurnData> onComputerPlayerFinishedPlayingTurn) throws Exception {
         boolean isComputerPlayerPlayingNext = this.mGameStatus.mPlayer.getType().equals(ePlayerType.Computer);
         boolean shouldPlayAnotherTurn = true;
 
@@ -99,14 +94,13 @@ public class Logic{
                     this.addDisc(computerPlayTurnParams.getmSelectedColumn()) : this.popout(computerPlayTurnParams.getmSelectedColumn());
 
             playedTurnData.setTurnType(computerPlayTurnParams.getmTurnType());
-            playedTurnDataList.add(playedTurnData);
             this.finishedPlayingTurn(playedTurnData);
+            Thread.sleep(300);
+            onComputerPlayerFinishedPlayingTurn.accept(playedTurnData);
 
             isComputerPlayerPlayingNext = this.mGameStatus.mPlayer.getType().equals(ePlayerType.Computer);
             shouldPlayAnotherTurn = playedTurnData.getGameState().equals(eGameState.Active); // Stop playing computer turns when game has ended.
         }
-
-        return playedTurnDataList;
     }
 
     private void finishedPlayingTurn(PlayedTurnData playedTurnData) {
@@ -120,21 +114,21 @@ public class Logic{
         return this.updateGameStatusAfterDiscAdded(chosenCell);
     }
 
-    private PlayedTurnData popout(int column) {
-        PlayedTurnData playedTurnData = new PlayedTurnData();
-        Collection<Cell> updatedCells = this.mGameBoard.PopoutAndGetUpdatedCells(column);
+    private PlayedTurnData popout(int column) throws InvalidUserInputException {
+        if(mGameBoard.CanPlayerPerformPopoutForColumn(this.mGameStatus.getPlayer(), column)) {
+            PlayedTurnData playedTurnData = new PlayedTurnData();
+            Collection<Cell> updatedCells = this.mGameBoard.PopoutAndGetUpdatedCells(column);
 
-        playedTurnData.setUpdatedCellsCollection(updatedCells);
-        playedTurnData.setGameState(this.mSequenceSearcher.CheckColumnForWinningSequences(column) ? eGameState.Won : eGameState.Active);
-        playedTurnData.setPlayerTurn(this.mGameStatus.mPlayer);
-        playedTurnData.setTurnType(eTurnType.Popout);
+            playedTurnData.setUpdatedCellsCollection(updatedCells);
+            playedTurnData.setGameState(this.mSequenceSearcher.CheckColumnForWinningSequences(column) ? eGameState.Won : eGameState.Active);
+            playedTurnData.setPlayerTurn(this.mGameStatus.mPlayer);
+            playedTurnData.setTurnType(eTurnType.Popout);
 
-        // Check if there is a winning sequence starting from a cell in the selected column as a result of the Popout.
-        return playedTurnData;
-    }
-
-    public List<PlayedTurnData> playComputerPlayersTurns() throws Exception {
-        return this.playComputerAlgoGamesIfNeededAndGetData();
+            // Check if there is a winning sequence starting from a cell in the selected column as a result of the Popout.
+            return playedTurnData;
+        } else {
+            throw new InvalidUserInputException("Player named " + this.mGameStatus.getPlayer().getName() + " cannot perform popout on column " + column);
+        }
     }
 
     public eGameState PlayerQuit(Player player) {
@@ -210,18 +204,6 @@ public class Logic{
 
     public List<Integer> getAvailablePopoutColumnsForCurrentPlayer() {
         return mGameBoard.getAvailablePopoutColumnsForCurrentPlayer(mGameStatus.mPlayer);
-    }
-
-    //NOY
-    public List<PlayedTurnData> HandlePopout(int index) throws Exception {
-        if (getAvailablePopoutColumnsForCurrentPlayer().contains(index)){ //check if popout available
-            try {
-               return PlayTurn(new PlayTurnParameters(index, eTurnType.Popout));
-            } catch (Exception e) {
-                throw new Exception();
-            }
-        }
-        return null;
     }
 
     public class GameStatus implements IGameStatus {
