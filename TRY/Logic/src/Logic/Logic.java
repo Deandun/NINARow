@@ -48,7 +48,6 @@ public class Logic{
 
     public void ReadGameFile(String filePath, Runnable onLoadFileFinish, Runnable onFinishedCheckingFileValidity) throws FileNotFoundException, InvalidFileInputException, IOException, JAXBException, InterruptedException {
         mFileManager.LoadGameFile(filePath, onLoadFileFinish, onFinishedCheckingFileValidity);
-        // TODO: when loading game file is moved to a seporate thread, create new board only when done loading file
         this.mGameBoard = new Board(GameSettings.getInstance().getRows(), GameSettings.getInstance().getColumns());
     }
 
@@ -132,7 +131,8 @@ public class Logic{
         }
     }
 
-    public eGameState PlayerQuit(Player player) {
+    //TODO: make adjustments so that player quit will be considered as a played turn data. Save this "turn" in turn history.
+    public PlayedTurnData PlayerQuit(Player player) {
         this.mGameStatus.PlayerQuitGame(player);
         eGameState gameState = eGameState.Active;
 
@@ -146,7 +146,7 @@ public class Logic{
             }
         }
 
-        return gameState;
+        return null;
     }
 
     public boolean isGameActive(){

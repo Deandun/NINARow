@@ -189,7 +189,7 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
 
     @FXML
     void startGame() throws Exception {
-        this.mBtnLoadFile.setDisable(true); // TODO: do we really need to disable load file? I think we need to support loading a new file during a game. Need to check exercise
+        this.mBtnLoadFile.setDisable(true);
         this.mBoardController.getBoardPane().setDisable(false);
         this.mBoardController.ResetBoard();
         this.mLogic.StartGame();
@@ -272,7 +272,10 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
         if(!mIsComputerPlayerTurnInProgress) {
             PlayedTurnData playedTurnData = this.mLogic.PlayTurn(playTurnParameters);
             this.handleUIAfterPlayedTurns(playedTurnData);
-            this.playComputerPlayersTurnsIfNeeded();
+
+            if(playedTurnData.getGameState().equals(eGameState.Active)) { // Play computer algo only if game is active.
+                this.playComputerPlayersTurnsIfNeeded();
+            }
         }
     }
 
@@ -286,7 +289,7 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
 
         if(gameState.equals(eGameState.Won)) {
             Map<Player, Collection<Cell>> playerToWinningSequenceMap = this.mLogic.getPlayerToWinningSequencesMap();
-
+            System.out.println("Game won by player: " + turnData.getPlayer().getName());
             this.mBoardController.DisplayWinningSequences(playerToWinningSequenceMap);
 
             //TODO: notify players that the game has been won. Disable the game and "Reset" logic to a state where there's a file loaded but game hasn't started.
