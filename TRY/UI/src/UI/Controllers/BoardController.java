@@ -12,8 +12,6 @@ import javafx.scene.control.Button;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.GridPane;
 import UI.Controllers.ControllerDelegates.IBoardControllerDelegate;
 import java.util.ArrayList;
@@ -64,6 +62,7 @@ public class BoardController implements ICellControllerDelegate {
         if(mIsPopoutEnabled) {
             initPopoutButtons();
         }
+        this.mBoardPane.setVisible(true);
     }
 
     private void initPopoutButtons() {
@@ -131,7 +130,32 @@ public class BoardController implements ICellControllerDelegate {
     }
 
     public void DisplayWinningSequences(Map<Player, Collection<Cell>> playerToWinningSequenceMap) {
+
+        playerToWinningSequenceMap.entrySet().forEach(
+                playerToWinningSequenceEntrySet -> {
+                    Player player = playerToWinningSequenceEntrySet.getKey();
+                    Collection<Cell> winningCells = playerToWinningSequenceEntrySet.getValue();
+                    setWinningStyle(winningCells);
+                }
+        );
         //TODO: Add an effect to the winning sequence cells! Do it by adding a style class to the buttons and adding the class and effect to the css file.
+    }
+
+    private void setWinningStyle(Collection<Cell> winningCells) {
+
+        Collection<CellController> winningCellsController = new ArrayList<>();
+
+        for (Cell cell : winningCells){
+            for (CellController cellController : this.mCellControllerList){
+                if (cell.getRowIndex() == cellController.getRow() && cell.getColumnIndex() == cellController.getColumn() ){
+                    winningCellsController.add(cellController);
+                    break;
+                }
+            }
+        }
+        for (CellController cellController : winningCellsController){
+            //cellController.getPane().setStyle(); //TODO: implement
+        }
     }
 
     public void DisablePopoutButtonsForColumns(List<Integer> columnsToEnableSortedList) {
@@ -171,9 +195,15 @@ public class BoardController implements ICellControllerDelegate {
         }
     }
 
-    public void setTheame(String backgroundStr){
-        //TODO: add more
-        this.mBoardPane.setStyle(backgroundStr);
+    public void setTheame(String style){
+        this.mBoardPane.setStyle(style);
+    }
+
+    public void ClearBoard() {
+        this.mCellControllerList.clear();
+        this.mBoardPane.getChildren().removeAll(this.mPopOutButtonList);
+        this.mPopOutButtonList.clear();
+        this.mBoardPane.setVisible(false);
     }
 }
 

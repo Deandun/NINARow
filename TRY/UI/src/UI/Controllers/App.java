@@ -25,6 +25,8 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import UI.eTheameType;
+
+import javafx.event.ActionEvent;
 import java.io.File;
 import java.util.*;
 import java.util.function.Consumer;
@@ -53,18 +55,18 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
     @FXML private FlowPane mBottomProgressPane;
     @FXML private Label mProgressTextLabel;
     @FXML private ProgressBar mProgressBar;
+    @FXML private ComboBox<eTheameType> mComboBoxTheame;
 
     private BoardController mBoardController;
     private GameDetailsController mGameDetailsController;
-    //PlayerDetails Members:
 
+    //PlayerDetails Members:
     private SimpleStringProperty mPlayerName;
     private SimpleStringProperty mPlayerID;
     private SimpleStringProperty mPlayerType;
     private ImageView mPlayerSign;
 
     //GameDetails Members:
-
     private SimpleStringProperty mCurrentPlayer;
     private SimpleStringProperty mTurnNumber;
     private SimpleStringProperty mTargetSize;
@@ -79,8 +81,17 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
             turnData ->
                 Platform.runLater( () -> this.handleUIAfterPlayedTurns(turnData)); // Update UI after turn has been played in UI thread.
 
-
     private Theame mTheame;
+
+    public App() {
+        this.mLogic = new Logic();
+        this.mCurrentPlayer = new SimpleStringProperty();
+        this.mTurnNumber = new SimpleStringProperty();
+        this.mVariant = new SimpleStringProperty();
+        this.mTargetSize = new SimpleStringProperty();
+        this.mTheame = new Theame();
+        this.mTheame.setAviadTheame();
+    }
 
     private boolean shouldPlayComputerPlayerNext() {
         return this.mLogic.GetCurrentPlayer().getType().equals(ePlayerType.Computer);
@@ -92,16 +103,6 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
             PlayComputerPlayerTask playComputerPlayerTask = new PlayComputerPlayerTask(this.mLogic, mOnAllComputerPlayersFinishedTurns, mOnSingleComputerPlayerFinishedTurn);
             new Thread(playComputerPlayerTask).start();
         }
-    }
-
-    public App() {
-        this.mLogic = new Logic();
-        this.mCurrentPlayer = new SimpleStringProperty();
-        this.mTurnNumber = new SimpleStringProperty();
-        this.mVariant = new SimpleStringProperty();
-        this.mTargetSize = new SimpleStringProperty();
-        this.mTheame = new Theame();
-        this.mTheame.setRelaxTheame();
     }
 
     @FXML
@@ -121,6 +122,8 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
         this.mBtnExitGame.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/UI/Images/Exit.JPG"), EXIT_BTN_SIZE, EXIT_BTN_SIZE, true, true)));
         this.mBtnExitGame.setText(null);
         this.mBtnExitGame.setPadding(new Insets(1));
+        this.mComboBoxTheame.getItems().addAll(eTheameType.AviadCohen, eTheameType.GuyRonen);
+        changeTheame();
     }
 
     @FXML
@@ -221,7 +224,8 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
         Optional<ButtonType> result = alert.showAndWait();
 
         if (result.get() == ButtonType.OK){
-            System.exit(0);
+            this.mLogic.exitGame();
+            clear();
         }
     }
 
@@ -244,7 +248,7 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
     @Override
     public void PopoutBtnClicked(int btnIndex) {
         try {
-            PlayTurnParameters playTurnParameters = new PlayTurnParameters(btnIndex, eTurnType.AddDisc);
+            PlayTurnParameters playTurnParameters = new PlayTurnParameters(btnIndex, eTurnType.Popout);
             this.playTurn(playTurnParameters);
         } catch (Exception e) {
             e.printStackTrace();
@@ -284,6 +288,7 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
             Map<Player, Collection<Cell>> playerToWinningSequenceMap = this.mLogic.getPlayerToWinningSequencesMap();
 
             this.mBoardController.DisplayWinningSequences(playerToWinningSequenceMap);
+
             //TODO: notify players that the game has been won. Disable the game and "Reset" logic to a state where there's a file loaded but game hasn't started.
         } else if (gameState.equals(eGameState.Draw)) {
             //TODO: notify players that the game has ended in a draw.
@@ -294,30 +299,40 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
             List<Integer> availablePopoutColumnSortedList = this.mLogic.getAvailablePopoutColumnsForCurrentPlayer();
             this.mBoardController.DisablePopoutButtonsForColumns(availablePopoutColumnSortedList);
         }
-
     }
 
     @Override
     public void ExitGameBtnClicked(boolean doExit) {
         System.out.println("Handle exit game btn clicked"); //DEBUG
         if (doExit){
+            clear();
             this.mLogic.exitGame();
-
         }
     }
-/*
-    public void changeTheame(){
-        this.mBoardController.setTheame(this.mTheame.getCurrentBoardBackground());
 
+    private void setStartConfiguration(){
+        this.mBtnStartGame.setDisable(true);
+        this.mBtnLoadFile.setDisable(false);
     }
-/*
-    private void onComboBoxItemChange(){
-        if (this.mComboBox.getItem().equals(eTheameType.Relax){
-            this.mTheame.setRelaxTheame();
+
+    private void clear() {
+        ImageManager.Clear(); //TODO: check what else
+        this.mBoardController.ClearBoard();
+        this.mTheame.setAviadTheame();
+        setStartConfiguration();
+    }
+
+    public void changeTheame(){
+        this.mStackPane.setStyle(this.mTheame.getCurrentTheameBackground());
+    }
+
+    public void onComboBoxItemChange(ActionEvent actionEvent) {
+        if (this.mComboBoxTheame.getSelectionModel().getSelectedItem().equals(eTheameType.AviadCohen)){
+            this.mTheame.setAviadTheame();
         }
         else{
-            this.mTheame.setCrazyTheame();
+            this.mTheame.setGuyTheame();
         }
         changeTheame();
-    }*/
+    }
 }

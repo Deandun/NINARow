@@ -73,8 +73,7 @@ public class SequenceSearcherStrategyFactory {
         return sequenceSearcherStrategy;
     }
 
-    //TODO: use when switching game file
-    public void ClearCache() {
+    public static void ClearCache() {
         strategyMap.clear();
     }
 

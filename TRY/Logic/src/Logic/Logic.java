@@ -14,6 +14,7 @@ import Logic.Managers.HistoryFileManager;
 import Logic.Managers.HistoryManager;
 import Logic.Models.*;
 import Logic.SequenceSearchers.SequenceSearcher;
+import Logic.SequenceSearchers.SequenceSearcherStrategyFactory;
 
 import javax.xml.bind.JAXBException;
 import java.io.FileNotFoundException;
@@ -199,7 +200,11 @@ public class Logic{
     }
 
     public void exitGame() {
-        //TODO: implement
+        this.mGameBoard.Clear();
+        this.mHistoryManager.Clear();
+        this.mSequenceSearcher.Clear();
+        GameSettings.getInstance().Clear();
+        SequenceSearcherStrategyFactory.ClearCache();
     }
 
     public List<Integer> getAvailablePopoutColumnsForCurrentPlayer() {
@@ -291,5 +296,6 @@ public class Logic{
         private int getNextPlayerIndex() {
             return ++mPlayerIndex % GameSettings.getInstance().getPlayers().size();
         }
+
     }
 }
