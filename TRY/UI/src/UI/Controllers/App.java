@@ -10,6 +10,7 @@ import Tasks.PlayComputerPlayerTask;
 import Tasks.ReadGameFileTask;
 import UI.Controllers.ControllerDelegates.IBoardControllerDelegate;
 import UI.Controllers.ControllerDelegates.IGameSettingsControllerDelegate;
+import UI.Theame;
 import UI.UIMisc.ImageManager;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -23,6 +24,7 @@ import javafx.scene.layout.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
+import UI.eTheameType;
 import java.io.File;
 import java.util.*;
 import java.util.function.Consumer;
@@ -78,6 +80,8 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
                 Platform.runLater( () -> this.handleUIAfterPlayedTurns(turnData)); // Update UI after turn has been played in UI thread.
 
 
+    private Theame mTheame;
+
     private boolean shouldPlayComputerPlayerNext() {
         return this.mLogic.GetCurrentPlayer().getType().equals(ePlayerType.Computer);
     }
@@ -96,6 +100,8 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
         this.mTurnNumber = new SimpleStringProperty();
         this.mVariant = new SimpleStringProperty();
         this.mTargetSize = new SimpleStringProperty();
+        this.mTheame = new Theame();
+        this.mTheame.setRelaxTheame();
     }
 
     @FXML
@@ -299,4 +305,19 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
 
         }
     }
+/*
+    public void changeTheame(){
+        this.mBoardController.setTheame(this.mTheame.getCurrentBoardBackground());
+
+    }
+/*
+    private void onComboBoxItemChange(){
+        if (this.mComboBox.getItem().equals(eTheameType.Relax){
+            this.mTheame.setRelaxTheame();
+        }
+        else{
+            this.mTheame.setCrazyTheame();
+        }
+        changeTheame();
+    }*/
 }

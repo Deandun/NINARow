@@ -36,7 +36,6 @@ public class BoardController implements ICellControllerDelegate {
 
     public BoardController(int numRows, int numCols, IBoardControllerDelegate delegate) {
         this.mBoardPane = new GridPane();
-        //this.mBoardPane.setStyle("-fx-background-color: cornsilk; -fx-alignment: center;");
         this.mBoardPane.setDisable(true);
         this.mPopOutButtonList = new ArrayList<>();
         this.mNumColumns = numCols;
@@ -170,6 +169,11 @@ public class BoardController implements ICellControllerDelegate {
                 selectedCell.setImage(ImageManager.getImageForPlayerID(updatedCellInColumn.getPlayer().getID()));
             }
         }
+    }
+
+    public void setTheame(String backgroundStr){
+        //TODO: add more
+        this.mBoardPane.setStyle(backgroundStr);
     }
 }
 
