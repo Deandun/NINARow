@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.StackPane?>
+
+<StackPane  fx:id="AppStackPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="441.0" prefWidth="600.0" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml" fx:controller="UI.Controllers.AppController">
+   <children>
+      <BorderPane fx:id="AppBoardPane" prefHeight="431.0" prefWidth="600.0">
+         <right>
+            <fx:include fx:id="PlayerDetailsController" source="PlayerDetailsFxml.fxml" />
+         </right>
+         <left>
+            <fx:include fx:id="GameDetailsController" source="GameDetailsFxml.fxml" />
+         </left>
+         <top>
+            <fx:include fx:id="ConfigAndStartGameController" source="ConfigAndStartGameFxml.fxml" />
+         </top>
+      </BorderPane>
+   </children>
+</StackPane>
