@@ -12,6 +12,8 @@ import javafx.scene.control.Button;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.GridPane;
 import UI.Controllers.ControllerDelegates.IBoardControllerDelegate;
 import java.util.ArrayList;
@@ -34,6 +36,7 @@ public class BoardController implements ICellControllerDelegate {
 
     public BoardController(int numRows, int numCols, IBoardControllerDelegate delegate) {
         this.mBoardPane = new GridPane();
+        //this.mBoardPane.setStyle("-fx-background-color: cornsilk; -fx-alignment: center;");
         this.mBoardPane.setDisable(true);
         this.mPopOutButtonList = new ArrayList<>();
         this.mNumColumns = numCols;

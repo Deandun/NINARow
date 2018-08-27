@@ -6,7 +6,6 @@ import Logic.Enums.eVariant;
 import Logic.Logic;
 import Logic.Models.*;
 import Logic.Models.Cell;
-import Tasks.PlayComputerPlayerTask;
 import Tasks.ReadGameFileTask;
 import UI.Controllers.ControllerDelegates.IBoardControllerDelegate;
 import UI.Controllers.ControllerDelegates.IGameSettingsControllerDelegate;
@@ -14,6 +13,7 @@ import UI.UIMisc.ImageManager;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.concurrent.Service;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
@@ -23,6 +23,7 @@ import javafx.scene.layout.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
+import javax.swing.*;
 import java.io.File;
 import java.util.*;
 
@@ -66,29 +67,9 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
     private SimpleStringProperty mTurnNumber;
     private SimpleStringProperty mTargetSize;
     private SimpleStringProperty mVariant;
-
     private Logic mLogic;
     private int mTurnCounter;
 
-    // Computer player task.
-    private boolean mIsComputerPlayerTurnInProgress;
-
-    private synchronized void playComputerPlayerIfNeeded() {
-        if(this.shouldPlayComputerPlayerNext()) {
-            this.mIsComputerPlayerTurnInProgress = true;
-            Runnable onFinishedPlayingAllComputerPlayers = () -> mIsComputerPlayerTurnInProgress = false; // Callback for play computer player task!
-
-            // Set play computer player task. When task is finished, set is computer player turn in progress as false (so that human players can play again).
-            // When ever a computer player has finished playing, get the turn data using handleUIAfterPlayedTurns.
-            PlayComputerPlayerTask playComputerPlayerTask = new PlayComputerPlayerTask(this.mLogic,
-                    onFinishedPlayingAllComputerPlayers, this::handleUIAfterComputerPlayedTurn);
-            new Thread(playComputerPlayerTask).start();
-        }
-    }
-
-    private boolean shouldPlayComputerPlayerNext() {
-        return this.mLogic.GetCurrentPlayer().getType().equals(ePlayerType.Computer);
-    }
 
     public App() {
         this.mLogic = new Logic();
@@ -178,8 +159,6 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
         this.initImageManagerWithPlayerImages();
     }
 
-
-
     @FXML
     void startGame() throws Exception {
         this.mBtnLoadFile.setDisable(true); // TODO: do we really need to disable load file? I think we need to support loading a new file during a game. Need to check exercise
@@ -189,7 +168,15 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
 //        this.mGameDetailsController.setDelegate(this); TODO: figure out why this is null when we start game.
         initDetails();
 
-        this.playComputerPlayerIfNeeded();
+        if(mLogic.GetCurrentPlayer().getType().equals(ePlayerType.Computer)) {// If first player is a computer player
+            // This method throws an exception that should'nt occure. If it does, then theres something wrong with the computer player algo.
+            List<PlayedTurnData> computerPlayersTurnDataList = this.mLogic.playComputerPlayersTurns(); // If the first players are computer players, play their turns.
+            computerPlayersTurnDataList
+                    .forEach(
+                            turnData -> this.mBoardController.InsertDiscstAt(turnData.getUpdatedCellsCollection())
+                    );
+        }
+
     }
 
     public void setOnAction() {
@@ -216,8 +203,8 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
         alert.setContentText("Are you sure you want to exit game?");
         Optional<ButtonType> result = alert.showAndWait();
 
-        if (result.get() == ButtonType.OK){ //user chose ok
-            //TODO: reset entire game.
+        if (result.get() == ButtonType.OK){
+            System.exit(0);
         }
     }
 
@@ -239,9 +226,11 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
 
     @Override
     public void PopoutBtnClicked(int btnIndex) {
+        System.out.println("Handle popup btn clicked"); //DEBUG
+
         try {
-            PlayTurnParameters playTurnParameters = new PlayTurnParameters(btnIndex, eTurnType.Popout);
-            this.playTurn(playTurnParameters);
+            List<PlayedTurnData> playedTurnData = this.mLogic.HandlePopout(btnIndex);
+            this.handleUIAfterPlayedTurns(playedTurnData);
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println(e.getMessage());
@@ -251,57 +240,42 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
 
     @Override
     public void ColumnClicked(int columnIndex) {
-        //TODO: implement - if(!mLogic.isColumnFull(columnIndex))... else, let user know column is full (or do nothing?).
         try {
             PlayTurnParameters playTurnParameters = new PlayTurnParameters(columnIndex, eTurnType.AddDisc);
-            this.playTurn(playTurnParameters);
+            List<PlayedTurnData> playedTurnData = this.mLogic.PlayTurn(playTurnParameters);
+            this.handleUIAfterPlayedTurns(playedTurnData);
         } catch (Exception e) {
             e.printStackTrace();
             //TODO: catch all of the exceptions and handle them.
         }
     }
 
-    private synchronized void playTurn(PlayTurnParameters playTurnParameters) throws Exception {
-        if(!this.mIsComputerPlayerTurnInProgress) {
-            PlayedTurnData playedTurnData = this.mLogic.PlayTurn(playTurnParameters);
-            this.playComputerPlayerIfNeeded();
-            this.handleUIAfterPlayedTurn(playedTurnData);
-        } else {
-            //TODO: let user know that the computer player is in progress?
+    private void handleUIAfterPlayedTurns(List<PlayedTurnData> playedTurnDataList) {
+        for(PlayedTurnData turnData: playedTurnDataList) {
+            if (turnData.getTurnType().equals(eTurnType.Popout)) {
+                this.mBoardController.PopoutDisc(turnData.getUpdatedCellsCollection());
+            } else {
+                this.mBoardController.InsertDiscstAt(turnData.getUpdatedCellsCollection());
+            }
+            eGameState gameState = turnData.getGameState();
+
+            if(gameState.equals(eGameState.Won)) {
+                Map<Player, Collection<Cell>> playerToWinningSequenceMap = this.mLogic.getPlayerToWinningSequencesMap();
+
+                this.mBoardController.DisplayWinningSequences(playerToWinningSequenceMap);
+                //TODO: notify players that the game has been won. Disable the game and "Reset" logic to a state where there's a file loaded but game hasn't started.
+                break;
+            } else if (gameState.equals(eGameState.Draw)) {
+                //TODO: notify players that the game has ended in a draw.
+                break;
+            }
+
+            if(GameSettings.getInstance().getVariant().equals(eVariant.Popout)) {
+                // Enable popout buttons that the user is allowed to click.
+                List<Integer> availablePopoutColumnSortedList = this.mLogic.getAvailablePopoutColumnsForCurrentPlayer();
+                this.mBoardController.DisablePopoutButtonsForColumns(availablePopoutColumnSortedList);
+            }
         }
-    }
-
-    private void handleUIAfterPlayedTurn(PlayedTurnData turnData) {
-        if (turnData.getTurnType().equals(eTurnType.Popout)) {
-            this.mBoardController.PopoutDisc(turnData.getUpdatedCellsCollection());
-        } else {
-            this.mBoardController.InsertDiscstAt(turnData.getUpdatedCellsCollection());
-        }
-        eGameState gameState = turnData.getGameState();
-
-        if(gameState.equals(eGameState.Won)) {
-            Map<Player, Collection<Cell>> playerToWinningSequenceMap = this.mLogic.getPlayerToWinningSequencesMap();
-
-            this.mBoardController.DisplayWinningSequences(playerToWinningSequenceMap);
-            System.out.println("Player won!!"); //TODO: remove debug message.
-            //TODO: notify players that the game has been won. Disable the game and "Reset" logic to a state where there's a file loaded but game hasn't started.
-        } else if (gameState.equals(eGameState.Draw)) {
-            //TODO: notify players that the game has ended in a draw.
-        }
-
-        if(GameSettings.getInstance().getVariant().equals(eVariant.Popout)) {
-            // Enable popout buttons that the user is allowed to click.
-            List<Integer> availablePopoutColumnSortedList = this.mLogic.getAvailablePopoutColumnsForCurrentPlayer();
-            this.mBoardController.DisablePopoutButtonsForColumns(availablePopoutColumnSortedList);
-        }
-    }
-
-    private void handleUIAfterComputerPlayedTurn(PlayedTurnData turnData) {
-        // We get here from a different task/thread. Perform Platform.runlater to execute ui tasks in the UI thread.
-        // We depend on Platform.runLater being implemented by a serialized queue to avoid multi thread problems when updating the UI.
-        Platform.runLater(
-                () -> this.handleUIAfterPlayedTurn(turnData)
-        );
     }
 
     @Override
