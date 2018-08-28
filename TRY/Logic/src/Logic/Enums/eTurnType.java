@@ -2,5 +2,6 @@ package Logic.Enums;
 
 public enum eTurnType {
     AddDisc,
-    Popout
+    Popout,
+    PlayerQuit
 }

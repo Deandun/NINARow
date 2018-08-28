@@ -3,10 +3,10 @@ import Logic.Enums.eGameState;
 import Logic.Enums.ePlayerType;
 import Logic.Enums.eTurnType;
 import Logic.Enums.eVariant;
+import Logic.Interfaces.ILogicDelegate;
 import Logic.Logic;
 import Logic.Models.*;
 import Logic.Models.Cell;
-import Tasks.PlayComputerPlayerTask;
 import Tasks.ReadGameFileTask;
 import UI.Controllers.ControllerDelegates.IBoardControllerDelegate;
 import UI.Controllers.ControllerDelegates.IGameSettingsControllerDelegate;
@@ -33,7 +33,7 @@ import java.util.function.Consumer;
 
 import static UI.FinalSettings.EXIT_BTN_SIZE;
 
-public class App implements IBoardControllerDelegate, IGameSettingsControllerDelegate {
+public class App implements IBoardControllerDelegate, IGameSettingsControllerDelegate, ILogicDelegate {
 
     @FXML private StackPane mStackPane;
     @FXML private BorderPane mBorderPane;
@@ -74,17 +74,10 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
     private Logic mLogic;
     private int mTurnCounter;
 
-    // Computer player.
-    private boolean mIsComputerPlayerTurnInProgress; // A flag that states that the computer players turns are in progress (user cannot play at this time).
-    private Runnable mOnAllComputerPlayersFinishedTurns = () -> mIsComputerPlayerTurnInProgress = false; // Callback for when all computer players finished their turns.
-    private Consumer<PlayedTurnData> mOnSingleComputerPlayerFinishedTurn = // Callback for when a single computer player finished its turns.
-            turnData ->
-                Platform.runLater( () -> this.handleUIAfterPlayedTurns(turnData)); // Update UI after turn has been played in UI thread.
-
     private Theame mTheame;
 
     public App() {
-        this.mLogic = new Logic();
+        this.mLogic = new Logic(this);
         this.mCurrentPlayer = new SimpleStringProperty();
         this.mTurnNumber = new SimpleStringProperty();
         this.mVariant = new SimpleStringProperty();
@@ -95,14 +88,6 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
 
     private boolean shouldPlayComputerPlayerNext() {
         return this.mLogic.GetCurrentPlayer().getType().equals(ePlayerType.Computer);
-    }
-
-    private void playComputerPlayersTurnsIfNeeded() {
-        if(this.shouldPlayComputerPlayerNext()) {
-            mIsComputerPlayerTurnInProgress = true;
-            PlayComputerPlayerTask playComputerPlayerTask = new PlayComputerPlayerTask(this.mLogic, mOnAllComputerPlayersFinishedTurns, mOnSingleComputerPlayerFinishedTurn);
-            new Thread(playComputerPlayerTask).start();
-        }
     }
 
     @FXML
@@ -195,8 +180,6 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
         this.mLogic.StartGame();
 //        this.mGameDetailsController.setDelegate(this); TODO: figure out why this is null when we start game.
         initDetails();
-        this.playComputerPlayersTurnsIfNeeded();
-
     }
 
     public void setOnAction() {
@@ -243,6 +226,23 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
         ImageManager.SetImagesForPlayerIDs(playerIDs);
     }
 
+    // ILogicDelegate Implementation
+
+    @Override
+    public void onTurnPlayedSuccess(PlayedTurnData playedTurnData) {
+        this.handleUIAfterPlayedTurns(playedTurnData);
+    }
+
+    @Override
+    public void discAddedToFullColumn(int column) {
+        //TODO: notify user (color column red for 0.5s or show an error message?)
+    }
+
+    @Override
+    public void currentPlayerCannotPopoutAtColumn(int column) {
+        //TODO: notify user (color button red for 0.5s or show an error message?)
+    }
+
     // IBoardControllerDelegate implementation
 
     @Override
@@ -268,14 +268,11 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
         }
     }
 
-    private void playTurn(PlayTurnParameters playTurnParameters) throws Exception {
-        if(!mIsComputerPlayerTurnInProgress) {
-            PlayedTurnData playedTurnData = this.mLogic.PlayTurn(playTurnParameters);
-            this.handleUIAfterPlayedTurns(playedTurnData);
-
-            if(playedTurnData.getGameState().equals(eGameState.Active)) { // Play computer algo only if game is active.
-                this.playComputerPlayersTurnsIfNeeded();
-            }
+    private void playTurn(PlayTurnParameters playTurnParameters)  {
+        if(!this.mLogic.getIsTurnInProgress()) {
+            this.mLogic.playTurnAsync(playTurnParameters);
+        } else {
+            // Notify user that the computer is making his turn.
         }
     }
 

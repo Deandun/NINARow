@@ -33,7 +33,7 @@ public class Board{
         return mBoard;
     }
 
-    public Cell UpdateBoard(int column, Player player) throws Exception, InvalidUserInputException {
+    public Cell UpdateBoard(int column, Player player) throws InvalidUserInputException {
         // Selected column is full
         if(IsColumnFull(column)) {
             throw new InvalidUserInputException("Cannot insert to column " + column + " because it is full!");

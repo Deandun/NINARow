@@ -18,8 +18,6 @@ public class ConfigAndStartGameController extends GridPane {
     @FXML private Button mBtnLoadFile;
     @FXML private Button mBtnStartFile;
 
-    private Logic mLogic = new Logic(); // TODO: remove logic from this controller, only call logic in main app controller
-
 /*
     @FXML
     void loadFile(ActionEvent event) {
@@ -38,7 +36,6 @@ public class ConfigAndStartGameController extends GridPane {
     @FXML
     void startGame(ActionEvent event) {
         mBtnLoadFile.setDisable(true);
-        mLogic.StartGame();
     }
 
     public GridPane getPaneConfigAndStartGame() {
