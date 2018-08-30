@@ -78,8 +78,7 @@ public class GameSettings implements Serializable {
         this.mVariant = variant;
     }
 
-    // TODO: use when loading a new file
     public void Clear(){
-        mPlayers.clear();
+        this.mPlayers.clear();
     }
 }

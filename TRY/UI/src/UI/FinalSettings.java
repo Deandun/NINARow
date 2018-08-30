@@ -16,8 +16,8 @@ public class FinalSettings implements Serializable {
     public static final String BACKGROUND_SETTINGS = " -fx-background-repeat: stretch;   \n" +
         "    -fx-background-size: cover;\n" +
         "    -fx-background-position: center;";
-    public static final String AVIADCOHEN_THEAME_IMAGE_BACKGROUND = "-fx-background-image: url(\"UI/Images/AviadCohenTheameBackground.jpg\");";
-    public static final String GUYRONEN_THEAME_IMAGE_BACKGROUND = "-fx-background-image: url(\"UI/Images/GuyRonenTheameBackground.png\");";
-    public static final String AVIADCOHEN_THEAME_BOARD_BACKGROUND = "-fx-background-color: #F9D793;"; //only for example
+    public static final String AVIAD_THEAME_IMAGE_BACKGROUND = "-fx-background-image: url(\"UI/Images/AviadTheameBackground.jpg\");";
+    public static final String GUY_THEAME_IMAGE_BACKGROUND = "-fx-background-image: url(\"UI/Images/GuyTheameBackground.png\");";
+    public static final String Aviad_THEAME_BOARD_BACKGROUND = "-fx-background-color: #F9D793;"; //only for example
 
 }
