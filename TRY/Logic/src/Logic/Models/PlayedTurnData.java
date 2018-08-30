@@ -4,10 +4,11 @@ import Logic.Enums.eGameState;
 import Logic.Enums.eTurnType;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 
 public class PlayedTurnData implements Serializable {
-    private Collection<Cell> mUpdatedCellsCollection;
+    private Collection<Cell> mUpdatedCellsCollection = new ArrayList<>();
     private Player mPlayer;
     private eGameState mGameStateAfterTurn;
     private eTurnType mTurnType;
@@ -37,7 +38,10 @@ public class PlayedTurnData implements Serializable {
     }
 
     public void setUpdatedCellsCollection(Collection<Cell> updatedCell) {
-        this.mUpdatedCellsCollection = updatedCell;
+        // Shallow copy the cells so that if they change in game it won't affect this cell collection.
+        updatedCell.forEach(
+                cell -> this.mUpdatedCellsCollection.add(cell.getShallowCopy())
+        );
     }
 
     public void setPlayerTurn(Player player) {

@@ -2,10 +2,7 @@ package Logic.Models;
 
 import Logic.Exceptions.InvalidUserInputException;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Board{
@@ -87,14 +84,20 @@ public class Board{
         return this.removeCellFromIndexAndGetUpdatedCells(mBoard.length - 1, column); // Remove cell from the bottom most row at the selected column.
     }
 
-    public void RemoveAllPlayerDiscsFromBoard(Player player) {
+    public Collection<Cell> RemoveAllPlayerDiscsFromBoardAndGetUpdatedCells(Player player) {
+        Collection<Cell> updatedCellsCollections = new HashSet<>();
+        Collection<Cell> updatedCellsInColumn;
+
         for(int i = mBoard.length - 1; i >= 0; i--) { // Go over rows.
             for(int j = mBoard[i].length - 1; j >= 0; j--) { // Go over columns.
                 if(mBoard[i][j].getPlayer() != null && mBoard[i][j].getPlayer().equals(player)) { // Check if the cell was set by the player that quit.
-                    removeCellFromIndexAndGetUpdatedCells(i, j); // Remove cell from board.
+                    updatedCellsInColumn = this.removeCellFromIndexAndGetUpdatedCells(i, j); // Remove cell from board.
+                    updatedCellsCollections.addAll(updatedCellsInColumn);
                 }
             }
         }
+
+        return updatedCellsCollections;
     }
 
     public void Clear() {
@@ -144,7 +147,6 @@ public class Board{
     private Collection<Cell> removeCellFromIndexAndGetUpdatedCells(int row, int column) {
         Collection<Cell> updatedCellsList = new ArrayList<>();
         Player upperCellPlayer;
-
 
         // Go over the discs of the selected column starting from the selected row and update the player in the cell
         // until reaching null or the start of the column.

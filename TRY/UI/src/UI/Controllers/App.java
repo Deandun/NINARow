@@ -14,12 +14,15 @@ import UI.Theame;
 import UI.UIMisc.ImageManager;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -29,7 +32,6 @@ import UI.eTheameType;
 import javafx.event.ActionEvent;
 import java.io.File;
 import java.util.*;
-import java.util.function.Consumer;
 
 import static UI.FinalSettings.EXIT_BTN_SIZE;
 
@@ -57,6 +59,11 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
     @FXML private ProgressBar mProgressBar;
     @FXML private ComboBox<eTheameType> mComboBoxTheame;
 
+    //TODO: remove temp replay buttons and work with real fxml buttons.
+    private Button mReplayButton = new Button("Start");
+    private Button mBackReplayButton = new Button("Back");
+    private Button mForwardReplayButton = new Button("Forward");
+
     private BoardController mBoardController;
     private GameDetailsController mGameDetailsController;
 
@@ -74,6 +81,14 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
     private Logic mLogic;
     private int mTurnCounter;
 
+    // Replay
+    private BooleanProperty mIsReplayInProgressProperty = new SimpleBooleanProperty();
+    private ListIterator<PlayedTurnData> mPlayedTurnsData;
+
+    // Concurrency
+    private boolean mIsTurnInProgress;
+
+    // Themes
     private Theame mTheame;
 
     public App() {
@@ -84,6 +99,7 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
         this.mTargetSize = new SimpleStringProperty();
         this.mTheame = new Theame();
         this.mTheame.setAviadTheame();
+        this.mIsTurnInProgress = false;
     }
 
     private boolean shouldPlayComputerPlayerNext() {
@@ -109,6 +125,7 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
         this.mBtnExitGame.setPadding(new Insets(1));
         this.mComboBoxTheame.getItems().addAll(eTheameType.AviadCohen, eTheameType.GuyRonen);
         changeTheame();
+        this.initReplayButtons();
     }
 
     @FXML
@@ -207,8 +224,11 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
         Optional<ButtonType> result = alert.showAndWait();
 
         if (result.get() == ButtonType.OK){
-            this.mLogic.exitGame();
-            clear();
+            //TODO: rmove dummy player quit, uncomment exit game logic.
+            //this.mLogic.exitGame();
+            //clear();
+            PlayTurnParameters params = new PlayTurnParameters(eTurnType.PlayerQuit);
+            this.mLogic.playTurnAsync(params);
         }
     }
 
@@ -226,11 +246,42 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
         ImageManager.SetImagesForPlayerIDs(playerIDs);
     }
 
+    // Replay
+
+    private void initReplayButtons() {
+        // On clicks
+        this.mReplayButton.setOnMouseClicked(this::onReplayButtonClick);
+        this.mBackReplayButton.setOnMouseClicked(this::onBackReplayButtonClick);
+        this.mForwardReplayButton.setOnMouseClicked(this::onForwardReplayButtonClick);
+
+        // Bind buttons disable property.
+        //TODO: bind ReplayButton's disableProperty to a new boolean property isGameActiveProperty.
+        //TODO: bind replayButtons text property to the boolean property mIsReplayInProgress:
+        //this.mReplayButton.textProperty().bind(Bindings.selectBoolean());
+        this.mBackReplayButton.disableProperty().bind(this.mIsReplayInProgressProperty);
+        this.mForwardReplayButton.disableProperty().bind(this.mIsReplayInProgressProperty);
+    }
+
+    private void onReplayButtonClick(MouseEvent mouseEvent) {
+        // Toggle boolean property
+        this.mIsReplayInProgressProperty.setValue(!this.mIsReplayInProgressProperty.getValue());
+    }
+
+    private void onBackReplayButtonClick(MouseEvent mouseEvent) {
+
+    }
+
+    private void onForwardReplayButtonClick(MouseEvent mouseEvent) {
+
+    }
+
     // ILogicDelegate Implementation
 
     @Override
     public void onTurnPlayedSuccess(PlayedTurnData playedTurnData) {
-        this.handleUIAfterPlayedTurns(playedTurnData);
+        Platform.runLater(
+                () -> this.handleUIAfterPlayedTurns(playedTurnData)
+        );
     }
 
     @Override
@@ -241,6 +292,20 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
     @Override
     public void currentPlayerCannotPopoutAtColumn(int column) {
         //TODO: notify user (color button red for 0.5s or show an error message?)
+    }
+
+    @Override
+    public void turnInProgress() {
+        // Turn is in progress, human player cannot make any moves.
+        this.mIsTurnInProgress = true;
+    }
+
+    @Override
+    public void finishedTurn() {
+        // Notify (in the UI thread) that there's no longer a turn in progress.
+        Platform.runLater(
+                () -> this.mIsTurnInProgress = false
+        );
     }
 
     // IBoardControllerDelegate implementation
@@ -269,7 +334,7 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
     }
 
     private void playTurn(PlayTurnParameters playTurnParameters)  {
-        if(!this.mLogic.getIsTurnInProgress()) {
+        if(!this.mIsTurnInProgress) {
             this.mLogic.playTurnAsync(playTurnParameters);
         } else {
             // Notify user that the computer is making his turn.
@@ -277,16 +342,20 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
     }
 
     private void handleUIAfterPlayedTurns(PlayedTurnData turnData) {
-        if (turnData.getTurnType().equals(eTurnType.Popout)) {
-            this.mBoardController.PopoutDisc(turnData.getUpdatedCellsCollection());
-        } else {
-            this.mBoardController.InsertDiscstAt(turnData.getUpdatedCellsCollection());
+        if(turnData.getUpdatedCellsCollection() != null) {
+            // Update board if needed.
+            this.mBoardController.UpdateDiscs(turnData.getUpdatedCellsCollection());
+            this.mBoardController.UpdateDiscs(turnData.getUpdatedCellsCollection());
         }
-        eGameState gameState = turnData.getGameState();
 
+        eGameState gameState = turnData.getGameState();
         if(gameState.equals(eGameState.Won)) {
             Map<Player, Collection<Cell>> playerToWinningSequenceMap = this.mLogic.getPlayerToWinningSequencesMap();
-            System.out.println("Game won by player: " + turnData.getPlayer().getName());
+            System.out.println("Game won by players:");
+            for(Player p: playerToWinningSequenceMap.keySet()) {
+                System.out.println(p.getName());
+            }
+
             this.mBoardController.DisplayWinningSequences(playerToWinningSequenceMap);
 
             //TODO: notify players that the game has been won. Disable the game and "Reset" logic to a state where there's a file loaded but game hasn't started.

@@ -9,4 +9,8 @@ public interface ILogicDelegate {
     void discAddedToFullColumn(int column);
 
     void currentPlayerCannotPopoutAtColumn(int column);
+
+    void turnInProgress();
+
+    void finishedTurn();
 }

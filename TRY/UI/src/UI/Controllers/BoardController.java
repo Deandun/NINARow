@@ -80,29 +80,25 @@ public class BoardController implements ICellControllerDelegate {
         }
     }
 
-    public void InsertDiscstAt(Collection<Cell> updatedCellsCollection) {
-        // Insert discs one by one.
-        for(Cell updatedCell: updatedCellsCollection) {
+    public void UpdateDiscs(Collection<Cell> updatedColumnCellsCollection) {
+
+        for (Cell updatedCellInColumn : updatedColumnCellsCollection) {
             CellController selectedCell = this.mCellControllerList
                     .stream()
                     .filter(
-                            cell -> cell.getRow() == updatedCell.getRowIndex() && cell.getColumn() == updatedCell.getColumnIndex()
-                    )
-                    .findFirst()
-                    .get(); // There has to be a cell that answers the predicate above, so there is no need to check ifPresent().
+                            cell -> cell.getRow() == updatedCellInColumn.getRowIndex() && cell.getColumn() == updatedCellInColumn.getColumnIndex()
+                    ).findFirst()
+                    .get();
 
-                if(updatedCell.getPlayer().getType().equals(ePlayerType.Computer)) {
-                try {
-                    Thread.sleep(500); // Sleep for 0.5s before showing computer player's play.
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+            if (updatedCellInColumn.isEmpty()){
+                selectedCell.setImage(ImageManager.getEmptyDiscSlotImage());
             }
-
-            selectedCell.setImage(ImageManager.getImageForPlayerID(updatedCell.getPlayer().getID()));
+            else{
+                selectedCell.setImage(ImageManager.getImageForPlayerID(updatedCellInColumn.getPlayer().getID()));
+            }
         }
     }
-
+    
     private void setPopoutActions(Button popoutBtn) {
         DropShadow shadow = new DropShadow();
 
@@ -174,25 +170,6 @@ public class BoardController implements ICellControllerDelegate {
         this.mCellControllerList.stream().forEach(
                 cellController -> cellController.setImage(ImageManager.getEmptyDiscSlotImage())
         );
-    }
-
-    public void PopoutDisc(Collection<Cell> updatedColumnCellsCollection) {
-
-        for (Cell updatedCellInColumn : updatedColumnCellsCollection) {
-            CellController selectedCell = this.mCellControllerList
-                    .stream()
-                    .filter(
-                        cell -> cell.getRow() == updatedCellInColumn.getRowIndex() && cell.getColumn() == updatedCellInColumn.getColumnIndex()
-            ).findFirst()
-            .get();
-
-            if (updatedCellInColumn.isEmpty()){
-                selectedCell.setImage(ImageManager.getEmptyDiscSlotImage());
-            }
-            else{
-                selectedCell.setImage(ImageManager.getImageForPlayerID(updatedCellInColumn.getPlayer().getID()));
-            }
-        }
     }
 
     public void setTheame(String style){

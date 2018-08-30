@@ -5,6 +5,7 @@ import Logic.ComputerPlayer.PlayComputerPlayerTask;
 import Logic.Enums.eGameState;
 import Logic.Enums.ePlayerType;
 import Logic.Enums.eTurnType;
+import Logic.Enums.eVariant;
 import Logic.Exceptions.InvalidFileInputException;
 import Logic.Exceptions.InvalidInputException;
 import Logic.Exceptions.InvalidUserInputException;
@@ -23,10 +24,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
@@ -39,7 +37,7 @@ public class Logic{
     private Board mGameBoard;
     private SequenceSearcher mSequenceSearcher;
     private IComputerPlayerAlgo mComputerPlayerAlgo;
-    private boolean mIsTurnInProgress; // A flag that states that another players turn is in progress (user cannot play at this time).
+    //private boolean mIsTurnInProgress; // A flag that states that another players turn is in progress (user cannot play at this time).
     private BlockingQueue<PlayTurnParameters> mTurnsBlockingQueue;
     private ILogicDelegate mDelegate;
 
@@ -49,7 +47,7 @@ public class Logic{
         this.mGameStatus = new GameStatus();
         this.mSequenceSearcher = new SequenceSearcher();
         this.mComputerPlayerAlgo = new ComputerPlayerAlgo();
-        this.mIsTurnInProgress = false;
+       // this.mIsTurnInProgress = false;
         this.mTurnsBlockingQueue = new ArrayBlockingQueue<>(QUEUE_CAPACITY);
         this.mDelegate = logicDelegate;
     }
@@ -73,7 +71,8 @@ public class Logic{
 
         if(this.mGameStatus.getPlayer().getType().equals(ePlayerType.Computer)) {
             // If computer is playing first - Play computer turn.
-            this.mIsTurnInProgress = true;
+            //this.mIsTurnInProgress = true;
+            this.mDelegate.turnInProgress();
             PlayComputerPlayerTask playComputerPlayerTask = new PlayComputerPlayerTask(this::playComputerAlgoTurn);
             new Thread(playComputerPlayerTask).start();
         }
@@ -100,20 +99,19 @@ public class Logic{
         return playedTurnData;
     }
 
-    // This method is synchronized with the function called startConsumingPlayerTurns to ensure that a human player's turn is not registered
-    // Until the computer player's turn is not noticeable to him.
-    private synchronized void playComputerAlgoTurn()  {
-
+    private void playComputerAlgoTurn()  {
         // Use algo to determine next computer turn.
-        PlayTurnParameters computerPlayTurnParams = this.mComputerPlayerAlgo.getNextPlay(this.mGameStatus.mPlayer);
-
-        this.playTurnAsync(computerPlayTurnParams);
+        PlayTurnParameters computerPlayTurnParams = this.mComputerPlayerAlgo.getNextPlay(this.mGameStatus.mCurrentPlayer);
 
         try {
             Thread.sleep(300);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
+        this.playTurnAsync(computerPlayTurnParams);
+
+
     }
 
     private void finishedPlayingTurn(PlayedTurnData playedTurnData) {
@@ -134,7 +132,7 @@ public class Logic{
 
             playedTurnData.setUpdatedCellsCollection(updatedCells);
             playedTurnData.setGameState(this.mSequenceSearcher.CheckColumnForWinningSequences(column) ? eGameState.Won : eGameState.Active);
-            playedTurnData.setPlayerTurn(this.mGameStatus.mPlayer);
+            playedTurnData.setPlayerTurn(this.mGameStatus.mCurrentPlayer);
             playedTurnData.setTurnType(eTurnType.Popout);
 
             // Check if there is a winning sequence starting from a cell in the selected column as a result of the Popout.
@@ -144,22 +142,30 @@ public class Logic{
         }
     }
 
-    //TODO: make adjustments so that player quit will be considered as a played turn data. Save this "turn" in turn history.
-    private PlayedTurnData playerQuit(Player player) {
-        this.mGameStatus.PlayerQuitGame(player);
+    private PlayedTurnData currentPlayerQuit(PlayTurnParameters turnParameters) {
+        PlayedTurnData playedTurnData = new PlayedTurnData();
         eGameState gameState = eGameState.Active;
 
-        if(GameSettings.getInstance().getPlayers().size() == 1) {//only one player remains, he has won!
+        if(GameSettings.getInstance().getPlayers().size() == 1) { //only one player remains, he has won!
            gameState = eGameState.Won;
         } else {
-            mGameBoard.RemoveAllPlayerDiscsFromBoard(player);
+            Collection<Cell> updatedCells = this.mGameBoard.RemoveAllPlayerDiscsFromBoardAndGetUpdatedCells(this.mGameStatus.getPlayer());
+            playedTurnData.setUpdatedCellsCollection(updatedCells);
 
-            if (mSequenceSearcher.CheckEntireBoardForWinningSequences()){  //run all over board and check if someone won
-                gameState =  eGameState.Won;
+            if (this.mSequenceSearcher.CheckEntireBoardForWinningSequences()){  //run all over board and check if someone won
+                gameState = eGameState.Won;
+            } else if(this.isDrawForNextPlayer()) {
+                gameState = eGameState.Draw;
             }
         }
 
-        return null;
+        this.mGameStatus.CurrentPlayerQuitGame();
+
+        playedTurnData.setGameState(gameState);
+        playedTurnData.setTurnType(turnParameters.getmTurnType());
+        this.finishedPlayingTurn(playedTurnData);
+
+        return playedTurnData;
     }
 
     public boolean isGameActive(){
@@ -184,6 +190,8 @@ public class Logic{
 
         if(mSequenceSearcher.CheckCellForWinningSequence(updatedCell)) {
             gameState = eGameState.Won;
+        } else if (this.isDrawForNextPlayer()) {
+            gameState = eGameState.Draw;
         } else {
             gameState = eGameState.Active;
         }
@@ -221,15 +229,34 @@ public class Logic{
     }
 
     public List<Integer> getAvailablePopoutColumnsForCurrentPlayer() {
-        return mGameBoard.getAvailablePopoutColumnsForCurrentPlayer(mGameStatus.mPlayer);
+        return mGameBoard.getAvailablePopoutColumnsForCurrentPlayer(mGameStatus.mCurrentPlayer);
     }
 
+    private boolean isDrawForNextPlayer() {
+        boolean isPopoutGameMode = GameSettings.getInstance().getVariant().equals(eVariant.Popout);
+        // Check if next player can perform popout. If he can't, and the board is full - game is in a draw.
+        boolean canNextPlayerPopout = this.mGameBoard.CanPlayerPerformPopout(this.mGameStatus.getNextPlayer());
+        boolean isBoardFull = this.mGameBoard.getIsBoardFull();
+        boolean isDraw;
+
+        if(!isPopoutGameMode && isBoardFull) {
+            // Not in popout mode and board is full
+            isDraw = true;
+        } else if (isPopoutGameMode && isBoardFull && !canNextPlayerPopout) {
+            // In popout mode, board is full and next player can't popout
+            isDraw = true;
+        } else {
+            isDraw = false;
+        }
+
+        return isDraw;
+    }
     // Turns blocking queue
 
-    public synchronized void playTurnAsync(PlayTurnParameters turnParameters) {
+    public void playTurnAsync(PlayTurnParameters turnParameters) {
         // (At least for exercise 2) UI thread executes this code.
-        this.mIsTurnInProgress = true;
-        this.mTurnsBlockingQueue.add(turnParameters);
+        this.mDelegate.turnInProgress();
+        this.mTurnsBlockingQueue.offer(turnParameters);
     }
 
     // This method is executed in a background thread.
@@ -238,6 +265,7 @@ public class Logic{
         // While game is active.
         while(true) {
             PlayTurnParameters playedTurnParams;
+
             try {
                 playedTurnParams = this.mTurnsBlockingQueue.take();
             } catch (InterruptedException e) {
@@ -245,27 +273,19 @@ public class Logic{
                 break;
             }
 
-            // Sync between computer player turn and the following code to ensure that a human player cannot play until the computer player's changes
-            // Are noticeable. The human player cannot play while mIsTurnInProgress is true or the queue is not empty.
-            // At the start of the following sync code block we set mIsTurnInProgress To true, meaning the human player can't make a play (while his UI stays responsive).
-            // If the computer is not playing next, mIsTurnInProgress Is set to false, allowing the human player to play.
-            // Else, the computer sends his play params to the async queue, and only when all of the computer players are done playing
-            // mIsTurnInProgress is set to false.
-            synchronized (this) {
-                // If game has ended, break.
-                if (!this.mGameStatus.getGameState().equals(eGameState.Active)) {
-                    break;
-                }
+           // If game has ended, break.
+            if (!this.mGameStatus.getGameState().equals(eGameState.Active)) {
+                break;
+            }
 
-                this.executeTurn(playedTurnParams);
+            this.executeTurn(playedTurnParams);
 
-                // Play computer player if needed.
-                if (this.mGameStatus.getPlayer().getType().equals(ePlayerType.Computer)) {
-                    PlayComputerPlayerTask playComputerPlayerTask = new PlayComputerPlayerTask(this::playComputerAlgoTurn);
-                    new Thread(playComputerPlayerTask).start();
-                } else {
-                    this.mIsTurnInProgress = false; // If the computer player is not playing next, signal there is no turn in progress.
-                }
+            // Play computer player if needed.
+            if (this.mGameStatus.getPlayer().getType().equals(ePlayerType.Computer)) {
+                PlayComputerPlayerTask playComputerPlayerTask = new PlayComputerPlayerTask(this::playComputerAlgoTurn);
+                new Thread(playComputerPlayerTask).start();
+            } else {
+                this.mDelegate.finishedTurn(); // If the computer player is not playing next, signal there is no turn in progress.
             }
         }
 
@@ -307,28 +327,20 @@ public class Logic{
     }
 
     private void executePlayerQuit(PlayTurnParameters playedTurnParams) {
-        PlayedTurnData turnData = this.playerQuit(playedTurnParams.getPlayer());
+        PlayedTurnData turnData = this.currentPlayerQuit(playedTurnParams);
         this.mDelegate.onTurnPlayedSuccess(turnData);
-    }
-
-    public boolean getIsTurnInProgress() {
-        return mIsTurnInProgress && this.mTurnsBlockingQueue.isEmpty();
     }
 
     public class GameStatus implements IGameStatus {
         private eGameState mGameState = eGameState.Inactive;
-        private int mTurn = 0;
-        private Player mPlayer;
-        private int mPlayerIndex;
+        private Player mCurrentPlayer;
+        private Iterator<Player> mPlayerIterator;
         private Instant mGameStart;
 
         // Getters/Setters
-        public int getTurn() {
-            return mTurn;
-        }
 
         public Player getPlayer() {
-            return mPlayer;
+            return mCurrentPlayer;
         }
 
         @Override
@@ -336,7 +348,7 @@ public class Logic{
 
         @Override
         public String getNameOfPlayerCurrentlyPlaying() {
-            return mPlayer.getName();
+            return mCurrentPlayer.getName();
         }
 
         @Override
@@ -346,60 +358,53 @@ public class Logic{
 
         // API
 
-        void StartNewGame(){
+        private void StartNewGame() {
+            this.mPlayerIterator = GameSettings.getInstance().getPlayers().iterator();
+            this.mCurrentPlayer = this.mPlayerIterator.next();
             this.mGameState = eGameState.Active;
-            this.mTurn = 0;
-            this.mPlayerIndex = 0;
             GameSettings.getInstance().getPlayers().forEach(
                     (player) -> player.setTurnCounter(0) // Reset turn counter
             );
-            this.mPlayer = GameSettings.getInstance().getPlayers().get(mPlayerIndex);
             this.mGameStart = Instant.now();
         }
 
         // Adjust game status when a player has finished his turn.
-        void FinishedTurn() {
-            mTurn++;
-            mPlayer.FinishedTurn();
-            nextPlayer();
+        private void FinishedTurn() {
+            this.mCurrentPlayer.FinishedTurn();
+            this.nextPlayer();
         }
 
-        public void PlayerQuitGame(Player quittingPlayer) {
-            int quittingPlayerIndex = GameSettings.getInstance().getPlayers().indexOf(quittingPlayer);
-            int currentlyPlayingPlayerIndex = GameSettings.getInstance().getPlayers().indexOf(mPlayer);
-
-            // If quitting player is currently playing, or if the index of the quitting player is greater than
-            // that of the player that is currently playing, decrement the playing player's index to accommodate.
-            if(quittingPlayer.equals(mPlayer) || quittingPlayerIndex > currentlyPlayingPlayerIndex) {
-                mPlayerIndex--;
-            }
-
+        private void CurrentPlayerQuitGame() {
+            Player quittingPlayer = this.mCurrentPlayer;
+            this.nextPlayer(); // Set next player.
+            // Remove player by ID
             GameSettings.getInstance().getPlayers().remove(quittingPlayer);
-        }
-
-        @Override
-        public String toString(){
-            String gameActivation = "Game is ";
-
-            if (mGameState != eGameState.Inactive){
-                gameActivation += "active";
-            }
-            else{
-                gameActivation += "not active";
-            }
-
-            return gameActivation + ", Turn number is " + mTurn + ", Player turn is: " + this.mPlayer.getName();
         }
 
         // Helper functions
 
         private void nextPlayer() {
-            mPlayer = GameSettings.getInstance().getPlayers().get(getNextPlayerIndex());
+            // If done iterating over players, reset iterator.
+            if(!this.mPlayerIterator.hasNext()) {
+                this.mPlayerIterator = GameSettings.getInstance().getPlayers().iterator();
+            }
+
+            this.mCurrentPlayer = this.mPlayerIterator.next();
         }
 
-        private int getNextPlayerIndex() {
-            return ++mPlayerIndex % GameSettings.getInstance().getPlayers().size();
-        }
+        private Player getNextPlayer() {
+            Player nextPlayer;
 
+            if(this.mPlayerIterator.hasNext()) {
+                Iterator<Player> currentPlayerIterator = this.mPlayerIterator; // Save current iterator.
+
+                nextPlayer = this.mPlayerIterator.next();
+                this.mPlayerIterator = currentPlayerIterator; // Restore previous iterator value.
+            } else {
+                nextPlayer = GameSettings.getInstance().getPlayers().iterator().next();
+            }
+
+            return nextPlayer;
+        }
     }
 }

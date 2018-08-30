@@ -42,4 +42,14 @@ public class Cell implements Serializable {
     public Player getPlayer() {
         return mPlayer;
     }
+
+    public Cell getShallowCopy() {
+        Cell copyCell = new Cell();
+
+        copyCell.setRowIndex(this.mRowIndex);
+        copyCell.setColumnIndex(this.mColumnIndex);
+        copyCell.setPlayer(this.mPlayer);
+
+        return copyCell;
+    }
 }

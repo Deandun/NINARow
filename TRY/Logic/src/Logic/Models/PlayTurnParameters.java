@@ -5,7 +5,10 @@ import Logic.Enums.eTurnType;
 public class PlayTurnParameters {
     private int mSelectedColumn;
     private eTurnType mTurnType;
-    private Player mPlayer;
+
+    public PlayTurnParameters(eTurnType turnType) {
+        this.mTurnType = turnType;
+    }
 
     public PlayTurnParameters(int selectedColumn, eTurnType turnType) {
         this.mSelectedColumn = selectedColumn;
@@ -18,13 +21,5 @@ public class PlayTurnParameters {
 
     public eTurnType getmTurnType() {
         return mTurnType;
-    }
-
-    public Player getPlayer() {
-        return mPlayer;
-    }
-
-    public void setPlayer(Player player) {
-        this.mPlayer = player;
     }
 }
