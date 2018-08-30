@@ -12,6 +12,7 @@ import UI.Controllers.ControllerDelegates.IBoardControllerDelegate;
 import UI.Controllers.ControllerDelegates.IGameSettingsControllerDelegate;
 import UI.Theame;
 import UI.UIMisc.ImageManager;
+import UI.Replay.ReplayManager;
 import UI.eInvalidMoveType;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -84,7 +85,7 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
 
     // Replay
     private BooleanProperty mIsReplayInProgressProperty = new SimpleBooleanProperty();
-    private ListIterator<PlayedTurnData> mPlayedTurnsData;
+    private ReplayManager mReplayManager = new ReplayManager();
 
     // Concurrency
     private boolean mIsTurnInProgress;
@@ -126,7 +127,7 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
         this.mBtnExitGame.setPadding(new Insets(1));
         this.mComboBoxTheame.getItems().addAll(eTheameType.Aviad, eTheameType.Guy);
         changeTheame();
-        this.initReplayButtons();
+        this.initReplay();
     }
 
     @FXML
@@ -250,7 +251,7 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
 
     // Replay
 
-    private void initReplayButtons() {
+    private void initReplay() {
         // On clicks
         this.mReplayButton.setOnMouseClicked(this::onReplayButtonClick);
         this.mBackReplayButton.setOnMouseClicked(this::onBackReplayButtonClick);
@@ -262,6 +263,11 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
         //this.mReplayButton.textProperty().bind(Bindings.selectBoolean());
         this.mBackReplayButton.disableProperty().bind(this.mIsReplayInProgressProperty);
         this.mForwardReplayButton.disableProperty().bind(this.mIsReplayInProgressProperty);
+
+        //TODO: remove temp adding buttons manually
+        this.mGridPaneConfig.add(this.mBackReplayButton, 4, 0);
+        this.mGridPaneConfig.add(this.mReplayButton, 5, 0);
+        this.mGridPaneConfig.add(this.mForwardReplayButton, 6, 0);
     }
 
     private void onReplayButtonClick(MouseEvent mouseEvent) {
@@ -270,7 +276,9 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
     }
 
     private void onBackReplayButtonClick(MouseEvent mouseEvent) {
+        if(this.mReplayManager.hasPrevious()) {
 
+        }
     }
 
     private void onForwardReplayButtonClick(MouseEvent mouseEvent) {

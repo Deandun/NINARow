@@ -1,4 +1,4 @@
-package UI.UIMisc;
+package UI.Replay;
 
 import Logic.Models.PlayedTurnData;
 import javafx.beans.property.BooleanProperty;
@@ -10,12 +10,10 @@ import java.util.List;
 import java.util.ListIterator;
 
 public class ReplayManager {
-    private BooleanProperty mIsReplayInProgressProperty;
     private IntegerProperty mCurrentTurnNumberInReplay;
     private ListIterator<PlayedTurnData> mPlayedTurnsDataListIterator;
 
     public ReplayManager() {
-        this.mIsReplayInProgressProperty = new SimpleBooleanProperty();
         this.mCurrentTurnNumberInReplay = new SimpleIntegerProperty();
     }
 
@@ -23,20 +21,15 @@ public class ReplayManager {
         // TODO: check if this gives us the actual last turn iterator
         this.mCurrentTurnNumberInReplay.setValue(playedTurnData.size());
         this.mPlayedTurnsDataListIterator = playedTurnData.listIterator(playedTurnData.size()); // Set to last element.
-        this.mIsReplayInProgressProperty.setValue(true);
-    }
-
-    public void stop() {
-        this.mIsReplayInProgressProperty.setValue(false);
     }
 
     public PlayedTurnData getNextTurnData() {
-        this.mCurrentTurnNumberInReplay.setValue(this.mCurrentTurnNumberInReplay.getValue() + 1);
+        this.mCurrentTurnNumberInReplay.setValue(this.mPlayedTurnsDataListIterator.nextIndex());
         return this.mPlayedTurnsDataListIterator.next();
     }
 
     public PlayedTurnData getPreviousTurnData() {
-        this.mCurrentTurnNumberInReplay.setValue(this.mCurrentTurnNumberInReplay.getValue() - 1);
+        this.mCurrentTurnNumberInReplay.setValue(this.mPlayedTurnsDataListIterator.previousIndex());
         return this.mPlayedTurnsDataListIterator.previous();
     }
 
@@ -48,13 +41,6 @@ public class ReplayManager {
         return this.mPlayedTurnsDataListIterator.hasPrevious();
     }
 
-    public boolean IsReplayInProgressProperty() {
-        return this.mIsReplayInProgressProperty.get();
-    }
-
-    public BooleanProperty getIsReplayInProgressProperty() {
-        return this.mIsReplayInProgressProperty;
-    }
 
     public IntegerProperty getCurrentTurnNumberInReplayProperty() {
         return this.mCurrentTurnNumberInReplay;
