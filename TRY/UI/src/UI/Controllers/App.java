@@ -12,6 +12,7 @@ import UI.Controllers.ControllerDelegates.IBoardControllerDelegate;
 import UI.Controllers.ControllerDelegates.IGameSettingsControllerDelegate;
 import UI.Theame;
 import UI.UIMisc.ImageManager;
+import UI.eInvalidMoveType;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
@@ -123,7 +124,7 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
         this.mBtnExitGame.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/UI/Images/Exit.JPG"), EXIT_BTN_SIZE, EXIT_BTN_SIZE, true, true)));
         this.mBtnExitGame.setText(null);
         this.mBtnExitGame.setPadding(new Insets(1));
-        this.mComboBoxTheame.getItems().addAll(eTheameType.AviadCohen, eTheameType.GuyRonen);
+        this.mComboBoxTheame.getItems().addAll(eTheameType.Aviad, eTheameType.Guy);
         changeTheame();
         this.initReplayButtons();
     }
@@ -181,7 +182,7 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
 
     private void updateUIAfterGameFileRead() {
         this.mBottomProgressPane.setVisible(false);
-        this.mBtnStartGame.setDisable(false);
+        setGameEnabled();
         this.mBoardController = new BoardController(GameSettings.getInstance().getRows(), GameSettings.getInstance().getColumns(), this);
         this.mBoardController.InitBoard();
         this.mBorderPane.setMaxSize(300, 300);
@@ -191,7 +192,7 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
 
     @FXML
     void startGame() throws Exception {
-        this.mBtnLoadFile.setDisable(true);
+        setGameEnabled();
         this.mBoardController.getBoardPane().setDisable(false);
         this.mBoardController.ResetBoard();
         this.mLogic.StartGame();
@@ -224,11 +225,12 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
         Optional<ButtonType> result = alert.showAndWait();
 
         if (result.get() == ButtonType.OK){
-            //TODO: rmove dummy player quit, uncomment exit game logic.
+            //TODO: remove dummy player quit, uncomment exit game logic.
             //this.mLogic.exitGame();
             //clear();
             PlayTurnParameters params = new PlayTurnParameters(eTurnType.PlayerQuit);
             this.mLogic.playTurnAsync(params);
+            setGameDisabled();
         }
     }
 
@@ -286,12 +288,20 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
 
     @Override
     public void discAddedToFullColumn(int column) {
-        //TODO: notify user (color column red for 0.5s or show an error message?)
+        try {
+            this.mBoardController.handelInvalidAction(column, eInvalidMoveType.ColumnFull); //notify user
+        } catch (InterruptedException e) {
+            System.out.println("SleepError. "+ e.getMessage());
+        }
     }
 
     @Override
     public void currentPlayerCannotPopoutAtColumn(int column) {
-        //TODO: notify user (color button red for 0.5s or show an error message?)
+        try {
+            this.mBoardController.handelInvalidAction(column, eInvalidMoveType.InvalidPopout);
+        } catch (InterruptedException e) {
+            System.out.println("SleepError. "+ e.getMessage());
+        }
     }
 
     @Override
@@ -357,7 +367,8 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
             }
 
             this.mBoardController.DisplayWinningSequences(playerToWinningSequenceMap);
-
+            setGameDisabled();
+            gameWonMsg(turnData.getPlayer().getName());
             //TODO: notify players that the game has been won. Disable the game and "Reset" logic to a state where there's a file loaded but game hasn't started.
         } else if (gameState.equals(eGameState.Draw)) {
             //TODO: notify players that the game has ended in a draw.
@@ -370,6 +381,23 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
         }
     }
 
+    private void gameWonMsg(String WinnerName) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Game Finish");
+        alert.setContentText(WinnerName +" Player won the game! Congratulation.");
+        Optional<ButtonType> result = alert.showAndWait();
+
+        if (result.get() == ButtonType.OK){ //user chose ok
+            alert.close();
+        } 
+    }
+
+    private void setGameEnabled() {
+        this.mBtnLoadFile.setDisable(false);
+        this.mBtnStartGame.setDisable(true);
+        this.mBtnExitGame.setDisable(false);
+    }
+
     @Override
     public void ExitGameBtnClicked(boolean doExit) {
         System.out.println("Handle exit game btn clicked"); //DEBUG
@@ -379,16 +407,17 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
         }
     }
 
-    private void setStartConfiguration(){
+    private void setGameDisabled(){
         this.mBtnStartGame.setDisable(true);
         this.mBtnLoadFile.setDisable(false);
+        this.mBtnExitGame.setDisable(true);
     }
 
     private void clear() {
         ImageManager.Clear(); //TODO: check what else
         this.mBoardController.ClearBoard();
         this.mTheame.setAviadTheame();
-        setStartConfiguration();
+        setGameDisabled();
     }
 
     public void changeTheame(){
@@ -396,7 +425,7 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
     }
 
     public void onComboBoxItemChange(ActionEvent actionEvent) {
-        if (this.mComboBoxTheame.getSelectionModel().getSelectedItem().equals(eTheameType.AviadCohen)){
+        if (this.mComboBoxTheame.getSelectionModel().getSelectedItem().equals(eTheameType.Aviad)){
             this.mTheame.setAviadTheame();
         }
         else{

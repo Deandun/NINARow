@@ -41,7 +41,7 @@
                         <Insets />
                      </opaqueInsets>
                   </Button>
-                  <ComboBox fx:id="mComboBoxTheame" onAction="#onComboBoxItemChange" prefWidth="150.0" promptText="Aviad Cohen Theame" GridPane.columnIndex="2">
+                  <ComboBox fx:id="mComboBoxTheame" onAction="#onComboBoxItemChange" prefWidth="150.0" promptText="Aviad Theame" GridPane.columnIndex="2">
                      <GridPane.margin>
                         <Insets left="5.0" />
                      </GridPane.margin>

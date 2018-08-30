@@ -8,18 +8,18 @@ public class Theame {
     private String mCurrentBackgound;
 
     public Theame(){
-        this.mCurrentTheame = eTheameType.AviadCohen;
-        this.mCurrentBackgound = AVIADCOHEN_THEAME_IMAGE_BACKGROUND;
+        this.mCurrentTheame = eTheameType.Aviad;
+        this.mCurrentBackgound = AVIAD_THEAME_IMAGE_BACKGROUND;
     }
 
     public void  setAviadTheame() {
-        this.mCurrentTheame = eTheameType.AviadCohen;
-        this.mCurrentBackgound = AVIADCOHEN_THEAME_IMAGE_BACKGROUND;
+        this.mCurrentTheame = eTheameType.Aviad;
+        this.mCurrentBackgound = AVIAD_THEAME_IMAGE_BACKGROUND;
     }
 
     public void setGuyTheame(){
-        this.mCurrentTheame = eTheameType.GuyRonen;
-        this.mCurrentBackgound = GUYRONEN_THEAME_IMAGE_BACKGROUND;
+        this.mCurrentTheame = eTheameType.Guy;
+        this.mCurrentBackgound = GUY_THEAME_IMAGE_BACKGROUND;
     }
 
     public eTheameType getCurrentTheame() {

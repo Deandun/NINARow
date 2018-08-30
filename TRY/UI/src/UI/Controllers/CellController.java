@@ -6,8 +6,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
-import javafx.scene.paint.ImagePattern;
-import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 
 import static UI.FinalSettings.CELL_SIZE;
@@ -70,7 +68,6 @@ public class CellController {
         this.mIVSign.setImage(image);
     }
 
-
     public Pane getPane() {
         return mPane;
     }
@@ -81,5 +78,17 @@ public class CellController {
 
     public int getRow() {
         return mRow;
+    }
+
+    public void setDefaultStyle() {
+        //TODO: implements from css file
+    }
+
+    public void setErrorStyle() {
+        //TODO: implements from css file
+    }
+
+    public void setWinningStyle() {
+        //TODO: implements from css file
     }
 }

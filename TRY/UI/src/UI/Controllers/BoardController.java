@@ -1,14 +1,15 @@
 package UI.Controllers;
 
-import Logic.Enums.ePlayerType;
 import Logic.Enums.eVariant;
 import Logic.Models.Cell;
 import Logic.Models.GameSettings;
 import Logic.Models.Player;
 import UI.Controllers.ControllerDelegates.ICellControllerDelegate;
 import UI.UIMisc.ImageManager;
+import UI.eInvalidMoveType;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -20,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import static UI.FinalSettings.POPOUT_BTN_SIZE;
+import static java.lang.Thread.sleep;
 
 public class BoardController implements ICellControllerDelegate {
 
@@ -31,6 +33,7 @@ public class BoardController implements ICellControllerDelegate {
     private int mPopoutRowIndex;
     private IBoardControllerDelegate mDelegate;
     private boolean mIsPopoutEnabled;
+    private Label mMSGToUser;
 
     public BoardController(int numRows, int numCols, IBoardControllerDelegate delegate) {
         this.mBoardPane = new GridPane();
@@ -42,6 +45,8 @@ public class BoardController implements ICellControllerDelegate {
         this.mPopoutRowIndex = this.mNumOfDiscRows;
         this.mIsPopoutEnabled = GameSettings.getInstance().getVariant().equals(eVariant.Popout);
         this.mDelegate = delegate;
+        this.mMSGToUser = new Label(); //TODO: check
+        this.mMSGToUser.setVisible(false);
     }
 
     public GridPane getBoardPane() {
@@ -134,6 +139,7 @@ public class BoardController implements ICellControllerDelegate {
                     setWinningStyle(winningCells);
                 }
         );
+
         //TODO: Add an effect to the winning sequence cells! Do it by adding a style class to the buttons and adding the class and effect to the css file.
     }
 
@@ -150,7 +156,7 @@ public class BoardController implements ICellControllerDelegate {
             }
         }
         for (CellController cellController : winningCellsController){
-            //cellController.getPane().setStyle(); //TODO: implement
+            cellController.setWinningStyle();
         }
     }
 
@@ -182,5 +188,36 @@ public class BoardController implements ICellControllerDelegate {
         this.mPopOutButtonList.clear();
         this.mBoardPane.setVisible(false);
     }
+
+    public void handelInvalidAction(int column, eInvalidMoveType invalidMove) throws InterruptedException {
+        List<CellController> invalidColumn = getCellsListInColumn(column);
+
+        this.mMSGToUser.setText("Error: " + invalidMove.name());
+        this.mMSGToUser.setVisible(true);
+
+        for(CellController cell: invalidColumn){
+            cell.setErrorStyle();
+        }
+        sleep(5000);
+
+        for(CellController cell: invalidColumn){
+            cell.setDefaultStyle();
+        }
+
+        this.mMSGToUser.setVisible(false);
+    }
+
+    private List<CellController> getCellsListInColumn(int column) {
+        List<CellController> wantedCells =  new ArrayList<>();
+
+        for (CellController cell : this.mCellControllerList){
+            if (cell.getColumn() == column){
+                wantedCells.add(cell);
+            }
+        }
+
+        return wantedCells;
+    }
+
 }
 

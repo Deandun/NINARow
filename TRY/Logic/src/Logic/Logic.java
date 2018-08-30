@@ -55,7 +55,8 @@ public class Logic{
     // ILogic interface implementation.
 
     public void ReadGameFile(String filePath, Runnable onLoadFileFinish, Runnable onFinishedCheckingFileValidity) throws FileNotFoundException, InvalidFileInputException, IOException, JAXBException, InterruptedException {
-        mFileManager.LoadGameFile(filePath, onLoadFileFinish, onFinishedCheckingFileValidity);
+        GameSettings.getInstance().Clear();
+        this.mFileManager.LoadGameFile(filePath, onLoadFileFinish, onFinishedCheckingFileValidity);
         this.mGameBoard = new Board(GameSettings.getInstance().getRows(), GameSettings.getInstance().getColumns());
     }
 
@@ -393,7 +394,9 @@ public class Logic{
         }
 
         private Player getNextPlayer() {
-            Player nextPlayer;
+            return mCurrentPlayer;
+        }
+         /*   Player nextPlayer;
 
             if(this.mPlayerIterator.hasNext()) {
                 Iterator<Player> currentPlayerIterator = this.mPlayerIterator; // Save current iterator.
@@ -405,6 +408,6 @@ public class Logic{
             }
 
             return nextPlayer;
-        }
+        }*/
     }
 }

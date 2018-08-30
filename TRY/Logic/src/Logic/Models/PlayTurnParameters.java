@@ -20,6 +20,6 @@ public class PlayTurnParameters {
     }
 
     public eTurnType getmTurnType() {
-        return mTurnType;
+        return this.mTurnType;
     }
 }
