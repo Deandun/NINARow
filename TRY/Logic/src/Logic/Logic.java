@@ -335,7 +335,7 @@ public class Logic{
     public class GameStatus implements IGameStatus {
         private eGameState mGameState = eGameState.Inactive;
         private Player mCurrentPlayer;
-        private Iterator<Player> mPlayerIterator;
+        private ListIterator<Player> mPlayerIterator;
         private Instant mGameStart;
 
         // Getters/Setters
@@ -360,7 +360,7 @@ public class Logic{
         // API
 
         private void StartNewGame() {
-            this.mPlayerIterator = GameSettings.getInstance().getPlayers().iterator();
+            this.mPlayerIterator = GameSettings.getInstance().getPlayers().listIterator();
             this.mCurrentPlayer = this.mPlayerIterator.next();
             this.mGameState = eGameState.Active;
             GameSettings.getInstance().getPlayers().forEach(
@@ -387,27 +387,23 @@ public class Logic{
         private void nextPlayer() {
             // If done iterating over players, reset iterator.
             if(!this.mPlayerIterator.hasNext()) {
-                this.mPlayerIterator = GameSettings.getInstance().getPlayers().iterator();
+                this.mPlayerIterator = GameSettings.getInstance().getPlayers().listIterator();
             }
 
             this.mCurrentPlayer = this.mPlayerIterator.next();
         }
 
         private Player getNextPlayer() {
-            return mCurrentPlayer;
-        }
-         /*   Player nextPlayer;
+            Player nextPlayer;
 
             if(this.mPlayerIterator.hasNext()) {
-                Iterator<Player> currentPlayerIterator = this.mPlayerIterator; // Save current iterator.
-
-                nextPlayer = this.mPlayerIterator.next();
-                this.mPlayerIterator = currentPlayerIterator; // Restore previous iterator value.
+                nextPlayer = this.mPlayerIterator.next(); // Go next and then set back to previous element
+                this.mPlayerIterator.previous();
             } else {
-                nextPlayer = GameSettings.getInstance().getPlayers().iterator().next();
+                nextPlayer = GameSettings.getInstance().getPlayers().iterator().next(); // Get first element.
             }
 
             return nextPlayer;
-        }*/
+        }
     }
 }

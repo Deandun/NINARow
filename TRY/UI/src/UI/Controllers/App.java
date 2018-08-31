@@ -192,7 +192,7 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
     }
 
     @FXML
-    void startGame() throws Exception {
+    void startGame() {
         setGameEnabled();
         this.mBoardController.getBoardPane().setDisable(false);
         this.mBoardController.ResetBoard();
@@ -261,8 +261,8 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
         //TODO: bind ReplayButton's disableProperty to a new boolean property isGameActiveProperty.
         //TODO: bind replayButtons text property to the boolean property mIsReplayInProgress:
         //this.mReplayButton.textProperty().bind(Bindings.selectBoolean());
-        this.mBackReplayButton.disableProperty().bind(this.mIsReplayInProgressProperty);
-        this.mForwardReplayButton.disableProperty().bind(this.mIsReplayInProgressProperty);
+        this.mBackReplayButton.disableProperty().bind(this.mIsReplayInProgressProperty.not());
+        this.mForwardReplayButton.disableProperty().bind(this.mIsReplayInProgressProperty.not());
 
         //TODO: remove temp adding buttons manually
         this.mGridPaneConfig.add(this.mBackReplayButton, 4, 0);
@@ -364,8 +364,14 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
     }
 
     private void playTurn(PlayTurnParameters playTurnParameters)  {
+        // Cannot play turn if the computer player is in progress or replay is in progress.
+
         if(!this.mIsTurnInProgress) {
-            this.mLogic.playTurnAsync(playTurnParameters);
+            if(!this.mIsReplayInProgressProperty.getValue()) {
+                this.mLogic.playTurnAsync(playTurnParameters);
+            } else {
+                // Notify user that a replay is in progress.
+            }
         } else {
             // Notify user that the computer is making his turn.
         }
@@ -381,11 +387,6 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
         eGameState gameState = turnData.getGameState();
         if(gameState.equals(eGameState.Won)) {
             Map<Player, Collection<Cell>> playerToWinningSequenceMap = this.mLogic.getPlayerToWinningSequencesMap();
-            System.out.println("Game won by players:");
-            for(Player p: playerToWinningSequenceMap.keySet()) {
-                System.out.println(p.getName());
-            }
-
             this.mBoardController.DisplayWinningSequences(playerToWinningSequenceMap);
             setGameDisabled();
             gameWonMsg(turnData.getPlayer().getName());
@@ -428,6 +429,7 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
     }
 
     private void setGameDisabled(){
+        //TODO: bind these!
         this.mBtnStartGame.setDisable(true);
         this.mBtnLoadFile.setDisable(false);
         this.mBtnExitGame.setDisable(true);

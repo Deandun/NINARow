@@ -71,10 +71,7 @@ public class ReplayTurnDataAdapter {
         }
 
         // Sort cells by rows in an ascending order (row 0...num of rows - 1)
-        updatedCellArray =
-                (Cell[]) Arrays.stream(updatedCellArray)
-                        .sorted(Comparator.comparingInt(Cell::getRowIndex))
-                        .toArray();
+        Arrays.sort(updatedCellArray, Comparator.comparingInt(Cell::getRowIndex));
 
         // Set the player of each cell with the player of the cell bellow it.
         for(int i = 0; i < updatedCellArray.length - 1; i++) {

@@ -19,7 +19,6 @@ public class ReplayManager {
     }
 
     public void start(List<PlayedTurnData> playedTurnData) {
-        // TODO: check if this gives us the actual last turn iterator
         this.mCurrentTurnNumberInReplay.setValue(playedTurnData.size());
         this.mPlayedTurnsDataListIterator = playedTurnData.listIterator(playedTurnData.size()); // Set to last element.
     }
