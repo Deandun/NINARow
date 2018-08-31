@@ -5,6 +5,7 @@ import Logic.Models.PlayedTurnData;
 import javafx.beans.property.IntegerProperty;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 // An adapter class for the replay manager, manipulate the return data for "getPrevious" so that the UI could handle it better.
 public class ReplayTurnDataAdapter {
@@ -29,9 +30,6 @@ public class ReplayTurnDataAdapter {
                 break;
             case Popout:
                 manipulatedTurnData = this.manipulatePreviousPopoutTurn(previousTurnData);
-                break;
-            case PlayerQuit:
-                manipulatedTurnData = this.manipulatePreviousPlayerQuitTurn(previousTurnData);
                 break;
         }
 
@@ -58,34 +56,39 @@ public class ReplayTurnDataAdapter {
 
     private PlayedTurnData manipulatePreviousPopoutTurn(PlayedTurnData previousTurnData) {
         PlayedTurnData manipulatedTurnData = new PlayedTurnData();
-        Cell updatedCellCollection[] = new Cell[previousTurnData.getUpdatedCellsCollection().size()];
-
+        Cell updatedCellArray[] = new Cell[previousTurnData.getUpdatedCellsCollection().size()];
         Iterator<Cell> cellIterator = previousTurnData.getUpdatedCellsCollection().iterator();
         int index = 0;
 
+        // Convert the updated cells collection to an array.
         while (cellIterator.hasNext()) {
             // Shallow copy cell so that manipulating it won't affect the original cell.
-            updatedCellCollection[index++] = cellIterator.next().getShallowCopy();
+            updatedCellArray[index++] = cellIterator.next().getShallowCopy();
         }
 
-        // Sort by rows in an descending order
-        updatedCellCollection =
-                (Cell[]) Arrays.stream(updatedCellCollection)
-                .sorted(
-                    (cell1, cell2) -> cell2.getRowIndex() - cell1.getRowIndex()
-                ).toArray();
+        // Sort cells by rows in an ascending order (row 0...num of rows - 1)
+        updatedCellArray =
+                (Cell[]) Arrays.stream(updatedCellArray)
+                        .sorted(Comparator.comparingInt(Cell::getRowIndex))
+                        .toArray();
 
-        //TODO: go over the sorted cells collection. Set each cell's player with the previous cell's player (starting with the second cell).
-        //TODO: set the first cell's player as null.
+        // Set the player of each cell with the player of the cell bellow it.
+        for(int i = 0; i < updatedCellArray.length - 1; i++) {
+            Cell currentCell = updatedCellArray[i];
+            Cell lowerCell = updatedCellArray[i + 1];
 
-        //TODO: turn to arraylist
-        //manipulatedTurnData.setUpdatedCellsCollection(updatedCellCollection);
+            currentCell.setPlayer(lowerCell.getPlayer());
+        }
+
+        // Set the player of lowest cell in column to be the one who played the turn.
+        updatedCellArray[updatedCellArray.length - 1].setPlayer(previousTurnData.getPlayer());
+
+        // Convert array to collection.
+        Collection<Cell> updatedCellsCollection = Arrays.stream(updatedCellArray).collect(Collectors.toList());
+
+        manipulatedTurnData.setUpdatedCellsCollection(updatedCellsCollection);
 
         return manipulatedTurnData;
-    }
-
-    private PlayedTurnData manipulatePreviousPlayerQuitTurn(PlayedTurnData previousTurnData) {
-        return null;
     }
 
     public boolean hasNext() {
@@ -96,8 +99,11 @@ public class ReplayTurnDataAdapter {
         return this.mReplayManager.hasPrevious();
     }
 
-
     public IntegerProperty getCurrentTurnNumberInReplayProperty() {
         return this.mReplayManager.getCurrentTurnNumberInReplayProperty();
+    }
+
+    public List<PlayedTurnData> getAllNextTurnsCollection() {
+        return this.mReplayManager.getAllNextTurnsCollection();
     }
 }

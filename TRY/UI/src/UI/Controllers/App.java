@@ -10,9 +10,9 @@ import Logic.Models.Cell;
 import Tasks.ReadGameFileTask;
 import UI.Controllers.ControllerDelegates.IBoardControllerDelegate;
 import UI.Controllers.ControllerDelegates.IGameSettingsControllerDelegate;
+import UI.Replay.ReplayTurnDataAdapter;
 import UI.Theame;
 import UI.UIMisc.ImageManager;
-import UI.Replay.ReplayManager;
 import UI.eInvalidMoveType;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -85,7 +85,7 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
 
     // Replay
     private BooleanProperty mIsReplayInProgressProperty = new SimpleBooleanProperty();
-    private ReplayManager mReplayManager = new ReplayManager();
+    private ReplayTurnDataAdapter mReplayAdapter = new ReplayTurnDataAdapter();
 
     // Concurrency
     private boolean mIsTurnInProgress;
@@ -271,18 +271,30 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
     }
 
     private void onReplayButtonClick(MouseEvent mouseEvent) {
+        if(this.mIsReplayInProgressProperty.getValue()) {
+            // Replay is in progress - User wants to end replay.
+            this.mReplayAdapter.getAllNextTurnsCollection().forEach(this::handleUIAfterPlayedTurns);
+        } else {
+            // Replay is not in progress - User wants to start replaying.
+            this.mReplayAdapter.start(this.mLogic.GetTurnHistory());
+        }
+
         // Toggle boolean property
         this.mIsReplayInProgressProperty.setValue(!this.mIsReplayInProgressProperty.getValue());
     }
 
     private void onBackReplayButtonClick(MouseEvent mouseEvent) {
-        if(this.mReplayManager.hasPrevious()) {
-
+        if(this.mReplayAdapter.hasPrevious()) {
+            PlayedTurnData previousTurnData = this.mReplayAdapter.getPreviousTurnData();
+            this.handleUIAfterPlayedTurns(previousTurnData);
         }
     }
 
     private void onForwardReplayButtonClick(MouseEvent mouseEvent) {
-
+        if(this.mReplayAdapter.hasNext()) {
+            PlayedTurnData nextTurnData = this.mReplayAdapter.getNextTurnData();
+            this.handleUIAfterPlayedTurns(nextTurnData);
+        }
     }
 
     // ILogicDelegate Implementation

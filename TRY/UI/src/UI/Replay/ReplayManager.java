@@ -6,6 +6,7 @@ import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -41,8 +42,16 @@ public class ReplayManager {
         return this.mPlayedTurnsDataListIterator.hasPrevious();
     }
 
-
+    //TODO: bind this property with a label that holds a text like "(currentTurn) / (total num of turns)"
     public IntegerProperty getCurrentTurnNumberInReplayProperty() {
         return this.mCurrentTurnNumberInReplay;
+    }
+
+    public List<PlayedTurnData> getAllNextTurnsCollection() {
+        List<PlayedTurnData> remainingTurnDataList = new ArrayList<>();
+
+        this.mPlayedTurnsDataListIterator.forEachRemaining(remainingTurnDataList::add);
+
+        return remainingTurnDataList;
     }
 }
