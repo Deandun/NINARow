@@ -11,6 +11,10 @@ import java.util.stream.Collectors;
 public class ReplayTurnDataAdapter {
     private ReplayManager mReplayManager;
 
+    public ReplayTurnDataAdapter() {
+        this.mReplayManager = new ReplayManager();
+    }
+
     public void start(List<PlayedTurnData> playedTurnData) {
         this.mReplayManager.start(playedTurnData);
     }

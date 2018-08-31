@@ -413,9 +413,9 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
     }
 
     private void setGameEnabled() {
-        this.mBtnLoadFile.setDisable(false);
-        this.mBtnStartGame.setDisable(true);
-        this.mBtnExitGame.setDisable(false);
+        this.mBtnLoadFile.setDisable(true);
+        this.mBtnStartGame.setDisable(false);
+        this.mBtnExitGame.setDisable(true);
     }
 
     @Override
