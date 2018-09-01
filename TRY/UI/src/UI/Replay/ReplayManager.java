@@ -13,14 +13,16 @@ import java.util.ListIterator;
 public class ReplayManager {
     private IntegerProperty mCurrentTurnNumberInReplay;
     private ListIterator<PlayedTurnData> mPlayedTurnsDataListIterator;
+    private int mTotalNumberOfTurns;
 
     public ReplayManager() {
         this.mCurrentTurnNumberInReplay = new SimpleIntegerProperty();
     }
 
     public void start(List<PlayedTurnData> playedTurnData) {
-        this.mCurrentTurnNumberInReplay.setValue(playedTurnData.size());
-        this.mPlayedTurnsDataListIterator = playedTurnData.listIterator(playedTurnData.size()); // Set to last element.
+        this.mTotalNumberOfTurns = playedTurnData.size();
+        this.mCurrentTurnNumberInReplay.setValue(this.mTotalNumberOfTurns);
+        this.mPlayedTurnsDataListIterator = playedTurnData.listIterator(this.mTotalNumberOfTurns); // Set to last element.
     }
 
     public PlayedTurnData getNextTurnData() {
@@ -52,5 +54,9 @@ public class ReplayManager {
         this.mPlayedTurnsDataListIterator.forEachRemaining(remainingTurnDataList::add);
 
         return remainingTurnDataList;
+    }
+
+    public int getNumberOfTurnsPlayed() {
+        return this.mTotalNumberOfTurns;
     }
 }

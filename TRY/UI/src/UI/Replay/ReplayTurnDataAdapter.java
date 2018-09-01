@@ -107,4 +107,8 @@ public class ReplayTurnDataAdapter {
     public List<PlayedTurnData> getAllNextTurnsCollection() {
         return this.mReplayManager.getAllNextTurnsCollection();
     }
+
+    public int getNumberOfTurnsPlayed() {
+        return this.mReplayManager.getNumberOfTurnsPlayed();
+    }
 }

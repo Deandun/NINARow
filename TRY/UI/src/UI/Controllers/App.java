@@ -8,8 +8,10 @@ import Logic.Logic;
 import Logic.Models.*;
 import Logic.Models.Cell;
 import Tasks.ReadGameFileTask;
+import UI.ChangeListeners.TextChangingListeners;
 import UI.Controllers.ControllerDelegates.IBoardControllerDelegate;
 import UI.Controllers.ControllerDelegates.IGameSettingsControllerDelegate;
+import UI.FinalSettings;
 import UI.Replay.ReplayTurnDataAdapter;
 import UI.Theame;
 import UI.UIMisc.ImageManager;
@@ -62,12 +64,11 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
     @FXML private ComboBox<eTheameType> mComboBoxTheame;
 
     //TODO: remove temp replay buttons and work with real fxml buttons.
-    private Button mReplayButton = new Button("Start");
+    private Button mReplayButton = new Button("Start Replay");
     private Button mBackReplayButton = new Button("Back");
     private Button mForwardReplayButton = new Button("Forward");
 
     private BoardController mBoardController;
-    private GameDetailsController mGameDetailsController;
 
     //PlayerDetails Members:
     private SimpleStringProperty mPlayerName;
@@ -87,6 +88,15 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
     private BooleanProperty mIsReplayInProgressProperty = new SimpleBooleanProperty();
     private ReplayTurnDataAdapter mReplayAdapter = new ReplayTurnDataAdapter();
 
+    //States
+    private BooleanProperty mIsAppInInitModeProperty = new SimpleBooleanProperty();
+    private BooleanProperty mIsFileGameLoaded = new SimpleBooleanProperty();
+    private BooleanProperty mIsGameActiveProperty = new SimpleBooleanProperty();
+
+    // Change listeners
+    private TextChangingListeners mReplayTextChangingListener;
+    private TextChangingListeners mRestartTextChangingListener;
+
     // Concurrency
     private boolean mIsTurnInProgress;
 
@@ -102,6 +112,15 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
         this.mTheame = new Theame();
         this.mTheame.setAviadTheame();
         this.mIsTurnInProgress = false;
+        this.mRestartTextChangingListener = new TextChangingListeners(FinalSettings.RESTART_BTN_TEXT,
+                FinalSettings.START_BTN_TEXT,
+                (str) -> this.mBtnStartGame.setText(str)
+                );
+
+        this.mReplayTextChangingListener = new TextChangingListeners(FinalSettings.REPLAY_STOP_BTN_TEXT,
+                FinalSettings.REPLAY_START_BTN_TEXT,
+                (str) -> this.mReplayButton.setText(str)
+        );
     }
 
     private boolean shouldPlayComputerPlayerNext() {
@@ -110,17 +129,6 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
 
     @FXML
     private void initialize() {
-        //PlayerDetails
-//        mLblPlayer1Name.textProperty().bind(mPlayerName);
-//        mLblPlayer1ID.textProperty().bind(mPlayerID);
-//        mLblPlayer1Type.textProperty().bind(mPlayerType);
-        // mIVPlayer1Sign.imageProperty().bind(mPlayerSign);
-
-        //GameDetails:
-//        mLblCurrentPlayer.textProperty().bind(mCurrentPlayer);
-//        mLblTurnNumber.textProperty().bind(mTurnNumber);
-//        mLblVariant.textProperty().bind(mVariant);
-//        mLblTargetSize.textProperty().bind(mTargetSize);
         setOnAction();
         this.mBtnExitGame.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/UI/Images/Exit.JPG"), EXIT_BTN_SIZE, EXIT_BTN_SIZE, true, true)));
         this.mBtnExitGame.setText(null);
@@ -128,6 +136,26 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
         this.mComboBoxTheame.getItems().addAll(eTheameType.Aviad, eTheameType.Guy);
         changeTheame();
         this.initReplay();
+        this.mIsAppInInitModeProperty.setValue(true);
+        initBinding();
+    }
+
+    private void initBinding() {
+        //disabled binding
+        this.mBtnLoadFile.disableProperty().bind(this.mIsGameActiveProperty);
+        this.mBtnStartGame.disableProperty().bind(this.mIsAppInInitModeProperty);
+        this.mReplayButton.disableProperty().bind(this.mIsGameActiveProperty.not());
+        this.mBtnExitGame.disableProperty().bind(this.mIsGameActiveProperty.not());
+        this.mBackReplayButton.disableProperty().bind(this.mReplayAdapter.getCurrentTurnNumberInReplayProperty().isEqualTo(0));
+
+        // Panes visibility bindings.
+        this.mVBoxGameDetails.visibleProperty().bind(this.mIsGameActiveProperty);
+        this.mFlowPanePlayerDetails.visibleProperty().bind(this.mIsAppInInitModeProperty.not());
+
+        // Text listeners
+        this.mIsReplayInProgressProperty.addListener(this.mReplayTextChangingListener);
+        this.mIsGameActiveProperty.addListener(this.mRestartTextChangingListener);
+        //TODO: fix this.mForwardReplayButton.disableProperty()
     }
 
     @FXML
@@ -149,6 +177,8 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
                 this.bindTaskToUI(readGameFileTask);
                 new Thread(readGameFileTask).start();
                 // TODO: make it so setCenter doesn't "pull" top, left and right panes towards the center.
+                this.mIsAppInInitModeProperty.setValue(false);
+                this.mIsFileGameLoaded.setValue(true);
 
             } catch(Exception e) {
                 System.out.println(e.getMessage());
@@ -183,7 +213,6 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
 
     private void updateUIAfterGameFileRead() {
         this.mBottomProgressPane.setVisible(false);
-        setGameEnabled();
         this.mBoardController = new BoardController(GameSettings.getInstance().getRows(), GameSettings.getInstance().getColumns(), this);
         this.mBoardController.InitBoard();
         this.mBorderPane.setMaxSize(300, 300);
@@ -193,7 +222,6 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
 
     @FXML
     void startGame() {
-        setGameEnabled();
         this.mBoardController.getBoardPane().setDisable(false);
         this.mBoardController.ResetBoard();
         this.mLogic.StartGame();
@@ -205,6 +233,8 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
         this.mBtnLoadFile.setOnAction(e -> loadFile());
         this.mBtnStartGame.setOnAction(e -> {
             try {
+                this.mIsFileGameLoaded.setValue(false);
+                this.mIsGameActiveProperty.setValue(true);
                 startGame();
             } catch (Exception e1) {
                 // This method throws an exception that should'nt occure. If it does, then theres something wrong with the computer player algo.
@@ -348,20 +378,14 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println(e.getMessage());
-            //TODO: catch all of the exceptions and handle them.
         }
     }
 
     @Override
     public void ColumnClicked(int columnIndex) {
-        try {
-            PlayTurnParameters playTurnParameters = new PlayTurnParameters(columnIndex, eTurnType.AddDisc);
-            this.playTurn(playTurnParameters);
-        } catch (Exception e) {
-            e.printStackTrace();
-            //TODO: catch all of the exceptions and handle them.
-        }
-    }
+        PlayTurnParameters playTurnParameters = new PlayTurnParameters(columnIndex, eTurnType.AddDisc);
+        this.playTurn(playTurnParameters);
+}
 
     private void playTurn(PlayTurnParameters playTurnParameters)  {
         // Cannot play turn if the computer player is in progress or replay is in progress.
@@ -389,7 +413,8 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
             Map<Player, Collection<Cell>> playerToWinningSequenceMap = this.mLogic.getPlayerToWinningSequencesMap();
             this.mBoardController.DisplayWinningSequences(playerToWinningSequenceMap);
             setGameDisabled();
-            gameWonMsg(turnData.getPlayer().getName());
+            //todo: handle more than one winner
+            gameWonMsg(playerToWinningSequenceMap.keySet());
             //TODO: notify players that the game has been won. Disable the game and "Reset" logic to a state where there's a file loaded but game hasn't started.
         } else if (gameState.equals(eGameState.Draw)) {
             //TODO: notify players that the game has ended in a draw.
@@ -402,21 +427,15 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
         }
     }
 
-    private void gameWonMsg(String WinnerName) {
+    private void gameWonMsg(Set<Player> WinnerName) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("Game Finish");
-        alert.setContentText(WinnerName +" Player won the game! Congratulation.");
+    //        alert.setContentText(for(String name : WinnerName) {name +" Player won the game! Congratulation."});
         Optional<ButtonType> result = alert.showAndWait();
 
         if (result.get() == ButtonType.OK){ //user chose ok
             alert.close();
         } 
-    }
-
-    private void setGameEnabled() {
-        this.mBtnLoadFile.setDisable(true);
-        this.mBtnStartGame.setDisable(false);
-        this.mBtnExitGame.setDisable(true);
     }
 
     @Override
@@ -455,4 +474,6 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
         }
         changeTheame();
     }
+
+
 }

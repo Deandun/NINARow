@@ -21,7 +21,6 @@ public class Main extends Application {
         StackPane root = loader.load();
 
         // wire up controller
-        App appController = loader.getController();
         primaryStage.setTitle("DeaNoy Game - NinARow");
         Scene scene = new Scene(root, 670, 575);
 
