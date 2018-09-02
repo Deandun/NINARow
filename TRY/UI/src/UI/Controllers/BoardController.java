@@ -132,15 +132,12 @@ public class BoardController implements ICellControllerDelegate {
 
     public void DisplayWinningSequences(Map<Player, Collection<Cell>> playerToWinningSequenceMap) {
 
-        playerToWinningSequenceMap.entrySet().forEach(
-                playerToWinningSequenceEntrySet -> {
-                    Player player = playerToWinningSequenceEntrySet.getKey();
-                    Collection<Cell> winningCells = playerToWinningSequenceEntrySet.getValue();
-                    setWinningStyle(winningCells);
-                }
-        );
-
-        //TODO: Add an effect to the winning sequence cells! Do it by adding a style class to the buttons and adding the class and effect to the css file.
+        playerToWinningSequenceMap.forEach(
+                (player, winningCells) -> {
+            if (winningCells != null) {
+                setWinningStyle(winningCells);
+            }
+        });
     }
 
     private void setWinningStyle(Collection<Cell> winningCells) {
@@ -208,7 +205,7 @@ public class BoardController implements ICellControllerDelegate {
     }
 
     private List<CellController> getCellsListInColumn(int column) {
-        List<CellController> wantedCells =  new ArrayList<>();
+        List<CellController> wantedCells = new ArrayList<>();
 
         for (CellController cell : this.mCellControllerList){
             if (cell.getColumn() == column){
@@ -219,5 +216,12 @@ public class BoardController implements ICellControllerDelegate {
         return wantedCells;
     }
 
+    public void disableAllPopoutButtons() {
+        if(GameSettings.getInstance().getVariant().equals(eVariant.Popout)) {
+            this.mPopOutButtonList.forEach(
+                    btn -> btn.setDisable(true)
+            );
+        }
+    }
 }
 

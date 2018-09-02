@@ -37,9 +37,9 @@ public class Logic{
     private Board mGameBoard;
     private SequenceSearcher mSequenceSearcher;
     private IComputerPlayerAlgo mComputerPlayerAlgo;
-    //private boolean mIsTurnInProgress; // A flag that states that another players turn is in progress (user cannot play at this time).
     private BlockingQueue<PlayTurnParameters> mTurnsBlockingQueue;
     private ILogicDelegate mDelegate;
+    private Thread mTurnQueueListenerThread;
 
     public Logic(ILogicDelegate logicDelegate) {
         this.mFileManager = new FileManager();
@@ -47,9 +47,11 @@ public class Logic{
         this.mGameStatus = new GameStatus();
         this.mSequenceSearcher = new SequenceSearcher();
         this.mComputerPlayerAlgo = new ComputerPlayerAlgo();
-       // this.mIsTurnInProgress = false;
         this.mTurnsBlockingQueue = new ArrayBlockingQueue<>(QUEUE_CAPACITY);
         this.mDelegate = logicDelegate;
+        this.mTurnQueueListenerThread = new Thread(this::startConsumingPlayerTurns);
+        this.mTurnQueueListenerThread.setDaemon(true); // Daemon thread will not prevent the JVM from shutting down when the main thread ends.
+        this.mTurnQueueListenerThread.start(); // Start listening to player turns on a different thread.
     }
 
     // ILogic interface implementation.
@@ -68,7 +70,6 @@ public class Logic{
         this.mComputerPlayerAlgo.Init(this.mGameBoard);
         this.mHistoryManager.Clear();
         this.mGameStatus.StartNewGame();
-        new Thread(this::startConsumingPlayerTurns).start(); // Start listening to player turns on a different thread.
 
         if(this.mGameStatus.getPlayer().getType().equals(ePlayerType.Computer)) {
             // If computer is playing first - Play computer turn.
@@ -80,7 +81,17 @@ public class Logic{
     }
 
     public Map<Player, Collection<Cell>> getPlayerToWinningSequencesMap() {
-        return this.mSequenceSearcher.getPlayerToWinningSequencesMap();
+        Map<Player, Collection<Cell>> playerToWinningSequenceMap;
+
+        if(GameSettings.getInstance().getPlayers().size() == 1) {
+            // Player won by default, not by winning sequence.
+            playerToWinningSequenceMap = new HashMap<>();
+            playerToWinningSequenceMap.put(this.GetCurrentPlayer(), null);
+        } else {
+            playerToWinningSequenceMap = this.mSequenceSearcher.getPlayerToWinningSequencesMap();
+        }
+
+        return playerToWinningSequenceMap;
     }
 
     public GameStatus GetGameStatus() {
@@ -111,14 +122,21 @@ public class Logic{
         }
 
         this.playTurnAsync(computerPlayTurnParams);
-
-
     }
 
+    // This function should be called when a player has ended his turn (but not on playerQuit)
     private void finishedPlayingTurn(PlayedTurnData playedTurnData) {
+        this.finishedPlayingTurn(playedTurnData, true);
+    }
+
+    // Second parameter should be true only when player quit. When a player has quit, game status is updated
+    // Through another function.
+    private void finishedPlayingTurn(PlayedTurnData playedTurnData, boolean shouldUpdateGameStatus) {
         this.mGameStatus.mGameState = playedTurnData.getGameState();
         this.mHistoryManager.SetCurrentTurn(playedTurnData);
-        this.mGameStatus.FinishedTurn();
+        if(shouldUpdateGameStatus) {
+            this.mGameStatus.FinishedTurn();
+        }
     }
 
     private PlayedTurnData addDisc(int column) throws InvalidUserInputException {
@@ -147,9 +165,8 @@ public class Logic{
         PlayedTurnData playedTurnData = new PlayedTurnData();
         eGameState gameState = eGameState.Active;
 
-        if(GameSettings.getInstance().getPlayers().size() == 1) { //only one player remains, he has won!
-           gameState = eGameState.Won;
-        } else {
+        if(GameSettings.getInstance().getPlayers().size() > 2) {
+            // If there are more than 2 players, the game will go on after player quits.
             Collection<Cell> updatedCells = this.mGameBoard.RemoveAllPlayerDiscsFromBoardAndGetUpdatedCells(this.mGameStatus.getPlayer());
             playedTurnData.setUpdatedCellsCollection(updatedCells);
 
@@ -162,9 +179,15 @@ public class Logic{
 
         this.mGameStatus.CurrentPlayerQuitGame();
 
+        if(GameSettings.getInstance().getPlayers().size() < 2) {
+            gameState = eGameState.Won;
+        }
+
         playedTurnData.setGameState(gameState);
         playedTurnData.setTurnType(turnParameters.getmTurnType());
-        this.finishedPlayingTurn(playedTurnData);
+
+        // Don't update game status, it was done in GameStatus.CurrentPlayerQuit.
+        this.finishedPlayingTurn(playedTurnData, false);
 
         return playedTurnData;
     }
@@ -227,6 +250,7 @@ public class Logic{
         this.mSequenceSearcher.Clear();
         GameSettings.getInstance().Clear();
         SequenceSearcherStrategyFactory.ClearCache();
+        this.mTurnsBlockingQueue.clear();
     }
 
     public List<Integer> getAvailablePopoutColumnsForCurrentPlayer() {
@@ -270,11 +294,10 @@ public class Logic{
             try {
                 playedTurnParams = this.mTurnsBlockingQueue.take();
             } catch (InterruptedException e) {
-                e.printStackTrace(); // TODO: figure out when this happens and react accordingly
                 break;
             }
 
-           // If game has ended, break.
+            // If game has ended, break.
             if (!this.mGameStatus.getGameState().equals(eGameState.Active)) {
                 break;
             }

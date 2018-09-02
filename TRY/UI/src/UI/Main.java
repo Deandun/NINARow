@@ -26,22 +26,6 @@ public class Main extends Application {
 
         primaryStage.setScene(scene);
         primaryStage.show();
-        /*
-          FXMLLoader loader = new FXMLLoader();
-
-        URL mainFXML = getClass().getResource("AppFxml.fxml");
-        loader.setLocation(mainFXML);
-
-        StackPane root = loader.load();
-
-        // wire up controller
-        AppController appController = loader.getController();
-
-        primaryStage.setTitle("DeaNoy Game - NinARow");
-        Scene scene = new Scene(root, 670, 575);
-        primaryStage.setScene(scene);
-        primaryStage.show();
-         */
     }
 
     public static void main(String[] args) {

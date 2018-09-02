@@ -43,7 +43,6 @@ public class ReplayManager {
         return this.mPlayedTurnsDataListIterator.hasPrevious();
     }
 
-    //TODO: bind this property with a label that holds a text like "(currentTurn) / (total num of turns)"
     public IntegerProperty getCurrentTurnNumberInReplayProperty() {
         return this.mCurrentTurnNumberInReplay;
     }
@@ -57,6 +56,6 @@ public class ReplayManager {
     }
 
     public int getNumberOfTurnsPlayed() {
-        return this.mTotalNumberOfTurns;
+        return this.mTotalNumberOfTurns - 1;
     }
 }

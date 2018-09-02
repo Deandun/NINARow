@@ -3,6 +3,7 @@ package Logic.Models;
 import Logic.Enums.eTurnType;
 
 public class PlayTurnParameters {
+
     private int mSelectedColumn;
     private eTurnType mTurnType;
 
