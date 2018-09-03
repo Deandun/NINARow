@@ -10,7 +10,6 @@ import Logic.Models.Cell;
 import Tasks.ReadGameFileTask;
 import UI.ChangeListeners.TextChangingListeners;
 import UI.Controllers.ControllerDelegates.IBoardControllerDelegate;
-import UI.Controllers.ControllerDelegates.IGameSettingsControllerDelegate;
 import UI.FinalSettings;
 import UI.Replay.ReplayTurnDataAdapter;
 import UI.Theame;
@@ -33,11 +32,14 @@ import UI.eTheameType;
 
 import javafx.event.ActionEvent;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.*;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import static UI.FinalSettings.EXIT_BTN_SIZE;
 
-public class App implements IBoardControllerDelegate, IGameSettingsControllerDelegate, ILogicDelegate {
+public class App implements IBoardControllerDelegate, ILogicDelegate {
 
     @FXML private StackPane mStackPane;
     @FXML private BorderPane mBorderPane;
@@ -45,14 +47,13 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
     @FXML private Button mBtnLoadFile;
     @FXML private Button mBtnStartGame;
     @FXML private Button mBtnExitGame;
-    @FXML private FlowPane mFlowPanePlayerDetails; // TODO: remove from fxml!!!
     @FXML private Label mLblPlayer1Title;
     @FXML private Label mLblPlayer1Name;
     @FXML private Label mLblPlayer1ID;
     @FXML private Label mLblPlayer1Type;
-    @FXML private VBox mVBoxGameDetails;
     @FXML private Label mLblDetails;
     @FXML private Label mLblCurrentPlayer;
+    @FXML private VBox mVBoxGameDetails;
     @FXML private Label mLblTurnNumber;
     @FXML private Label mLblTargetSize;
     @FXML private Label mLblVariant;
@@ -155,18 +156,13 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
         if (selectedFile == null) {
             return;
         } else {
-            try {
-                Runnable onTaskFinish = this::onReadGameFileFinish;
-                this.mBottomProgressPane.setVisible(true);
+            this.mBottomProgressPane.setVisible(true);
 
-                ReadGameFileTask readGameFileTask = new ReadGameFileTask(selectedFile.getAbsolutePath(), this.mLogic, onTaskFinish);
-                this.bindTaskToUI(readGameFileTask);
-                // TODO: make it so setCenter doesn't "pull" top, left and right panes towards the center.
-                new Thread(readGameFileTask).start();
-            } catch(Exception e) {
-                System.out.println(e.getMessage());
-                //TODO: implement this and all of the other exceptions
-            }
+            ReadGameFileTask readGameFileTask = new ReadGameFileTask(selectedFile.getAbsolutePath(), this.mLogic,
+                    this::onReadGameFileFinish, this::onReadGameFileError);
+            this.bindTaskToUI(readGameFileTask);
+            // TODO: make it so setCenter doesn't "pull" top, left and right panes towards the center.
+            new Thread(readGameFileTask).start();
         }
     }
 
@@ -199,6 +195,10 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
                 });
     }
 
+    private void onReadGameFileError(String errorDescription) {
+        this.showAlert("File error!", errorDescription);
+    }
+
     private void updateUIAfterGameFileRead() {
         this.mBottomProgressPane.setVisible(false);
         this.mBoardController = new BoardController(GameSettings.getInstance().getRows(), GameSettings.getInstance().getColumns(), this);
@@ -224,9 +224,8 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
             this.mBoardController.ResetBoard();
             this.mCurrentTurnProperty.setValue(0);
             this.mLogic.StartGame();
-            initDetails();
         } else {
-            // todo: let the only user know he cannot start the game.
+            this.showAlert("Now hold on just a minute.", "We will not allow you to play alone! The game requires at least 2 players to start");
         }
     }
 
@@ -242,11 +241,8 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
                 e1.printStackTrace();
             }
         });
-        this.mBtnExitGame.setOnMouseClicked(e -> exitGame());
-    }
 
-    private void initDetails() {
-      //  mLogic.getPlayerName
+        this.mBtnExitGame.setOnMouseClicked(e -> exitGame());
     }
 
     private void exitGame() {
@@ -259,7 +255,7 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
         if (result.get() == ButtonType.OK){
             PlayTurnParameters params = new PlayTurnParameters(eTurnType.PlayerQuit);
             this.mLogic.playTurnAsync(params);
-            // TODO: restore exit game functionality
+            // TODO: uncomment exit game functionality and remove player quit code.
 
 //            if(this.mIsReplayInProgressProperty.getValue()) {
 //                // If exited during replay, stop replay.
@@ -423,11 +419,9 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
         if(gameState.equals(eGameState.Won)) {
             Map<Player, Collection<Cell>> playerToWinningSequenceMap = this.mLogic.getPlayerToWinningSequencesMap();
             this.mBoardController.DisplayWinningSequences(playerToWinningSequenceMap);
-            //todo: handle more than one winner
             gameWonMsg(playerToWinningSequenceMap.keySet());
-            //TODO: notify players that the game has been won. Disable the game and "Reset" logic to a state where there's a file loaded but game hasn't started.
         } else if (gameState.equals(eGameState.Draw)) {
-            //TODO: notify players that the game has ended in a draw.
+            this.showAlert("Draw!", "The game has ended in a draw. Please start a new game or exit.");
         }
     }
 
@@ -467,28 +461,26 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
         }
     }
 
-    private void gameWonMsg(Set<Player> WinnerName) {
+    private void gameWonMsg(Set<Player> winnersSet) {
+        Set<String> winnerNamesSet = winnersSet.stream().map(Player::getName).collect(Collectors.toSet());
+        final String namesSeporator = ", ";
+        String winnersNames = String.join(namesSeporator, winnerNamesSet);
+        this.showAlert("The game was won!", winnersNames + System.lineSeparator() + "Please start a new game or exit.");
+    }
+
+    private void showAlert(String title, String body) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Game Finish");
-    //        alert.setContentText(for(String name : WinnerName) {name +" Player won the game! Congratulation."});
+        alert.setTitle(title);
+        alert.setContentText(body);
         Optional<ButtonType> result = alert.showAndWait();
 
         if (result.get() == ButtonType.OK){ //user chose ok
             alert.close();
-        } 
-    }
-
-    @Override
-    public void ExitGameBtnClicked(boolean doExit) {
-        System.out.println("Handle exit game btn clicked"); //DEBUG
-        if (doExit){
-            clear();
-            this.mLogic.exitGame();
         }
     }
 
     private void clear() {
-        ImageManager.Clear(); //TODO: check what else
+        ImageManager.Clear();
         this.mBoardController.ClearBoard();
         this.mTheame.setAviadTheame();
     }
@@ -506,6 +498,4 @@ public class App implements IBoardControllerDelegate, IGameSettingsControllerDel
         }
         changeTheame();
     }
-
-
 }

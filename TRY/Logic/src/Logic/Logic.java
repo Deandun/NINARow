@@ -111,17 +111,23 @@ public class Logic{
         return playedTurnData;
     }
 
-    private void playComputerAlgoTurn()  {
-        // Use algo to determine next computer turn.
-        PlayTurnParameters computerPlayTurnParams = this.mComputerPlayerAlgo.getNextPlay(this.mGameStatus.mCurrentPlayer);
+    private void playComputerAlgoTurn() {
+        if(this.mComputerPlayerAlgo.hasNextPlay(this.mGameStatus.mCurrentPlayer)) {
+            // Use algo to determine next computer turn.
+            PlayTurnParameters computerPlayTurnParams = this.mComputerPlayerAlgo.getNextPlay(this.mGameStatus.mCurrentPlayer);
 
-        try {
-            Thread.sleep(300);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+            try {
+                Thread.sleep(300);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            this.playTurnAsync(computerPlayTurnParams);
+        } else {
+            // Computer player cannot make a play - Draw!
+            // In Ex02 we shouldn't get to this situation because a draw would've been determined after the previous turn.
+            // Check again in Ex03
         }
-
-        this.playTurnAsync(computerPlayTurnParams);
     }
 
     // This function should be called when a player has ended his turn (but not on playerQuit)
@@ -150,6 +156,7 @@ public class Logic{
             Collection<Cell> updatedCells = this.mGameBoard.PopoutAndGetUpdatedCells(column);
 
             playedTurnData.setUpdatedCellsCollection(updatedCells);
+            // Cannot draw after popout - only check if a player won.
             playedTurnData.setGameState(this.mSequenceSearcher.CheckColumnForWinningSequences(column) ? eGameState.Won : eGameState.Active);
             playedTurnData.setPlayerTurn(this.mGameStatus.mCurrentPlayer);
             playedTurnData.setTurnType(eTurnType.Popout);

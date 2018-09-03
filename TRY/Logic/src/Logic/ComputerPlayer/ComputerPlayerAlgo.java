@@ -19,8 +19,9 @@ public class ComputerPlayerAlgo implements IComputerPlayerAlgo {
     }
 
     // TODO: exception is thrown when the board is full and the player can't even use popout. handle it in UI (game draw)
+
     @Override
-    public PlayTurnParameters getNextPlay(Player playingPlayer)  {
+    public PlayTurnParameters getNextPlay(Player playingPlayer){
         int selectedColumn;
         eTurnType turnType;
 
@@ -33,6 +34,14 @@ public class ComputerPlayerAlgo implements IComputerPlayerAlgo {
         }
 
         return new PlayTurnParameters(selectedColumn, turnType);
+    }
+
+    @Override
+    public boolean hasNextPlay(Player playingPlayer) {
+        boolean isBoardFull = mBoard.IsBoardFull();
+        boolean canPopout = GameSettings.getInstance().getVariant().equals(eVariant.Popout) && mBoard.CanPlayerPerformPopout(playingPlayer);
+
+        return isBoardFull && !canPopout; // If the board is full and the computer player is unable to popout - Draw.
     }
 
     private int getPopoutColumn(Player playingPlayer) {
@@ -48,7 +57,7 @@ public class ComputerPlayerAlgo implements IComputerPlayerAlgo {
         return selectedColumn;
     }
 
-    private boolean shouldPopout(Player playingPlayer) {
+    private boolean shouldPopout(Player playingPlayer){
         boolean isBoardFull = mBoard.IsBoardFull();
         boolean canPopout = GameSettings.getInstance().getVariant().equals(eVariant.Popout) && mBoard.CanPlayerPerformPopout(playingPlayer);
         boolean shouldPopout = false;

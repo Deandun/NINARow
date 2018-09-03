@@ -3,8 +3,10 @@ package UI.Controllers;
 import Logic.Enums.ePlayerType;
 import Logic.Models.Player;
 import UI.UIMisc.ImageManager;
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
+import javafx.scene.control.Separator;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Rectangle;
@@ -77,7 +79,6 @@ public class PlayerDetailsController {
         previousPlayerDetails.markPlayerDetails();
     }
 
-    //TODO: debug this function!
     public void playerQuit() {
         PlayerDetails currentPlayerDetails = this.getNextPlayerDetails();
 
@@ -152,6 +153,7 @@ public class PlayerDetailsController {
         private Label mType;
         private Label mNumTurn;
         private ImageView mDiscImg;
+        private Separator mSeparator;
 
         private PlayerDetails(Player player) {
             this.mVBox = new VBox();
@@ -161,12 +163,14 @@ public class PlayerDetailsController {
             this.mType = new Label(player.getType().equals(ePlayerType.Human) ? "Human" : "Computer");
             this.mNumTurn = new Label("0");
             this.mDiscImg = new ImageView(ImageManager.getImageForPlayerID(player.getID()));
+            this.mSeparator = new Separator();
 
             this.initUI();
         }
 
         private void initUI() {
-            // TODO: init vbox settings (padding, margin...) here.
+            this.mVBox.setSpacing(4);
+
             this.initImage();
             this.mVBox.getChildren().add(this.mTitle);
             this.mVBox.getChildren().add(this.mName);
@@ -174,6 +178,7 @@ public class PlayerDetailsController {
             this.mVBox.getChildren().add(this.mType);
             this.mVBox.getChildren().add(this.mNumTurn);
             this.mVBox.getChildren().add(this.mDiscImg);
+            this.mVBox.getChildren().add(this.mSeparator);
         }
 
         private void initImage() {

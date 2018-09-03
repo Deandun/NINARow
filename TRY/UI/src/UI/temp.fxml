@@ -50,48 +50,6 @@
             </GridPane>
          </top>
          <right>
-            <FlowPane fx:id="mFlowPanePlayerDetails" prefHeight="312.0" prefWidth="71.0" BorderPane.alignment="CENTER">
-               <children>
-                  <Label fx:id="mLblPlayer1Title" text="Player 1">
-                     <padding>
-                        <Insets right="5.0" />
-                     </padding>
-                     <FlowPane.margin>
-                        <Insets left="5.0" right="5.0" />
-                     </FlowPane.margin>
-                     <font>
-                        <Font name="Comic Sans MS" size="15.0" />
-                     </font>
-                  </Label>
-                  <Label fx:id="mLblPlayer1Name" text="Name:">
-                     <FlowPane.margin>
-                        <Insets left="5.0" right="5.0" />
-                     </FlowPane.margin>
-                     <padding>
-                        <Insets right="5.0" />
-                     </padding>
-                     <font>
-                        <Font name="Comic Sans MS" size="12.0" />
-                     </font>
-                  </Label>
-                  <Label fx:id="mLblPlayer1ID" text="ID:">
-                     <padding>
-                        <Insets right="5.0" />
-                     </padding>
-                     <FlowPane.margin>
-                        <Insets left="5.0" right="5.0" />
-                     </FlowPane.margin>
-                  </Label>
-                  <Label fx:id="mLblPlayer1Type" alignment="CENTER" text="Type:">
-                     <padding>
-                        <Insets right="5.0" />
-                     </padding>
-                     <FlowPane.margin>
-                        <Insets left="5.0" right="5.0" />
-                     </FlowPane.margin>
-                  </Label>
-               </children>
-            </FlowPane>
          </right>
          <left>
             <VBox fx:id="mVBoxGameDetails" prefHeight="356.0" prefWidth="100.0" BorderPane.alignment="CENTER">

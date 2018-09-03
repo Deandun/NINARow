@@ -8,4 +8,6 @@ public interface IComputerPlayerAlgo {
     PlayTurnParameters getNextPlay(Player playingPlayer);
 
     void Init(Board board);
+
+    boolean hasNextPlay(Player playingPlayer);
 }

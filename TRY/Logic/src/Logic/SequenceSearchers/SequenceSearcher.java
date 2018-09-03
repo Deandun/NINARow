@@ -45,7 +45,6 @@ public class SequenceSearcher {
     }
 
     public boolean CheckCellForWinningSequence(Cell updatedCell) {
-        //TODO: check if logic works for all flow
         boolean didPlayerWin;
 
         if(updatedCell.getPlayer() != null) {
