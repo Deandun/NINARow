@@ -77,6 +77,8 @@ public class Logic{
             this.mDelegate.turnInProgress();
             PlayComputerPlayerTask playComputerPlayerTask = new PlayComputerPlayerTask(this::playComputerAlgoTurn);
             new Thread(playComputerPlayerTask).start();
+        } else {
+            this.mDelegate.noTurnInProgress(); // When a new game starts, signal the UI that the game is ready the first player's turn.
         }
     }
 
@@ -172,23 +174,21 @@ public class Logic{
         PlayedTurnData playedTurnData = new PlayedTurnData();
         eGameState gameState = eGameState.Active;
 
-        if(GameSettings.getInstance().getPlayers().size() > 2) {
-            // If there are more than 2 players, the game will go on after player quits.
-            Collection<Cell> updatedCells = this.mGameBoard.RemoveAllPlayerDiscsFromBoardAndGetUpdatedCells(this.mGameStatus.getPlayer());
-            playedTurnData.setUpdatedCellsCollection(updatedCells);
+        // If there are more than 2 players, the game will go on after player quits.
+        Collection<Cell> updatedCells = this.mGameBoard.RemoveAllPlayerDiscsFromBoardAndGetUpdatedCells(this.mGameStatus.getPlayer());
+        playedTurnData.setUpdatedCellsCollection(updatedCells);
 
+        if(GameSettings.getInstance().getPlayers().size() > 2) {
             if (this.mSequenceSearcher.CheckEntireBoardForWinningSequences()){  //run all over board and check if someone won
                 gameState = eGameState.Won;
             } else if(this.isDrawForNextPlayer()) {
                 gameState = eGameState.Draw;
             }
+        } else {
+            gameState = eGameState.Won;
         }
 
         this.mGameStatus.CurrentPlayerQuitGame();
-
-        if(GameSettings.getInstance().getPlayers().size() < 2) {
-            gameState = eGameState.Won;
-        }
 
         playedTurnData.setGameState(gameState);
         playedTurnData.setTurnType(turnParameters.getmTurnType());
@@ -268,7 +268,7 @@ public class Logic{
         boolean isPopoutGameMode = GameSettings.getInstance().getVariant().equals(eVariant.Popout);
         // Check if next player can perform popout. If he can't, and the board is full - game is in a draw.
         boolean canNextPlayerPopout = this.mGameBoard.CanPlayerPerformPopout(this.mGameStatus.getNextPlayer());
-        boolean isBoardFull = this.mGameBoard.getIsBoardFull();
+        boolean isBoardFull = this.mGameBoard.IsBoardFull();
         boolean isDraw;
 
         if(!isPopoutGameMode && isBoardFull) {
@@ -301,12 +301,14 @@ public class Logic{
             try {
                 playedTurnParams = this.mTurnsBlockingQueue.take();
             } catch (InterruptedException e) {
+                this.mDelegate.noTurnInProgress();
                 break;
             }
 
             // If game has ended, break.
             if (!this.mGameStatus.getGameState().equals(eGameState.Active)) {
-                break;
+                this.mDelegate.noTurnInProgress();
+                continue;
             }
 
             this.executeTurn(playedTurnParams);
@@ -316,7 +318,7 @@ public class Logic{
                 PlayComputerPlayerTask playComputerPlayerTask = new PlayComputerPlayerTask(this::playComputerAlgoTurn);
                 new Thread(playComputerPlayerTask).start();
             } else {
-                this.mDelegate.finishedTurn(); // If the computer player is not playing next, signal there is no turn in progress.
+                this.mDelegate.noTurnInProgress(); // If the computer player is not playing next, signal there is no turn in progress.
             }
         }
 
@@ -406,10 +408,13 @@ public class Logic{
         }
 
         private void CurrentPlayerQuitGame() {
+            // Was unable to perform this logic by using Iterator's remove function. Instead, using the following brute force technique.
             Player quittingPlayer = this.mCurrentPlayer;
-            this.nextPlayer(); // Set next player.
-            // Remove player by ID
-            GameSettings.getInstance().getPlayers().remove(quittingPlayer);
+            int quittingPlayerIndex = GameSettings.getInstance().getPlayers().indexOf(quittingPlayer);
+
+            GameSettings.getInstance().getPlayers().remove(quittingPlayer); // Remove current player.
+            this.mPlayerIterator = GameSettings.getInstance().getPlayers().listIterator(quittingPlayerIndex); // Reset iterator after list was changed.
+            this.nextPlayer(); // Assign the current player to the iterator's next element.
         }
 
         // Helper functions

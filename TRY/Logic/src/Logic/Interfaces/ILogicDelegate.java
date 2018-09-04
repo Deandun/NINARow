@@ -12,5 +12,5 @@ public interface ILogicDelegate {
 
     void turnInProgress();
 
-    void finishedTurn();
+    void noTurnInProgress();
 }

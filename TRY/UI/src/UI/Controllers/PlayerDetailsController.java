@@ -3,7 +3,6 @@ package UI.Controllers;
 import Logic.Enums.ePlayerType;
 import Logic.Models.Player;
 import UI.UIMisc.ImageManager;
-import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
@@ -144,6 +143,17 @@ public class PlayerDetailsController {
         return this.mPlayerDetailsList.get(previousPlayerDetailsIndex);
     }
 
+    public void reset() {
+        this.mPlayerDetailsList.forEach(
+                playerDetails -> {
+                    playerDetails.mTurnNumber = 0; // Reset turn.
+                    playerDetails.mTurnNumberLabel.setText("Turn number: " + Integer.toString(playerDetails.mTurnNumber));
+                    this.mVBox.getChildren().remove(playerDetails.getRoot()); // Remove from vbox.
+                    this.mVBox.getChildren().add(playerDetails.getRoot()); // Add to the end of the vbox.
+                }
+        );
+    }
+
     private class PlayerDetails {
 
         private VBox mVBox;
@@ -151,9 +161,10 @@ public class PlayerDetailsController {
         private Label mName;
         private Label mID;
         private Label mType;
-        private Label mNumTurn;
+        private Label mTurnNumberLabel;
         private ImageView mDiscImg;
         private Separator mSeparator;
+        private int mTurnNumber;
 
         private PlayerDetails(Player player) {
             this.mVBox = new VBox();
@@ -161,22 +172,23 @@ public class PlayerDetailsController {
             this.mName = new Label(player.getName());
             this.mID = new Label(player.getID());
             this.mType = new Label(player.getType().equals(ePlayerType.Human) ? "Human" : "Computer");
-            this.mNumTurn = new Label("0");
             this.mDiscImg = new ImageView(ImageManager.getImageForPlayerID(player.getID()));
             this.mSeparator = new Separator();
+            this.mTurnNumber = 0;
+            this.mTurnNumberLabel = new Label("Turn number: " + Integer.toString(this.mTurnNumber));
 
             this.initUI();
         }
 
         private void initUI() {
-            this.mVBox.setSpacing(4);
+            this.mVBox.setSpacing(2);
 
             this.initImage();
             this.mVBox.getChildren().add(this.mTitle);
             this.mVBox.getChildren().add(this.mName);
             this.mVBox.getChildren().add(this.mID);
             this.mVBox.getChildren().add(this.mType);
-            this.mVBox.getChildren().add(this.mNumTurn);
+            this.mVBox.getChildren().add(this.mTurnNumberLabel);
             this.mVBox.getChildren().add(this.mDiscImg);
             this.mVBox.getChildren().add(this.mSeparator);
         }
@@ -199,13 +211,13 @@ public class PlayerDetailsController {
         }
 
         private void incTurn() {
-            int incrementedTurn = Integer.parseInt(this.mNumTurn.getText()) + 1;
-            this.mNumTurn.setText(Integer.toString(incrementedTurn));
+            this.mTurnNumber++;
+            this.mTurnNumberLabel.setText("Turn number: " + Integer.toString(this.mTurnNumber));
         }
 
         private void decTurn() {
-            int decrementedTurn = Integer.parseInt(this.mNumTurn.getText()) - 1;
-            this.mNumTurn.setText(Integer.toString(decrementedTurn));
+            this.mTurnNumber--;
+            this.mTurnNumberLabel.setText("Turn number: " + Integer.toString(this.mTurnNumber));
         }
 
         //todo: UI functionality.

@@ -41,7 +41,7 @@ public class ComputerPlayerAlgo implements IComputerPlayerAlgo {
         boolean isBoardFull = mBoard.IsBoardFull();
         boolean canPopout = GameSettings.getInstance().getVariant().equals(eVariant.Popout) && mBoard.CanPlayerPerformPopout(playingPlayer);
 
-        return isBoardFull && !canPopout; // If the board is full and the computer player is unable to popout - Draw.
+        return !isBoardFull || canPopout; // If the board is full and the computer player is unable to popout - Draw.
     }
 
     private int getPopoutColumn(Player playingPlayer) {

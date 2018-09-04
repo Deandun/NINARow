@@ -222,6 +222,7 @@ public class App implements IBoardControllerDelegate, ILogicDelegate {
         if(GameSettings.getInstance().getPlayers().size() > 1) {
             this.mBoardController.getBoardPane().setDisable(false);
             this.mBoardController.ResetBoard();
+            this.mPlayerDetailsController.reset();
             this.mCurrentTurnProperty.setValue(0);
             this.mLogic.StartGame();
         } else {
@@ -235,7 +236,7 @@ public class App implements IBoardControllerDelegate, ILogicDelegate {
             try {
                 this.mIsFileGameLoaded.setValue(false);
                 this.mIsGameActiveProperty.setValue(true);
-                startGame();
+                this.startGame();
             } catch (Exception e1) {
                 // This method throws an exception that should'nt occure. If it does, then theres something wrong with the computer player algo.
                 e1.printStackTrace();
@@ -324,10 +325,11 @@ public class App implements IBoardControllerDelegate, ILogicDelegate {
     }
 
     private void onForwardReplayButtonClick(MouseEvent mouseEvent) {
-        if(this.mReplayAdapter.hasNext()) {
-            PlayedTurnData nextTurnData = this.mReplayAdapter.getNextTurnData();
-            this.handleUIAfterPlayedTurns(nextTurnData);
-        } else {
+        PlayedTurnData nextTurnData = this.mReplayAdapter.getNextTurnData();
+        this.handleUIAfterPlayedTurns(nextTurnData);
+
+        if(!this.mReplayAdapter.hasNext()) {
+            // Button will be disabled after this click.
             this.mForwardReplayButton.setDisable(true); // Manually set forward button's disableness
         }
     }
@@ -366,7 +368,7 @@ public class App implements IBoardControllerDelegate, ILogicDelegate {
     }
 
     @Override
-    public void finishedTurn() {
+    public void noTurnInProgress() {
         // Notify (in the UI thread) that there's no longer a turn in progress.
         Platform.runLater(
                 () -> this.mIsTurnInProgress = false
@@ -395,14 +397,21 @@ public class App implements IBoardControllerDelegate, ILogicDelegate {
     private void playTurn(PlayTurnParameters playTurnParameters)  {
         // Cannot play turn if the computer player is in progress or replay is in progress.
 
-        if(!this.mIsTurnInProgress) {
-            if(!this.mIsReplayInProgressProperty.getValue()) {
-                this.mLogic.playTurnAsync(playTurnParameters);
+        if(this.mLogic.GetGameState().equals(eGameState.Active)) {
+            if(!this.mIsTurnInProgress) { // TODO: after game won/draw turn in progress is stuck as true.
+                if(!this.mIsReplayInProgressProperty.getValue()) {
+                    this.mLogic.playTurnAsync(playTurnParameters);
+                } else {
+                    // Replay in progress
+                    this.showAlert("Oh no you didn't", "Cannot play turn while replay is in progress.");
+                }
             } else {
-                // Notify user that a replay is in progress.
+                // Computer player turn in progress.
+                // Notify user that the computer is making his turn.
             }
         } else {
-            // Notify user that the computer is making his turn.
+            // Game no longer active.
+            this.showAlert("Cannot play turn after the game has ended.", "Either restart or move on with your life.");
         }
     }
 
@@ -414,8 +423,12 @@ public class App implements IBoardControllerDelegate, ILogicDelegate {
         this.handleBoardControllerUIAfterTurn(turnData);
         this.handlePlayerDetailsControllerUIAfterTurn(turnData, isReverseTurn);
         this.handleGameDetailsUIAfterTurn(isReverseTurn);
+        if(!this.mIsReplayInProgressProperty.getValue()) {
+            this.handleGameStateEvents(turnData.getGameState());
+        }
+    }
 
-        eGameState gameState = turnData.getGameState();
+    private void handleGameStateEvents(eGameState gameState) {
         if(gameState.equals(eGameState.Won)) {
             Map<Player, Collection<Cell>> playerToWinningSequenceMap = this.mLogic.getPlayerToWinningSequencesMap();
             this.mBoardController.DisplayWinningSequences(playerToWinningSequenceMap);
@@ -465,12 +478,13 @@ public class App implements IBoardControllerDelegate, ILogicDelegate {
         Set<String> winnerNamesSet = winnersSet.stream().map(Player::getName).collect(Collectors.toSet());
         final String namesSeporator = ", ";
         String winnersNames = String.join(namesSeporator, winnerNamesSet);
-        this.showAlert("The game was won!", winnersNames + System.lineSeparator() + "Please start a new game or exit.");
+        String bodyString = "The winners are " + winnersNames + "." + System.lineSeparator() + "Please start a new game or exit.";
+        this.showAlert("The game was won!", bodyString);
     }
 
-    private void showAlert(String title, String body) {
+    private void showAlert(String header, String body) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(title);
+        alert.setHeaderText(header);
         alert.setContentText(body);
         Optional<ButtonType> result = alert.showAndWait();
 

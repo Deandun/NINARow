@@ -7,7 +7,6 @@ import java.util.stream.Collectors;
 
 public class Board{
     private Cell[][] mBoard;
-    private boolean mIsBoardFull;
 
     public Board(int numRows, int numCols) {
         this.Init(numRows, numCols);
@@ -15,7 +14,6 @@ public class Board{
 
     public void Init(int numRows, int numCols) {
         this.mBoard = new Cell[numRows][numCols];
-        this.mIsBoardFull = false;
 
         for(int i = 0; i < numRows; i++) {
             for(int j = 0; j < numCols; j++) {
@@ -107,10 +105,6 @@ public class Board{
             }
         }
     }
-
-    public boolean getIsBoardFull(){ return this.mIsBoardFull;}
-
-    public void setIsBoardFull(boolean isFull) { this.mIsBoardFull = isFull;}
 
     public boolean IsBoardFull() {
         boolean isBoardFull = true;
