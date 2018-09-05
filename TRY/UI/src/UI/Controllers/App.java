@@ -1,6 +1,6 @@
 package UI.Controllers;
+
 import Logic.Enums.eGameState;
-import Logic.Enums.ePlayerType;
 import Logic.Enums.eTurnType;
 import Logic.Enums.eVariant;
 import Logic.Interfaces.ILogicDelegate;
@@ -12,7 +12,7 @@ import UI.ChangeListeners.TextChangingListeners;
 import UI.Controllers.ControllerDelegates.IBoardControllerDelegate;
 import UI.FinalSettings;
 import UI.Replay.ReplayTurnDataAdapter;
-import UI.Theame;
+import UI.Theme;
 import UI.UIMisc.ImageManager;
 import UI.eInvalidMoveType;
 import javafx.application.Platform;
@@ -27,17 +27,14 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-
 import UI.eTheameType;
-
 import javafx.event.ActionEvent;
+
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import static UI.FinalSettings.EXIT_BTN_SIZE;
+import static UI.FinalSettings.*;
 
 public class App implements IBoardControllerDelegate, ILogicDelegate {
 
@@ -47,12 +44,6 @@ public class App implements IBoardControllerDelegate, ILogicDelegate {
     @FXML private Button mBtnLoadFile;
     @FXML private Button mBtnStartGame;
     @FXML private Button mBtnExitGame;
-    @FXML private Label mLblPlayer1Title;
-    @FXML private Label mLblPlayer1Name;
-    @FXML private Label mLblPlayer1ID;
-    @FXML private Label mLblPlayer1Type;
-    @FXML private Label mLblDetails;
-    @FXML private Label mLblCurrentPlayer;
     @FXML private VBox mVBoxGameDetails;
     @FXML private Label mLblTurnNumber;
     @FXML private Label mLblTargetSize;
@@ -63,9 +54,9 @@ public class App implements IBoardControllerDelegate, ILogicDelegate {
     @FXML private ComboBox<eTheameType> mComboBoxTheame;
 
     //TODO: remove temp replay buttons and work with real fxml buttons.
-    private Button mReplayButton = new Button("Start Replay");
-    private Button mBackReplayButton = new Button("Back");
-    private Button mForwardReplayButton = new Button("Forward");
+    private Button mBtnReplay = new Button("Start Replay");
+    private Button mBtnBackReplay = new Button("Back");
+    private Button mBtnForwardReplay = new Button("Forward");
 
     private BoardController mBoardController;
 
@@ -94,14 +85,14 @@ public class App implements IBoardControllerDelegate, ILogicDelegate {
     private boolean mIsTurnInProgress;
 
     // Themes
-    private Theame mTheame;
+    private Theme mTheme;
 
     public App() {
         this.mLogic = new Logic(this);
         this.mPlayerDetailsController = new PlayerDetailsController();
         this.mCurrentTurnProperty = new SimpleIntegerProperty();
-        this.mTheame = new Theame();
-        this.mTheame.setAviadTheame();
+        this.mTheme = new Theme();
+        this.mTheme.setAviadTheme();
         this.mIsTurnInProgress = false;
         this.mRestartTextChangingListener = new TextChangingListeners(FinalSettings.RESTART_BTN_TEXT,
                 FinalSettings.START_BTN_TEXT,
@@ -110,7 +101,7 @@ public class App implements IBoardControllerDelegate, ILogicDelegate {
 
         this.mReplayTextChangingListener = new TextChangingListeners(FinalSettings.REPLAY_STOP_BTN_TEXT,
                 FinalSettings.REPLAY_START_BTN_TEXT,
-                (str) -> this.mReplayButton.setText(str)
+                (str) -> this.mBtnReplay.setText(str)
         );
     }
 
@@ -122,19 +113,25 @@ public class App implements IBoardControllerDelegate, ILogicDelegate {
         this.mBtnExitGame.setText(null);
         this.mBtnExitGame.setPadding(new Insets(1));
         this.mComboBoxTheame.getItems().addAll(eTheameType.Aviad, eTheameType.Guy);
-        this.changeTheame();
-        this.initReplay();
+        changeTheme();
+        initReplay();
         this.mIsAppInInitModeProperty.setValue(true);
-        this.initBinding();
+        initBinding();
+        setDefaultDesign();
+    }
+
+    private void setDefaultDesign() {
+        this.mVBoxGameDetails.setId("mVBoxGameDetails");
+        this.changeOpacity(LOW_OPACITY);
     }
 
     private void initBinding() {
         //disabled binding
         this.mBtnLoadFile.disableProperty().bind(this.mIsGameActiveProperty);
         this.mBtnStartGame.disableProperty().bind(this.mIsAppInInitModeProperty);
-        this.mReplayButton.disableProperty().bind(this.mIsGameActiveProperty.not());
+        this.mBtnReplay.disableProperty().bind(this.mIsGameActiveProperty.not());
         this.mBtnExitGame.disableProperty().bind(this.mIsGameActiveProperty.not());
-        this.mBackReplayButton.disableProperty().bind(
+        this.mBtnBackReplay.disableProperty().bind(
                 Bindings.or(this.mIsReplayInProgressProperty.not(), this.mReplayAdapter.getCurrentTurnNumberInReplayProperty().isEqualTo(0)));
 
         // Panes visibility bindings.
@@ -237,6 +234,7 @@ public class App implements IBoardControllerDelegate, ILogicDelegate {
                 this.mIsFileGameLoaded.setValue(false);
                 this.mIsGameActiveProperty.setValue(true);
                 this.startGame();
+                changeOpacity(HIGH_OPACITY);
             } catch (Exception e1) {
                 // This method throws an exception that should'nt occure. If it does, then theres something wrong with the computer player algo.
                 e1.printStackTrace();
@@ -254,19 +252,20 @@ public class App implements IBoardControllerDelegate, ILogicDelegate {
         Optional<ButtonType> result = alert.showAndWait();
 
         if (result.get() == ButtonType.OK){
-            PlayTurnParameters params = new PlayTurnParameters(eTurnType.PlayerQuit);
-            this.mLogic.playTurnAsync(params);
-            // TODO: uncomment exit game functionality and remove player quit code.
+//            PlayTurnParameters params = new PlayTurnParameters(eTurnType.PlayerQuit);
+//            this.mLogic.playTurnAsync(params);
+//            // TODO: uncomment exit game functionality and remove player quit code.
 
-//            if(this.mIsReplayInProgressProperty.getValue()) {
-//                // If exited during replay, stop replay.
-//                this.mIsReplayInProgressProperty.setValue(false);
-//            }
-//
-//            this.mIsGameActiveProperty.setValue(false);
-//            this.mIsAppInInitModeProperty.setValue(true);
-//            this.mLogic.exitGame();
-//            clear();
+            if(this.mIsReplayInProgressProperty.getValue()) {
+                // If exited during replay, stop replay.
+                this.mIsReplayInProgressProperty.setValue(false);
+            }
+
+            this.mIsGameActiveProperty.setValue(false);
+            this.mIsAppInInitModeProperty.setValue(true);
+            this.changeOpacity(LOW_OPACITY);
+            this.mLogic.exitGame();
+            clear();
         }
     }
 
@@ -288,28 +287,28 @@ public class App implements IBoardControllerDelegate, ILogicDelegate {
 
     private void initReplay() {
         // On clicks
-        this.mReplayButton.setOnMouseClicked(this::onReplayButtonClick);
-        this.mBackReplayButton.setOnMouseClicked(this::onBackReplayButtonClick);
-        this.mForwardReplayButton.setOnMouseClicked(this::onForwardReplayButtonClick);
+        this.mBtnReplay.setOnMouseClicked(this::onReplayButtonClick);
+        this.mBtnBackReplay.setOnMouseClicked(this::onBackReplayButtonClick);
+        this.mBtnForwardReplay.setOnMouseClicked(this::onForwardReplayButtonClick);
 
-        this.mForwardReplayButton.setDisable(true); // Manually set forward button's disableness
+        this.mBtnForwardReplay.setDisable(true); // Manually set forward button's disableness
         //TODO: remove temp adding buttons manually
-        this.mGridPaneConfig.add(this.mBackReplayButton, 4, 0);
-        this.mGridPaneConfig.add(this.mReplayButton, 5, 0);
-        this.mGridPaneConfig.add(this.mForwardReplayButton, 6, 0);
+        this.mGridPaneConfig.add(this.mBtnBackReplay, 4, 0);
+        this.mGridPaneConfig.add(this.mBtnReplay, 5, 0);
+        this.mGridPaneConfig.add(this.mBtnForwardReplay, 6, 0);
     }
 
     private void onReplayButtonClick(MouseEvent mouseEvent) {
         if(this.mIsReplayInProgressProperty.getValue()) {
             // Replay is in progress - User wants to end replay.
             this.mReplayAdapter.getAllNextTurnsCollection().forEach(this::handleUIAfterPlayedTurns);
-            this.mForwardReplayButton.setDisable(true); // Manually set forward button's disableness
+            this.mBtnForwardReplay.setDisable(true); // Manually set forward button's disableness
         } else {
             // Replay is not in progress - User wants to start replaying.
             this.mReplayAdapter.start(this.mLogic.GetTurnHistory());
             this.mBoardController.disableAllPopoutButtons();
             // Replay just begun, we start at the final turn - can't go forward in replay.
-            this.mForwardReplayButton.setDisable(true); // Manually set forward button's disableness
+            this.mBtnForwardReplay.setDisable(true); // Manually set forward button's disableness
         }
 
         // Toggle boolean property
@@ -317,7 +316,7 @@ public class App implements IBoardControllerDelegate, ILogicDelegate {
     }
 
     private void onBackReplayButtonClick(MouseEvent mouseEvent) {
-        this.mForwardReplayButton.setDisable(false); // Manually set forward button's disableness
+        this.mBtnForwardReplay.setDisable(false); // Manually set forward button's disableness
         if(this.mReplayAdapter.hasPrevious()) {
             PlayedTurnData previousTurnData = this.mReplayAdapter.getPreviousTurnData();
             this.handleUIAfterPlayedTurns(previousTurnData, true);
@@ -330,7 +329,7 @@ public class App implements IBoardControllerDelegate, ILogicDelegate {
 
         if(!this.mReplayAdapter.hasNext()) {
             // Button will be disabled after this click.
-            this.mForwardReplayButton.setDisable(true); // Manually set forward button's disableness
+            this.mBtnForwardReplay.setDisable(true); // Manually set forward button's disableness
         }
     }
 
@@ -392,6 +391,7 @@ public class App implements IBoardControllerDelegate, ILogicDelegate {
     public void ColumnClicked(int columnIndex) {
         PlayTurnParameters playTurnParameters = new PlayTurnParameters(columnIndex, eTurnType.AddDisc);
         this.playTurn(playTurnParameters);
+
 }
 
     private void playTurn(PlayTurnParameters playTurnParameters)  {
@@ -496,20 +496,48 @@ public class App implements IBoardControllerDelegate, ILogicDelegate {
     private void clear() {
         ImageManager.Clear();
         this.mBoardController.ClearBoard();
-        this.mTheame.setAviadTheame();
+        this.mTheme.setAviadTheme();
     }
 
-    public void changeTheame(){
-        this.mStackPane.setStyle(this.mTheame.getCurrentTheameBackground());
+    public void changeTheme(){
+        this.mStackPane.setStyle(this.mTheme.getCurrentThemeBackground());
     }
 
     public void onComboBoxItemChange(ActionEvent actionEvent) {
         if (this.mComboBoxTheame.getSelectionModel().getSelectedItem().equals(eTheameType.Aviad)){
-            this.mTheame.setAviadTheame();
+            this.mTheme.setAviadTheme();
+            setTheme(eTheameType.Aviad);
         }
         else{
-            this.mTheame.setGuyTheame();
+            this.mTheme.setGuyTheme();
+            setTheme(eTheameType.Guy);
         }
-        changeTheame();
+        changeTheme();
+    }
+
+    public void changeOpacity(double opacity){
+        this.mVBoxGameDetails.setOpacity(opacity);
+        this.mPlayerDetailsController.setOpacity(opacity);
+    }
+
+    private void setTheme(eTheameType themeType){
+        if (themeType.equals(eTheameType.Aviad)){
+            this.mVBoxGameDetails.setStyle("-fx-background-color: #44b65f;" + "-fx-text-fill: black;");
+            this.mPlayerDetailsController.setTheme("-fx-background-color: #44b65f;" + "-fx-text-fill: black;");
+            setButtonsFill(BUTTON_GRADIENT_AVIAD);
+        }else{
+            this.mVBoxGameDetails.setStyle("-fx-background-color: #568AB6;" + "-fx-text-fill: white;");
+            this.mPlayerDetailsController.setTheme("-fx-background-color: #568AB6;" + "-fx-text-fill: white;");
+            setButtonsFill(BUTTON_GRADIENT_GUY);
+        }
+    }
+
+    private void setButtonsFill(String style) {
+        this.mBtnStartGame.setStyle(style);
+        this.mBtnLoadFile.setStyle(style);
+        this.mComboBoxTheame.setStyle(style);
+        this.mBtnReplay.setStyle(style);
+        this.mBtnForwardReplay.setStyle(style);
+        this.mBtnBackReplay.setStyle(style);
     }
 }

@@ -102,6 +102,7 @@ public class BoardController implements ICellControllerDelegate {
                 selectedCell.setImage(ImageManager.getImageForPlayerID(updatedCellInColumn.getPlayer().getID()));
             }
         }
+
     }
     
     private void setPopoutActions(Button popoutBtn) {
@@ -127,7 +128,9 @@ public class BoardController implements ICellControllerDelegate {
 
     @Override
     public void CellClicked(int row, int column) {
+
         this.mDelegate.ColumnClicked(column);
+
     }
 
     public void DisplayWinningSequences(Map<Player, Collection<Cell>> playerToWinningSequenceMap) {

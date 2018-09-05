@@ -1,6 +1,5 @@
 package UI;
 
-import UI.Controllers.App;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -10,7 +9,7 @@ import java.net.URL;
 
 public class Main extends Application {
 
-    private final String mCSSPath = "css/NInARowCss.css"; //TODO: implement
+    private final String mCSSPath = "UI/css/NInARowCss.css"; //TODO
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -23,6 +22,7 @@ public class Main extends Application {
         // wire up controller
         primaryStage.setTitle("DeaNoy Game - NinARow");
         Scene scene = new Scene(root, 670, 575);
+        scene.getStylesheets().add(mCSSPath);
 
         primaryStage.setScene(scene);
         primaryStage.show();

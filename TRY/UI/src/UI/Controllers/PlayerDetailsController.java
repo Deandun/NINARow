@@ -15,15 +15,23 @@ import java.util.Collection;
 import java.util.List;
 import java.util.ListIterator;
 
+import static UI.FinalSettings.HIGH_OPACITY;
+
 public class PlayerDetailsController {
 
-    private VBox mVBox;
+    private VBox mVBoxPlayerDetails;
     private List<PlayerDetails> mPlayerDetailsList;
     private ListIterator<PlayerDetails> mPlayerDetailsIterator;
 
     public PlayerDetailsController() {
-        this.mVBox = new VBox();
+        this.mVBoxPlayerDetails = new VBox();
         this.mPlayerDetailsList = new ArrayList<>();
+        setDesign();
+        }
+
+    private void setDesign() {
+        this.mVBoxPlayerDetails.setId("mVBoxPlayerDetails");
+        this.mVBoxPlayerDetails.setOpacity(HIGH_OPACITY);
     }
 
     public void setPlayersDetails(Collection<Player> players){
@@ -31,7 +39,7 @@ public class PlayerDetailsController {
                player -> {
                    PlayerDetails playerDetails = new PlayerDetails(player);
                    this.mPlayerDetailsList.add(playerDetails); // Add to player details list.
-                   this.mVBox.getChildren().add(playerDetails.getRoot()); // Add player details root to VBox.
+                   this.mVBoxPlayerDetails.getChildren().add(playerDetails.getRoot()); // Add player details root to VBox.
                }
        );
 
@@ -39,7 +47,7 @@ public class PlayerDetailsController {
     }
 
     public Node getRoot() {
-        return this.mVBox;
+        return this.mVBoxPlayerDetails;
     }
 
     public void updateToNextTurn(){
@@ -49,10 +57,10 @@ public class PlayerDetailsController {
         currentPlayerDetails.unMarkPlayerDetails();
 
         // Remove current player's details from the top of the "queue"
-        this.mVBox.getChildren().remove(currentPlayerDetails.mVBox);
+        this.mVBoxPlayerDetails.getChildren().remove(currentPlayerDetails.mVBox);
 
         // Add current player's details to the bottom of the players details "queue".
-        this.mVBox.getChildren().add(currentPlayerDetails.mVBox);
+        this.mVBoxPlayerDetails.getChildren().add(currentPlayerDetails.mVBox);
 
         // Next player should automatically be at the top of the queue, no need to perform actions on the queue.
         PlayerDetails nextPlayerDetails = this.getNextPlayerDetailsWithoutMovingIterator();
@@ -71,10 +79,10 @@ public class PlayerDetailsController {
         PlayerDetails previousPlayerDetails = this.getPreviousPlayersDetails();
 
         //Remove previous player details from the bottom of the queue.
-        this.mVBox.getChildren().remove(previousPlayerDetails.getRoot());
+        this.mVBoxPlayerDetails.getChildren().remove(previousPlayerDetails.getRoot());
 
         // Insert previous player at the top of the queue.
-        this.mVBox.getChildren().add(0, previousPlayerDetails.getRoot());
+        this.mVBoxPlayerDetails.getChildren().add(0, previousPlayerDetails.getRoot());
         previousPlayerDetails.markPlayerDetails();
     }
 
@@ -82,7 +90,7 @@ public class PlayerDetailsController {
         PlayerDetails currentPlayerDetails = this.getNextPlayerDetails();
 
         // Remove current player's details from the top of the "queue"
-        this.mVBox.getChildren().remove(currentPlayerDetails.mVBox);
+        this.mVBoxPlayerDetails.getChildren().remove(currentPlayerDetails.mVBox);
 
         // Remove the last player that was returned by using "next()"
         this.mPlayerDetailsIterator.remove();
@@ -148,10 +156,18 @@ public class PlayerDetailsController {
                 playerDetails -> {
                     playerDetails.mTurnNumber = 0; // Reset turn.
                     playerDetails.mTurnNumberLabel.setText("Turn number: " + Integer.toString(playerDetails.mTurnNumber));
-                    this.mVBox.getChildren().remove(playerDetails.getRoot()); // Remove from vbox.
-                    this.mVBox.getChildren().add(playerDetails.getRoot()); // Add to the end of the vbox.
+                    this.mVBoxPlayerDetails.getChildren().remove(playerDetails.getRoot()); // Remove from vbox.
+                    this.mVBoxPlayerDetails.getChildren().add(playerDetails.getRoot()); // Add to the end of the vbox.
                 }
         );
+    }
+
+    public void setTheme(String style) {
+        this.mVBoxPlayerDetails.setStyle(style);
+    }
+
+    public void setOpacity(double opacity){
+        this.mVBoxPlayerDetails.setOpacity(opacity);
     }
 
     private class PlayerDetails {

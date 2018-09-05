@@ -8,7 +8,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Rectangle;
 
-import static UI.FinalSettings.CELL_SIZE;
+import static UI.FinalSettings.*;
 
 public class CellController {
 
@@ -81,14 +81,14 @@ public class CellController {
     }
 
     public void setDefaultStyle() {
-        //TODO: implements from css file
-    }
+        this.mPane.setStyle(CELL_BORDER_DEFAULT);
+   }
 
     public void setErrorStyle() {
-        //TODO: implements from css file
+        this.mPane.setStyle(CELL_BORDER_ERROR);
     }
 
     public void setWinningStyle() {
-        //TODO: implements from css file
+        this.mPane.setStyle(CELL_BORDER_WINNING);
     }
 }

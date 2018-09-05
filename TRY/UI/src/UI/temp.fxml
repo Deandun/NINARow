@@ -52,7 +52,7 @@
          <right>
          </right>
          <left>
-            <VBox fx:id="mVBoxGameDetails" prefHeight="356.0" prefWidth="100.0" BorderPane.alignment="CENTER">
+            <VBox fx:id="mVBoxGameDetails" prefHeight="312.0" prefWidth="150.0" BorderPane.alignment="CENTER">
                <children>
                   <Label fx:id="mLblDetails" prefHeight="21.0" prefWidth="95.0" text="Game Details:">
                      <font>
