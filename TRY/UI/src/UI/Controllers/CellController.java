@@ -1,11 +1,12 @@
 package UI.Controllers;
 
 import UI.Controllers.ControllerDelegates.ICellControllerDelegate;
+import javafx.scene.effect.Bloom;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
 import static UI.FinalSettings.*;
@@ -18,6 +19,8 @@ public class CellController {
     private ICellControllerDelegate mDelegate;
     private int mColumn;
     private int mRow;
+    private Border mDefaultBorder;
+    private Border mMarkedBorder;
 
     public CellController(int column, int row, ICellControllerDelegate delegate){
         this.mColumn = column;
@@ -28,39 +31,42 @@ public class CellController {
     }
 
     private void init() {
-        mIVSign = new ImageView(this.mEmptyCellImg);
-        mIVSign.setFitHeight(CELL_SIZE);
-        mIVSign.setFitWidth(CELL_SIZE);
+        this.mIVSign = new ImageView(this.mEmptyCellImg);
+        this.mDefaultBorder = new Border(new BorderStroke(Color.BLACK,
+                BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT));
+        this.mMarkedBorder = new Border(new BorderStroke(Color.RED,
+                BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT));
+
+        this.mIVSign.setFitHeight(CELL_SIZE);
+        this.mIVSign.setFitWidth(CELL_SIZE);
 
         Rectangle clip = new Rectangle(
-                mIVSign.getFitWidth(), mIVSign.getFitHeight()
+                this.mIVSign.getFitWidth(), this.mIVSign.getFitHeight()
         );
         clip.setArcWidth(40);
         clip.setArcHeight(40);
-        mIVSign.setClip(clip);
-
+        this.mIVSign.setClip(clip);
 
         setOnAction();
 
-        mPane = new StackPane();
-        mPane.getChildren().add(mIVSign);
-        mPane.setPrefSize(CELL_SIZE, CELL_SIZE);
+        this.mPane = new StackPane();
+        this.mPane.setBorder(new Border(new BorderStroke(Color.BLACK,
+                BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
+        this.mPane.getChildren().add(this.mIVSign);
+        this.mPane.setPrefSize(CELL_SIZE, CELL_SIZE);
     }
 
     private void setOnAction() {
-        DropShadow shadow = new DropShadow();
-
-        mIVSign.setOnMouseClicked(
-                e -> this.mDelegate.CellClicked(mRow, mColumn)
+        this.mIVSign.setOnMouseClicked(
+                e -> this.mDelegate.CellClicked(this.mRow, this.mColumn)
         );
 
-        mIVSign.setOnMouseEntered(
-                e -> mIVSign.setEffect(shadow)
-
+        this.mIVSign.setOnMouseEntered(
+                e -> this.mPane.setBorder(this.mMarkedBorder)
         );
 
-        mIVSign.setOnMouseExited(
-                e -> mIVSign.setEffect(null)
+        this.mIVSign.setOnMouseExited(
+                e -> this.mPane.setBorder(this.mDefaultBorder)
         );
     }
 
@@ -69,26 +75,30 @@ public class CellController {
     }
 
     public Pane getPane() {
-        return mPane;
+        return this.mPane;
     }
 
     public int getColumn() {
-        return mColumn;
+        return this.mColumn;
     }
 
     public int getRow() {
-        return mRow;
+        return this.mRow;
     }
 
     public void setDefaultStyle() {
         this.mPane.setStyle(CELL_BORDER_DEFAULT);
-   }
+        this.mPane.setBorder(this.mDefaultBorder);
+    }
 
     public void setErrorStyle() {
         this.mPane.setStyle(CELL_BORDER_ERROR);
+        this.mPane.setBorder(this.mMarkedBorder);
     }
 
     public void setWinningStyle() {
         this.mPane.setStyle(CELL_BORDER_WINNING);
+        this.mPane.setBorder(this.mMarkedBorder);
+
     }
 }

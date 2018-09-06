@@ -3,6 +3,7 @@ package UI.Controllers;
 import Logic.Enums.ePlayerType;
 import Logic.Models.Player;
 import UI.UIMisc.ImageManager;
+import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
@@ -16,6 +17,8 @@ import java.util.List;
 import java.util.ListIterator;
 
 import static UI.FinalSettings.HIGH_OPACITY;
+import static UI.FinalSettings.PLAYER_MARKED_LABEL;
+import static UI.FinalSettings.REMOVE_PLAYER_MARKED_LABEL;
 
 public class PlayerDetailsController {
 
@@ -66,6 +69,13 @@ public class PlayerDetailsController {
         PlayerDetails nextPlayerDetails = this.getNextPlayerDetailsWithoutMovingIterator();
 
         nextPlayerDetails.markPlayerDetails();
+    }
+
+    public void markCurrentPlayer(){
+        try{
+            this.getNextPlayerDetailsWithoutMovingIterator().markPlayerDetails();
+        }catch (NullPointerException e){
+        }
     }
 
     public void updateToPreviousTurn(){
@@ -170,10 +180,20 @@ public class PlayerDetailsController {
         this.mVBoxPlayerDetails.setOpacity(opacity);
     }
 
+    public void setLabelsStyle(String newStyle) {
+        this.mPlayerDetailsList.stream().forEach(
+                playerDetails -> playerDetails.setLabelsStyle(newStyle)
+        );
+    }
+
+    public void clear() { //TODO: not working
+        this.mVBoxPlayerDetails.getChildren().removeAll();
+        this.mPlayerDetailsList.clear();
+    }
+
     private class PlayerDetails {
 
         private VBox mVBox;
-        private Label mTitle;
         private Label mName;
         private Label mID;
         private Label mType;
@@ -184,7 +204,6 @@ public class PlayerDetailsController {
 
         private PlayerDetails(Player player) {
             this.mVBox = new VBox();
-            this.mTitle = new Label("Title!");
             this.mName = new Label(player.getName());
             this.mID = new Label(player.getID());
             this.mType = new Label(player.getType().equals(ePlayerType.Human) ? "Human" : "Computer");
@@ -198,15 +217,28 @@ public class PlayerDetailsController {
 
         private void initUI() {
             this.mVBox.setSpacing(2);
-
             this.initImage();
-            this.mVBox.getChildren().add(this.mTitle);
             this.mVBox.getChildren().add(this.mName);
             this.mVBox.getChildren().add(this.mID);
             this.mVBox.getChildren().add(this.mType);
             this.mVBox.getChildren().add(this.mTurnNumberLabel);
             this.mVBox.getChildren().add(this.mDiscImg);
             this.mVBox.getChildren().add(this.mSeparator);
+            paddingLabels();
+        }
+
+        public void setLabelsStyle(String style){
+            this.mName.setStyle(style);
+            this.mID.setStyle(style);
+            this.mType.setStyle(style);
+            this.mTurnNumberLabel.setStyle(style);
+        }
+
+        private void paddingLabels() {
+            this.mName.setPadding(new Insets(5));
+            this.mID.setPadding(new Insets(5));
+            this.mType.setPadding(new Insets(5));
+            this.mTurnNumberLabel.setPadding(new Insets(5));
         }
 
         private void initImage() {
@@ -219,7 +251,6 @@ public class PlayerDetailsController {
             clip.setArcWidth(40);
             clip.setArcHeight(40);
             this.mDiscImg.setClip(clip);
-
         }
 
         private Node getRoot() {
@@ -236,13 +267,13 @@ public class PlayerDetailsController {
             this.mTurnNumberLabel.setText("Turn number: " + Integer.toString(this.mTurnNumber));
         }
 
-        //todo: UI functionality.
         private void markPlayerDetails() {
-            //TODO: set background color or effect
+            this.mName.setStyle(PLAYER_MARKED_LABEL );
         }
 
         private void unMarkPlayerDetails() {
-            // TODO: remove bg color/effect
+            this.mName.setStyle(REMOVE_PLAYER_MARKED_LABEL );
         }
+
     }
 }

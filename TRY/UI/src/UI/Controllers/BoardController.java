@@ -45,8 +45,9 @@ public class BoardController implements ICellControllerDelegate {
         this.mPopoutRowIndex = this.mNumOfDiscRows;
         this.mIsPopoutEnabled = GameSettings.getInstance().getVariant().equals(eVariant.Popout);
         this.mDelegate = delegate;
-        this.mMSGToUser = new Label(); //TODO: check
+        this.mMSGToUser = new Label();
         this.mMSGToUser.setVisible(false);
+        this.mBoardPane.setPadding(new Insets(10));
     }
 
     public GridPane getBoardPane() {
@@ -78,6 +79,7 @@ public class BoardController implements ICellControllerDelegate {
             popoutBtn.setPrefSize(POPOUT_BTN_SIZE, POPOUT_BTN_SIZE);
             popoutBtn.setPadding(new Insets(1));
             popoutBtn.setDisable(true);
+            popoutBtn.setPadding(new Insets(5));
 
             this.mPopOutButtonList.add(popoutBtn);
             this.mBoardPane.add(popoutBtn, i, this.mPopoutRowIndex);
@@ -128,9 +130,7 @@ public class BoardController implements ICellControllerDelegate {
 
     @Override
     public void CellClicked(int row, int column) {
-
         this.mDelegate.ColumnClicked(column);
-
     }
 
     public void DisplayWinningSequences(Map<Player, Collection<Cell>> playerToWinningSequenceMap) {
@@ -174,7 +174,13 @@ public class BoardController implements ICellControllerDelegate {
 
     public void ResetBoard() {
         this.mCellControllerList.stream().forEach(
-                cellController -> cellController.setImage(ImageManager.getEmptyDiscSlotImage())
+                cellController -> {
+                    cellController.setImage(ImageManager.getEmptyDiscSlotImage());
+                    cellController.setDefaultStyle();
+                }
+        );
+        this.mPopOutButtonList.stream().forEach(
+                button -> button.setDisable(true)
         );
     }
 
@@ -195,12 +201,12 @@ public class BoardController implements ICellControllerDelegate {
         this.mMSGToUser.setText("Error: " + invalidMove.name());
         this.mMSGToUser.setVisible(true);
 
-        for(CellController cell: invalidColumn){
+        for (CellController cell : invalidColumn) {
             cell.setErrorStyle();
         }
-        sleep(5000);
+        sleep(1000);
 
-        for(CellController cell: invalidColumn){
+        for (CellController cell : invalidColumn) {
             cell.setDefaultStyle();
         }
 

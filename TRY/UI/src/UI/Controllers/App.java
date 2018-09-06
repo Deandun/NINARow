@@ -27,7 +27,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import UI.eTheameType;
+import UI.eThemeType;
 import javafx.event.ActionEvent;
 
 import java.io.File;
@@ -51,7 +51,7 @@ public class App implements IBoardControllerDelegate, ILogicDelegate {
     @FXML private FlowPane mBottomProgressPane;
     @FXML private Label mProgressTextLabel;
     @FXML private ProgressBar mProgressBar;
-    @FXML private ComboBox<eTheameType> mComboBoxTheame;
+    @FXML private ComboBox<eThemeType> mComboBoxTheame;
 
     //TODO: remove temp replay buttons and work with real fxml buttons.
     private Button mBtnReplay = new Button("Start Replay");
@@ -92,7 +92,6 @@ public class App implements IBoardControllerDelegate, ILogicDelegate {
         this.mPlayerDetailsController = new PlayerDetailsController();
         this.mCurrentTurnProperty = new SimpleIntegerProperty();
         this.mTheme = new Theme();
-        this.mTheme.setAviadTheme();
         this.mIsTurnInProgress = false;
         this.mRestartTextChangingListener = new TextChangingListeners(FinalSettings.RESTART_BTN_TEXT,
                 FinalSettings.START_BTN_TEXT,
@@ -112,8 +111,7 @@ public class App implements IBoardControllerDelegate, ILogicDelegate {
         this.mBtnExitGame.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/UI/Images/Exit.JPG"), EXIT_BTN_SIZE, EXIT_BTN_SIZE, true, true)));
         this.mBtnExitGame.setText(null);
         this.mBtnExitGame.setPadding(new Insets(1));
-        this.mComboBoxTheame.getItems().addAll(eTheameType.Aviad, eTheameType.Guy);
-        changeTheme();
+        this.mComboBoxTheame.getItems().addAll(eThemeType.Default, eThemeType.Aviad, eThemeType.Guy);
         initReplay();
         this.mIsAppInInitModeProperty.setValue(true);
         initBinding();
@@ -122,7 +120,11 @@ public class App implements IBoardControllerDelegate, ILogicDelegate {
 
     private void setDefaultDesign() {
         this.mVBoxGameDetails.setId("mVBoxGameDetails");
-        this.changeOpacity(LOW_OPACITY);
+        changeOpacity(LOW_OPACITY);
+        this.mBtnExitGame.setId("mBtnExitGame");
+        this.mTheme.setDefaultTheme();
+        setTheme(eThemeType.Default);
+        changeTheme();
     }
 
     private void initBinding() {
@@ -219,6 +221,7 @@ public class App implements IBoardControllerDelegate, ILogicDelegate {
         if(GameSettings.getInstance().getPlayers().size() > 1) {
             this.mBoardController.getBoardPane().setDisable(false);
             this.mBoardController.ResetBoard();
+            setLabelsStyle(LABEL_STYLE_DEFAULT);
             this.mPlayerDetailsController.reset();
             this.mCurrentTurnProperty.setValue(0);
             this.mLogic.StartGame();
@@ -252,10 +255,6 @@ public class App implements IBoardControllerDelegate, ILogicDelegate {
         Optional<ButtonType> result = alert.showAndWait();
 
         if (result.get() == ButtonType.OK){
-//            PlayTurnParameters params = new PlayTurnParameters(eTurnType.PlayerQuit);
-//            this.mLogic.playTurnAsync(params);
-//            // TODO: uncomment exit game functionality and remove player quit code.
-
             if(this.mIsReplayInProgressProperty.getValue()) {
                 // If exited during replay, stop replay.
                 this.mIsReplayInProgressProperty.setValue(false);
@@ -263,7 +262,8 @@ public class App implements IBoardControllerDelegate, ILogicDelegate {
 
             this.mIsGameActiveProperty.setValue(false);
             this.mIsAppInInitModeProperty.setValue(true);
-            this.changeOpacity(LOW_OPACITY);
+            this.mComboBoxTheame.setValue(eThemeType.Default);
+            setDefaultDesign();
             this.mLogic.exitGame();
             clear();
         }
@@ -423,6 +423,7 @@ public class App implements IBoardControllerDelegate, ILogicDelegate {
         this.handleBoardControllerUIAfterTurn(turnData);
         this.handlePlayerDetailsControllerUIAfterTurn(turnData, isReverseTurn);
         this.handleGameDetailsUIAfterTurn(isReverseTurn);
+        //TODO: remove marked border from current player that moved
         if(!this.mIsReplayInProgressProperty.getValue()) {
             this.handleGameStateEvents(turnData.getGameState());
         }
@@ -495,6 +496,7 @@ public class App implements IBoardControllerDelegate, ILogicDelegate {
 
     private void clear() {
         ImageManager.Clear();
+        this.mPlayerDetailsController.clear();
         this.mBoardController.ClearBoard();
         this.mTheme.setAviadTheme();
     }
@@ -504,15 +506,22 @@ public class App implements IBoardControllerDelegate, ILogicDelegate {
     }
 
     public void onComboBoxItemChange(ActionEvent actionEvent) {
-        if (this.mComboBoxTheame.getSelectionModel().getSelectedItem().equals(eTheameType.Aviad)){
+        if (this.mComboBoxTheame.getSelectionModel().getSelectedItem().equals(eThemeType.Aviad)){
             this.mTheme.setAviadTheme();
-            setTheme(eTheameType.Aviad);
+            setTheme(eThemeType.Aviad);
         }
-        else{
+        else if (this.mComboBoxTheame.getSelectionModel().getSelectedItem().equals(eThemeType.Guy)){
             this.mTheme.setGuyTheme();
-            setTheme(eTheameType.Guy);
+            setTheme(eThemeType.Guy);
+        } else{
+            this.mTheme.setDefaultTheme();
+            setTheme(eThemeType.Default);
         }
         changeTheme();
+        if (this.mPlayerDetailsController != null){
+            this.mPlayerDetailsController.markCurrentPlayer();
+        }
+
     }
 
     public void changeOpacity(double opacity){
@@ -520,15 +529,22 @@ public class App implements IBoardControllerDelegate, ILogicDelegate {
         this.mPlayerDetailsController.setOpacity(opacity);
     }
 
-    private void setTheme(eTheameType themeType){
-        if (themeType.equals(eTheameType.Aviad)){
-            this.mVBoxGameDetails.setStyle("-fx-background-color: #44b65f;" + "-fx-text-fill: black;");
-            this.mPlayerDetailsController.setTheme("-fx-background-color: #44b65f;" + "-fx-text-fill: black;");
-            setButtonsFill(BUTTON_GRADIENT_AVIAD);
+    private void setTheme(eThemeType themeType){
+        if (themeType.equals(eThemeType.Aviad)){
+            this.mVBoxGameDetails.setStyle(VBOX_STYLE_AVIAD);
+            this.mPlayerDetailsController.setTheme(PLAYERS_PANE_STYLE_AVIAD + FONT_AVIAD);
+            setButtonsFill(BUTTON_GRADIENT_AVIAD + FONT_AVIAD);
+            setLabelsStyle(LABEL_STYLE_AVIAD + FONT_AVIAD);
+        }else if (themeType.equals(eThemeType.Guy)){
+            this.mVBoxGameDetails.setStyle(VBOX_STYLE_GUY);
+            this.mPlayerDetailsController.setTheme(PLAYERS_PANE_STYLE_GUY + FONT_GUY);
+            setButtonsFill(BUTTON_GRADIENT_GUY + FONT_GUY);
+            setLabelsStyle(LABEL_STYLE_GUY + FONT_GUY);
         }else{
-            this.mVBoxGameDetails.setStyle("-fx-background-color: #568AB6;" + "-fx-text-fill: white;");
-            this.mPlayerDetailsController.setTheme("-fx-background-color: #568AB6;" + "-fx-text-fill: white;");
-            setButtonsFill(BUTTON_GRADIENT_GUY);
+            this.mVBoxGameDetails.setStyle(VBOX_STYLE_DEFAULT);
+            this.mPlayerDetailsController.setTheme(PLAYERS_PANE_STYLE_DEFAULT + FONT_DEFAULT);
+            setButtonsFill(BUTTON_GRADIENT_DEFAULT + FONT_DEFAULT);
+            setLabelsStyle(LABEL_STYLE_DEFAULT + FONT_DEFAULT);
         }
     }
 
@@ -539,5 +555,12 @@ public class App implements IBoardControllerDelegate, ILogicDelegate {
         this.mBtnReplay.setStyle(style);
         this.mBtnForwardReplay.setStyle(style);
         this.mBtnBackReplay.setStyle(style);
+    }
+
+    private void setLabelsStyle(String style){
+        this.mLblTargetSize.setStyle(style);
+        this.mLblTurnNumber.setStyle(style);
+        this.mLblVariant.setStyle(style);
+        this.mPlayerDetailsController.setLabelsStyle(style);
     }
 }
