@@ -209,7 +209,6 @@ public class App implements IBoardControllerDelegate, ILogicDelegate {
         this.mBottomProgressPane.setVisible(false);
         this.mBoardController = new BoardController(GameSettings.getInstance().getRows(), GameSettings.getInstance().getColumns(), this);
         this.mBoardController.InitBoard();
-        this.mBorderPane.setMaxSize(300, 300);
         this.mBorderPane.setCenter(this.mBoardController.getBoardPane());
         this.initImageManagerWithPlayerImages();
         this.mLblTargetSize.setText("Target: " + Integer.toString(GameSettings.getInstance().getTarget()));

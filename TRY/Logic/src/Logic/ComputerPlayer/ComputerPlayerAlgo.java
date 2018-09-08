@@ -18,8 +18,6 @@ public class ComputerPlayerAlgo implements IComputerPlayerAlgo {
         mSequenceSearcher.setBoard(mBoard);
     }
 
-    // TODO: exception is thrown when the board is full and the player can't even use popout. handle it in UI (game draw)
-
     @Override
     public PlayTurnParameters getNextPlay(Player playingPlayer){
         int selectedColumn;

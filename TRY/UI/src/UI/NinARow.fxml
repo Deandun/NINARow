@@ -100,6 +100,9 @@
                     </opaqueInsets>
                   </Button>
                 </children>
+                     <BorderPane.margin>
+                        <Insets left="10.0" top="10.0" />
+                     </BorderPane.margin>
               </VBox>
             </left>
             <bottom>
@@ -122,7 +125,10 @@
               </FlowPane>
             </bottom>
                <right>
-                  <VBox fx:id="mVBoxPlayerDetails" BorderPane.alignment="CENTER_RIGHT" />
+                  <VBox fx:id="mVBoxPlayerDetails" prefHeight="260.0" prefWidth="147.0" BorderPane.alignment="CENTER_RIGHT">
+                     <BorderPane.margin>
+                        <Insets right="10.0" top="10.0" />
+                     </BorderPane.margin></VBox>
                </right>
           </BorderPane>
         </children>
