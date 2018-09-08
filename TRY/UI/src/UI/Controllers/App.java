@@ -29,7 +29,6 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import UI.eThemeType;
 import javafx.event.ActionEvent;
-
 import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -38,9 +37,12 @@ import static UI.FinalSettings.*;
 
 public class App implements IBoardControllerDelegate, ILogicDelegate {
 
-    @FXML private StackPane mStackPane;
+    @FXML private ScrollPane mScrollPane;
+    @FXML private AnchorPane mAnchorPane;
+    @FXML private VBox mVBoxPlayerDetails;
     @FXML private BorderPane mBorderPane;
     @FXML private GridPane mGridPaneConfig;
+    @FXML private Button mBtnQuitGame;
     @FXML private Button mBtnLoadFile;
     @FXML private Button mBtnStartGame;
     @FXML private Button mBtnExitGame;
@@ -53,11 +55,9 @@ public class App implements IBoardControllerDelegate, ILogicDelegate {
     @FXML private ProgressBar mProgressBar;
     @FXML private ComboBox<eThemeType> mComboBoxTheame;
 
-    //TODO: remove temp replay buttons and work with real fxml buttons.
     private Button mBtnReplay = new Button("Start Replay");
     private Button mBtnBackReplay = new Button("Back");
     private Button mBtnForwardReplay = new Button("Forward");
-
     private BoardController mBoardController;
 
     // Game details (left pan)
@@ -65,7 +65,6 @@ public class App implements IBoardControllerDelegate, ILogicDelegate {
 
     //PlayerDetails (right pane)
     private PlayerDetailsController mPlayerDetailsController;
-
     private Logic mLogic;
 
     // Replay
@@ -107,13 +106,17 @@ public class App implements IBoardControllerDelegate, ILogicDelegate {
     @FXML
     private void initialize() {
         setOnAction();
-        this.mBorderPane.setRight(this.mPlayerDetailsController.getRoot());
+        this.mBorderPane.setRight(this.mVBoxPlayerDetails);
         this.mBtnExitGame.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/UI/Images/Exit.JPG"), EXIT_BTN_SIZE, EXIT_BTN_SIZE, true, true)));
         this.mBtnExitGame.setText(null);
         this.mBtnExitGame.setPadding(new Insets(1));
-        this.mComboBoxTheame.getItems().addAll(eThemeType.Default, eThemeType.Aviad, eThemeType.Guy);
-        initReplay();
+        this.mBtnQuitGame.setDisable(true);
+        this.mComboBoxTheame.getItems().addAll(eThemeType.Default, eThemeType.Aviad, eThemeType.Binsk);
         this.mIsAppInInitModeProperty.setValue(true);
+        this.mScrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        this.mScrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        this.mPlayerDetailsController.setVBox(mVBoxPlayerDetails);
+        initReplay();
         initBinding();
         setDefaultDesign();
     }
@@ -133,12 +136,13 @@ public class App implements IBoardControllerDelegate, ILogicDelegate {
         this.mBtnStartGame.disableProperty().bind(this.mIsAppInInitModeProperty);
         this.mBtnReplay.disableProperty().bind(this.mIsGameActiveProperty.not());
         this.mBtnExitGame.disableProperty().bind(this.mIsGameActiveProperty.not());
+        this.mBtnQuitGame.disableProperty().bind(this.mIsGameActiveProperty.not());
         this.mBtnBackReplay.disableProperty().bind(
                 Bindings.or(this.mIsReplayInProgressProperty.not(), this.mReplayAdapter.getCurrentTurnNumberInReplayProperty().isEqualTo(0)));
 
         // Panes visibility bindings.
         this.mVBoxGameDetails.visibleProperty().bind(this.mIsAppInInitModeProperty.not());
-        this.mPlayerDetailsController.getRoot().visibleProperty().bind(this.mIsAppInInitModeProperty.not());
+        this.mVBoxPlayerDetails.visibleProperty().bind(this.mIsAppInInitModeProperty.not());
 
         // Text listeners
         this.mIsReplayInProgressProperty.addListener(this.mReplayTextChangingListener);
@@ -157,6 +161,7 @@ public class App implements IBoardControllerDelegate, ILogicDelegate {
         } else {
             this.mBottomProgressPane.setVisible(true);
 
+            this.clear();
             ReadGameFileTask readGameFileTask = new ReadGameFileTask(selectedFile.getAbsolutePath(), this.mLogic,
                     this::onReadGameFileFinish, this::onReadGameFileError);
             this.bindTaskToUI(readGameFileTask);
@@ -195,7 +200,9 @@ public class App implements IBoardControllerDelegate, ILogicDelegate {
     }
 
     private void onReadGameFileError(String errorDescription) {
-        this.showAlert("File error!", errorDescription);
+        Platform.runLater(
+                () -> this.showAlert("File error!", errorDescription)
+        );
     }
 
     private void updateUIAfterGameFileRead() {
@@ -218,15 +225,19 @@ public class App implements IBoardControllerDelegate, ILogicDelegate {
 
     @FXML
     void startGame() {
-        if(GameSettings.getInstance().getPlayers().size() > 1) {
-            this.mBoardController.getBoardPane().setDisable(false);
-            this.mBoardController.ResetBoard();
-            setLabelsStyle(LABEL_STYLE_DEFAULT);
-            this.mPlayerDetailsController.reset();
-            this.mCurrentTurnProperty.setValue(0);
-            this.mLogic.StartGame();
-        } else {
-            this.showAlert("Now hold on just a minute.", "We will not allow you to play alone! The game requires at least 2 players to start");
+        // Start game only if game is not in progress - could happen when user tries to restart game while
+        // The computer player is playing.
+        if(!this.mIsTurnInProgress) {
+            if (GameSettings.getInstance().getPlayers().size() > 1) {
+                this.mBoardController.getBoardPane().setDisable(false);
+                this.mBoardController.ResetBoard();
+                setLabelsStyle(LABEL_STYLE_DEFAULT);
+                this.mPlayerDetailsController.reset();
+                this.mCurrentTurnProperty.setValue(0);
+                this.mLogic.StartGame();
+            } else {
+                this.showAlert("Now hold on just a minute.", "We will not allow you to play alone! The game requires at least 2 players to start");
+            }
         }
     }
 
@@ -382,7 +393,6 @@ public class App implements IBoardControllerDelegate, ILogicDelegate {
             PlayTurnParameters playTurnParameters = new PlayTurnParameters(btnIndex, eTurnType.Popout);
             this.playTurn(playTurnParameters);
         } catch (Exception e) {
-            e.printStackTrace();
             System.out.println(e.getMessage());
         }
     }
@@ -391,8 +401,7 @@ public class App implements IBoardControllerDelegate, ILogicDelegate {
     public void ColumnClicked(int columnIndex) {
         PlayTurnParameters playTurnParameters = new PlayTurnParameters(columnIndex, eTurnType.AddDisc);
         this.playTurn(playTurnParameters);
-
-}
+    }
 
     private void playTurn(PlayTurnParameters playTurnParameters)  {
         // Cannot play turn if the computer player is in progress or replay is in progress.
@@ -497,12 +506,17 @@ public class App implements IBoardControllerDelegate, ILogicDelegate {
     private void clear() {
         ImageManager.Clear();
         this.mPlayerDetailsController.clear();
-        this.mBoardController.ClearBoard();
+
+        if (this.mBoardController != null){
+            this.mBoardController.ClearBoard();
+        }
+
         this.mTheme.setAviadTheme();
     }
 
     public void changeTheme(){
-        this.mStackPane.setStyle(this.mTheme.getCurrentThemeBackground());
+      //  this.mScrollPane.setStyle(this.mTheme.getCurrentThemeBackground());
+        this.mBorderPane.setStyle(this.mTheme.getCurrentThemeBackground());
     }
 
     public void onComboBoxItemChange(ActionEvent actionEvent) {
@@ -510,9 +524,9 @@ public class App implements IBoardControllerDelegate, ILogicDelegate {
             this.mTheme.setAviadTheme();
             setTheme(eThemeType.Aviad);
         }
-        else if (this.mComboBoxTheame.getSelectionModel().getSelectedItem().equals(eThemeType.Guy)){
+        else if (this.mComboBoxTheame.getSelectionModel().getSelectedItem().equals(eThemeType.Binsk)){
             this.mTheme.setGuyTheme();
-            setTheme(eThemeType.Guy);
+            setTheme(eThemeType.Binsk);
         } else{
             this.mTheme.setDefaultTheme();
             setTheme(eThemeType.Default);
@@ -535,11 +549,11 @@ public class App implements IBoardControllerDelegate, ILogicDelegate {
             this.mPlayerDetailsController.setTheme(PLAYERS_PANE_STYLE_AVIAD + FONT_AVIAD);
             setButtonsFill(BUTTON_GRADIENT_AVIAD + FONT_AVIAD);
             setLabelsStyle(LABEL_STYLE_AVIAD + FONT_AVIAD);
-        }else if (themeType.equals(eThemeType.Guy)){
-            this.mVBoxGameDetails.setStyle(VBOX_STYLE_GUY);
-            this.mPlayerDetailsController.setTheme(PLAYERS_PANE_STYLE_GUY + FONT_GUY);
-            setButtonsFill(BUTTON_GRADIENT_GUY + FONT_GUY);
-            setLabelsStyle(LABEL_STYLE_GUY + FONT_GUY);
+        }else if (themeType.equals(eThemeType.Binsk)){
+            this.mVBoxGameDetails.setStyle(VBOX_STYLE_Guy);
+            this.mPlayerDetailsController.setTheme(PLAYERS_PANE_STYLE_Guy + FONT_Guy);
+            setButtonsFill(BUTTON_GRADIENT_Guy + FONT_Guy);
+            setLabelsStyle(LABEL_STYLE_Guy + FONT_Guy);
         }else{
             this.mVBoxGameDetails.setStyle(VBOX_STYLE_DEFAULT);
             this.mPlayerDetailsController.setTheme(PLAYERS_PANE_STYLE_DEFAULT + FONT_DEFAULT);
@@ -562,5 +576,22 @@ public class App implements IBoardControllerDelegate, ILogicDelegate {
         this.mLblTurnNumber.setStyle(style);
         this.mLblVariant.setStyle(style);
         this.mPlayerDetailsController.setLabelsStyle(style);
+    }
+
+    public void resizeHeight(ReadOnlyDoubleProperty newSize){
+        this.mBorderPane.prefHeightProperty().bind(newSize);
+    }
+
+    public void resizeWidth(ReadOnlyDoubleProperty newSize){
+        this.mBorderPane.prefWidthProperty().bind(newSize);
+    }
+
+    public void QuitBtnClicked(MouseEvent mouseEvent) {
+        try {
+            PlayTurnParameters playTurnParameters = new PlayTurnParameters(eTurnType.PlayerQuit);
+            this.playTurn(playTurnParameters);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
     }
 }

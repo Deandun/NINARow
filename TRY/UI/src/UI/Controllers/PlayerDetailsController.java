@@ -4,6 +4,7 @@ import Logic.Enums.ePlayerType;
 import Logic.Models.Player;
 import UI.UIMisc.ImageManager;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
@@ -49,10 +50,6 @@ public class PlayerDetailsController {
         this.mPlayerDetailsIterator = this.mPlayerDetailsList.listIterator();
     }
 
-    public Node getRoot() {
-        return this.mVBoxPlayerDetails;
-    }
-
     public void updateToNextTurn(){
         PlayerDetails currentPlayerDetails = this.getNextPlayerDetails();
 
@@ -79,11 +76,10 @@ public class PlayerDetailsController {
     }
 
     public void updateToPreviousTurn(){
+        this.unmarkCurrentPlayer();
+
         PlayerDetails currentPlayerDetails = this.getPreviousPlayerDetailsWithoutMovingIterator();
-
         currentPlayerDetails.decTurn();
-        currentPlayerDetails.unMarkPlayerDetails();
-
 
         // Get previous players details from the bottom of the queue.
         PlayerDetails previousPlayerDetails = this.getPreviousPlayersDetails();
@@ -162,6 +158,9 @@ public class PlayerDetailsController {
     }
 
     public void reset() {
+        this.unmarkCurrentPlayer();
+
+        // Reset order/details of player details inside the root node.
         this.mPlayerDetailsList.forEach(
                 playerDetails -> {
                     playerDetails.mTurnNumber = 0; // Reset turn.
@@ -170,6 +169,14 @@ public class PlayerDetailsController {
                     this.mVBoxPlayerDetails.getChildren().add(playerDetails.getRoot()); // Add to the end of the vbox.
                 }
         );
+
+        // Mark first player.
+        this.mPlayerDetailsList.get(0).markPlayerDetails();
+    }
+
+    private void unmarkCurrentPlayer() {
+        PlayerDetails nextPlayerDetails = this.getNextPlayerDetailsWithoutMovingIterator();
+        nextPlayerDetails.unMarkPlayerDetails();
     }
 
     public void setTheme(String style) {
@@ -186,13 +193,16 @@ public class PlayerDetailsController {
         );
     }
 
-    public void clear() { //TODO: not working
-        this.mVBoxPlayerDetails.getChildren().removeAll();
+    public void clear() {
+        this.mVBoxPlayerDetails.getChildren().clear();
         this.mPlayerDetailsList.clear();
     }
 
-    private class PlayerDetails {
+    public void setVBox(VBox mVBoxPlayerDetails) {
+        this.mVBoxPlayerDetails = mVBoxPlayerDetails;
+    }
 
+    private class PlayerDetails {
         private VBox mVBox;
         private Label mName;
         private Label mID;
@@ -268,12 +278,11 @@ public class PlayerDetailsController {
         }
 
         private void markPlayerDetails() {
-            this.mName.setStyle(PLAYER_MARKED_LABEL );
+            this.mVBox.setStyle(PLAYER_MARKED_LABEL );
         }
 
         private void unMarkPlayerDetails() {
-            this.mName.setStyle(REMOVE_PLAYER_MARKED_LABEL );
+            this.mVBox.setStyle(REMOVE_PLAYER_MARKED_LABEL);
         }
-
     }
 }

@@ -12,7 +12,7 @@
     -fx-text-fill: black;
     -fx-font-style: oblique;
     -fx-font-size: 12px;
-    -fx-background-color: linear-gradient(#008307, #9ce7a0);
+    -fx-background-color: linear-gradient(#c78517, #e7c28e);
     -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 1 );
 }
 

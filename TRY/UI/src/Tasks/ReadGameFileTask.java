@@ -59,18 +59,21 @@ public class ReadGameFileTask extends Task<Void> {
             errorDescription = "Error reading from file.";
         } catch (Exception e) {
             errorDescription = "A general error has occurred";
-        } finally {
-            if(didErrorOccur) {
-                this.mOnErrorCallback.accept(errorDescription);
-            }
         }
 
-        // JAXBException,
-        this.updateMessage("Finished reading from file :)");
-        this.updateProgress(100, 100);
-        Thread.sleep(300);
+        if(didErrorOccur) {
+            this.updateMessage("");
+            this.updateProgress(0, 100);
+            this.mOnErrorCallback.accept(errorDescription);
+        } else {
+            // JAXBException,
+            this.updateMessage("Finished reading from file :)");
+            this.updateProgress(100, 100);
+            Thread.sleep(300);
 
-        this.mOnFinish.run();
+            this.mOnFinish.run();
+        }
+
 
         return null;
     }
