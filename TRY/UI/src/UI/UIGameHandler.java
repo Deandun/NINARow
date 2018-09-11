@@ -1,7 +1,9 @@
 package UI;
 
 import UI.Controllers.App;
+import UI.Controllers.LobbyController;
 import UI.Controllers.LoginController;
+import UI.UIMisc.GameDescriptionData;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -24,14 +26,17 @@ public class UIGameHandler extends Application {
     public void start(Stage primaryStage) throws Exception {
         this.mPrimaryStage = primaryStage;
         this.loadLoginController();
-        //this.loadGameController(); // TODO: remove dummy first call to game controller.
-
     }
 
-    private void loadLoginController() throws IOException {
+    private void loadLoginController() {
         URL mainFXML = getClass().getResource("Login.fxml");
         mLoader.setLocation(mainFXML);
-        Pane root = mLoader.load();
+        Pane root = null;
+        try {
+            root = mLoader.load();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         LoginController loginController = mLoader.getController();
         loginController.setmOnFinishedLogin(
                 (playerID) ->  {
@@ -44,13 +49,39 @@ public class UIGameHandler extends Application {
     }
 
     private void loadLobbyController() {
-        // TODO:
+        mLoader = new FXMLLoader();
+        URL mainFXML = getClass().getResource("Lobby.fxml");
+        mLoader.setLocation(mainFXML);
+        ScrollPane root = null;
+
+        try {
+            root = mLoader.load();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        LobbyController lobbyController = mLoader.getController();
+        lobbyController.setmOnLogout(this::loadLoginController);
+        lobbyController.setmOnEnteringGame(this::loadGameController);
+
+        // wire up controller
+        mPrimaryStage.setTitle("Lobby");
+        Scene scene = new Scene(root);
+        //scene.getStylesheets().add(mCSSPath);
+        mPrimaryStage.setScene(scene);
+        mPrimaryStage.show();
     }
 
-    private void loadGameController() throws IOException {
+    private void loadGameController(GameDescriptionData data) {
+        mLoader = new FXMLLoader();
         URL mainFXML = getClass().getResource("NinARow.fxml");
         mLoader.setLocation(mainFXML);
-        ScrollPane root = mLoader.load();
+        ScrollPane root = null;
+        try {
+            root = mLoader.load();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         App appController = mLoader.getController();
         appController.setOnPlayerQuitGame(this::loadLobbyController);
 
@@ -71,7 +102,7 @@ public class UIGameHandler extends Application {
         // wire up controller
         mPrimaryStage.setTitle(title);
         Scene scene = new Scene(rootPane);
-        scene.getStylesheets().add(mCSSPath);
+        //scene.getStylesheets().add(mCSSPath);
         mPrimaryStage.setScene(scene);
         mPrimaryStage.show();
     }
