@@ -6,7 +6,7 @@ import Logic.Models.GameSettings;
 import Logic.Models.Player;
 import UI.Controllers.ControllerDelegates.ICellControllerDelegate;
 import UI.UIMisc.ImageManager;
-import UI.eInvalidMoveType;
+import UI.UIMisc.eInvalidMoveType;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -20,7 +20,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import static UI.FinalSettings.POPOUT_BTN_SIZE;
+import static UI.UIMisc.FinalSettings.POPOUT_BTN_SIZE;
 import static java.lang.Thread.sleep;
 
 public class BoardController implements ICellControllerDelegate {

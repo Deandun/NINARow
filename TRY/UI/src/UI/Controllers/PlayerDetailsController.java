@@ -4,7 +4,6 @@ import Logic.Enums.ePlayerType;
 import Logic.Models.Player;
 import UI.UIMisc.ImageManager;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.Separator;
@@ -17,9 +16,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.ListIterator;
 
-import static UI.FinalSettings.HIGH_OPACITY;
-import static UI.FinalSettings.PLAYER_MARKED_LABEL;
-import static UI.FinalSettings.REMOVE_PLAYER_MARKED_LABEL;
+import static UI.UIMisc.FinalSettings.HIGH_OPACITY;
+import static UI.UIMisc.FinalSettings.PLAYER_MARKED_LABEL;
+import static UI.UIMisc.FinalSettings.REMOVE_PLAYER_MARKED_LABEL;
 
 public class PlayerDetailsController {
 

@@ -1,15 +1,13 @@
 package UI.Controllers;
 
 import UI.Controllers.ControllerDelegates.ICellControllerDelegate;
-import javafx.scene.effect.Bloom;
-import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
-import static UI.FinalSettings.*;
+import static UI.UIMisc.FinalSettings.*;
 
 public class CellController {
 

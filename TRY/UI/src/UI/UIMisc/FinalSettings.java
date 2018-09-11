@@ -1,4 +1,4 @@
-package UI;
+package UI.UIMisc;
 
 import java.io.Serializable;
 

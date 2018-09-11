@@ -1,4 +1,4 @@
-package UI;
+package UI.Theme;
 
 public enum eThemeType {
         Default,

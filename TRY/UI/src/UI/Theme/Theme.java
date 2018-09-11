@@ -1,6 +1,6 @@
-package UI;
+package UI.Theme;
 
-import static UI.FinalSettings.*;
+import static UI.UIMisc.FinalSettings.*;
 
 public class Theme {
 

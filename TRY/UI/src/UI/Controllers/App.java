@@ -10,11 +10,11 @@ import Logic.Models.Cell;
 import Tasks.ReadGameFileTask;
 import UI.ChangeListeners.TextChangingListeners;
 import UI.Controllers.ControllerDelegates.IBoardControllerDelegate;
-import UI.FinalSettings;
+import UI.UIMisc.FinalSettings;
 import UI.Replay.ReplayTurnDataAdapter;
-import UI.Theme;
+import UI.Theme.Theme;
 import UI.UIMisc.ImageManager;
-import UI.eInvalidMoveType;
+import UI.UIMisc.eInvalidMoveType;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
@@ -27,13 +27,13 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import UI.eThemeType;
+import UI.Theme.eThemeType;
 import javafx.event.ActionEvent;
 import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static UI.FinalSettings.*;
+import static UI.UIMisc.FinalSettings.*;
 
 public class App implements IBoardControllerDelegate, ILogicDelegate {
 
@@ -54,6 +54,14 @@ public class App implements IBoardControllerDelegate, ILogicDelegate {
     @FXML private Label mProgressTextLabel;
     @FXML private ProgressBar mProgressBar;
     @FXML private ComboBox<eThemeType> mComboBoxTheame;
+
+    // On player quit game
+
+    private Runnable mOnPlayerQuitGame;
+
+    public void setOnPlayerQuitGame(Runnable mOnPlayerQuitGame) {
+        this.mOnPlayerQuitGame = mOnPlayerQuitGame;
+    }
 
     private Button mBtnReplay = new Button("Start Replay");
     private Button mBtnBackReplay = new Button("Back");
@@ -273,9 +281,10 @@ public class App implements IBoardControllerDelegate, ILogicDelegate {
             this.mIsGameActiveProperty.setValue(false);
             this.mIsAppInInitModeProperty.setValue(true);
             this.mComboBoxTheame.setValue(eThemeType.Default);
-            setDefaultDesign();
+            this.setDefaultDesign();
             this.mLogic.exitGame();
-            clear();
+            this.clear();
+            this.mOnPlayerQuitGame.run();
         }
     }
 

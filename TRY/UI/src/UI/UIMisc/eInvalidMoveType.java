@@ -1,4 +1,4 @@
-package UI;
+package UI.UIMisc;
 
 public enum eInvalidMoveType {
     ColumnFull,
