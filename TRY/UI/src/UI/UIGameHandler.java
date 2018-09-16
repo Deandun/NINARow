@@ -1,5 +1,6 @@
 package UI;
 
+import Logic.Models.Player;
 import UI.Controllers.App;
 import UI.Controllers.LobbyController;
 import UI.Controllers.LoginController;
@@ -8,7 +9,6 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
@@ -20,7 +20,7 @@ public class UIGameHandler extends Application {
 
     private FXMLLoader mLoader = new FXMLLoader();
     private Stage mPrimaryStage;
-    private String mLoggedInPlayerID;
+    private Player mLoggedInPlayer;
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -29,6 +29,7 @@ public class UIGameHandler extends Application {
     }
 
     private void loadLoginController() {
+        this.mLoader = new FXMLLoader();
         URL mainFXML = getClass().getResource("Login.fxml");
         mLoader.setLocation(mainFXML);
         Pane root = null;
@@ -37,10 +38,11 @@ public class UIGameHandler extends Application {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        this.mLoggedInPlayer = null;
         LoginController loginController = mLoader.getController();
         loginController.setmOnFinishedLogin(
                 (playerID) ->  {
-                    this.mLoggedInPlayerID = playerID;
+                    this.mLoggedInPlayer = playerID;
                     this.loadLobbyController();
                 }
             );
@@ -83,7 +85,8 @@ public class UIGameHandler extends Application {
             e.printStackTrace();
         }
         App appController = mLoader.getController();
-        appController.setOnPlayerQuitGame(this::loadLobbyController);
+        appController.init(data, this.mLoggedInPlayer);
+        appController.setOnPlayerLeftGame(this::loadLobbyController);
 
         // wire up controller
         mPrimaryStage.setTitle("DeaNoy Game - NinARow");

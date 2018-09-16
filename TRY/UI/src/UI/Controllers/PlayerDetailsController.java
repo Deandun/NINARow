@@ -204,7 +204,6 @@ public class PlayerDetailsController {
     private class PlayerDetails {
         private VBox mVBox;
         private Label mName;
-        private Label mID;
         private Label mType;
         private Label mTurnNumberLabel;
         private ImageView mDiscImg;
@@ -214,9 +213,8 @@ public class PlayerDetailsController {
         private PlayerDetails(Player player) {
             this.mVBox = new VBox();
             this.mName = new Label(player.getName());
-            this.mID = new Label(player.getID());
             this.mType = new Label(player.getType().equals(ePlayerType.Human) ? "Human" : "Computer");
-            this.mDiscImg = new ImageView(ImageManager.getImageForPlayerID(player.getID()));
+            this.mDiscImg = new ImageView(ImageManager.getImageForPlayerID(player.getName()));
             this.mSeparator = new Separator();
             this.mTurnNumber = 0;
             this.mTurnNumberLabel = new Label("Turn number: " + Integer.toString(this.mTurnNumber));
@@ -228,7 +226,6 @@ public class PlayerDetailsController {
             this.mVBox.setSpacing(2);
             this.initImage();
             this.mVBox.getChildren().add(this.mName);
-            this.mVBox.getChildren().add(this.mID);
             this.mVBox.getChildren().add(this.mType);
             this.mVBox.getChildren().add(this.mTurnNumberLabel);
             this.mVBox.getChildren().add(this.mDiscImg);
@@ -238,14 +235,12 @@ public class PlayerDetailsController {
 
         public void setLabelsStyle(String style){
             this.mName.setStyle(style);
-            this.mID.setStyle(style);
             this.mType.setStyle(style);
             this.mTurnNumberLabel.setStyle(style);
         }
 
         private void paddingLabels() {
             this.mName.setPadding(new Insets(5));
-            this.mID.setPadding(new Insets(5));
             this.mType.setPadding(new Insets(5));
             this.mTurnNumberLabel.setPadding(new Insets(5));
         }

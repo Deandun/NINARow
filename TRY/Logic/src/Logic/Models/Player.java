@@ -6,13 +6,11 @@ import java.io.Serializable;
 
 public class Player implements Serializable {
 
-    private String mID;
     private int mTurnCounter;
     private String mName;
     private ePlayerType mType;
 
-    public void init(String ID, String name, ePlayerType type) {
-        setID(ID);
+    public void init(String name, ePlayerType type) {
         setTurnCounter(0);
         setName(name);
         setType(type);
@@ -20,19 +18,14 @@ public class Player implements Serializable {
 
     @Override
     public String toString(){
-        return "ID: " + mID +
-                " Name: " + mName +
+        return "Name: " + mName +
                 " Type: " + mType.name();
     }
 
     @Override
     public boolean equals(Object otherPlayer) {
         // Check if other player is not null and IDs match.
-        return otherPlayer != null && mID.contentEquals(((Player)otherPlayer).mID);
-    }
-
-    public String getID() {
-        return mID;
+        return otherPlayer != null && mName.contentEquals(((Player)otherPlayer).mName);
     }
 
     public void FinishedTurn() {
@@ -48,10 +41,6 @@ public class Player implements Serializable {
     }
 
     public int getTurnCounter(){return mTurnCounter;}
-
-    public void setID(String ID) {
-        this.mID = ID;
-    }
 
     public void setTurnCounter(int turnCounter) {
         this.mTurnCounter = turnCounter;

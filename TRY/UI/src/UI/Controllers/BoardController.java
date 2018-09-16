@@ -1,8 +1,6 @@
 package UI.Controllers;
 
-import Logic.Enums.eVariant;
 import Logic.Models.Cell;
-import Logic.Models.GameSettings;
 import Logic.Models.Player;
 import UI.Controllers.ControllerDelegates.ICellControllerDelegate;
 import UI.UIMisc.ImageManager;
@@ -42,9 +40,9 @@ public class BoardController implements ICellControllerDelegate {
         this.mNumColumns = numCols;
         this.mNumOfDiscRows = numRows;
         this.mCellControllerList = new ArrayList<>();
-        this.mPopoutRowIndex = this.mNumOfDiscRows;
-        this.mIsPopoutEnabled = GameSettings.getInstance().getVariant().equals(eVariant.Popout);
         this.mDelegate = delegate;
+        this.mPopoutRowIndex = this.mNumOfDiscRows;
+        this.mIsPopoutEnabled = this.mDelegate.isPopoutAllowed();
         this.mMSGToUser = new Label();
         this.mMSGToUser.setVisible(false);
         this.mBoardPane.setPadding(new Insets(10));
@@ -101,7 +99,7 @@ public class BoardController implements ICellControllerDelegate {
                 selectedCell.setImage(ImageManager.getEmptyDiscSlotImage());
             }
             else{
-                selectedCell.setImage(ImageManager.getImageForPlayerID(updatedCellInColumn.getPlayer().getID()));
+                selectedCell.setImage(ImageManager.getImageForPlayerID(updatedCellInColumn.getPlayer().getName()));
             }
         }
 
@@ -226,7 +224,7 @@ public class BoardController implements ICellControllerDelegate {
     }
 
     public void disableAllPopoutButtons() {
-        if(GameSettings.getInstance().getVariant().equals(eVariant.Popout)) {
+        if(this.mDelegate.isPopoutAllowed()) {
             this.mPopOutButtonList.forEach(
                     btn -> btn.setDisable(true)
             );

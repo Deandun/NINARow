@@ -82,8 +82,7 @@ public class FileManager {
         playersFromFile.forEach(
                 playerFromFile -> {
                     Logic.Models.Player newPlayer = new Logic.Models.Player();
-                    newPlayer.init(Short.toString(playerFromFile.getId()),
-                            playerFromFile.getName(), ePlayerType.valueOf(playerFromFile.getType()));
+                    newPlayer.init(playerFromFile.getName(), ePlayerType.valueOf(playerFromFile.getType()));
                     GameSettings.getInstance().getPlayers().add(newPlayer);
                 }
         );

@@ -4,12 +4,10 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
@@ -31,29 +29,22 @@
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                 </rowConstraints>
                 <children>
-                  <Button fx:id="mBtnLoadFile" mnemonicParsing="false" text="Load File">
-                    <GridPane.margin>
-                      <Insets left="10.0" />
-                    </GridPane.margin>
-                  </Button>
-                  <Button fx:id="mBtnStartGame" mnemonicParsing="false" text="Start Game" GridPane.columnIndex="1">
-                    <GridPane.margin>
-                      <Insets left="10.0" />
-                    </GridPane.margin>
-                    <opaqueInsets>
-                      <Insets />
-                    </opaqueInsets>
-                  </Button>
                   <ComboBox fx:id="mComboBoxTheame" onAction="#onComboBoxItemChange" prefHeight="25.0" prefWidth="112.0" promptText="Default" GridPane.columnIndex="2">
                     <GridPane.margin>
-                      <Insets left="5.0" />
+                      <Insets right="10.0" />
                     </GridPane.margin>
                   </ComboBox>
+                        <Button fx:id="mBtnQuitGame" mnemonicParsing="false" onMouseClicked="#QuitBtnClicked" text="Quit Game">
+                           <opaqueInsets>
+                              <Insets />
+                           </opaqueInsets>
+                           <GridPane.margin>
+                              <Insets left="10.0" />
+                           </GridPane.margin>
+                        </Button>
                 </children>
               </GridPane>
             </top>
-            <right>
-            </right>
             <left>
               <VBox fx:id="mVBoxGameDetails" BorderPane.alignment="CENTER">
                 <children>
@@ -83,47 +74,12 @@
                       <Insets left="5.0" top="5.0" />
                     </VBox.margin>
                   </Label>
-                        <Button fx:id="mBtnQuitGame" mnemonicParsing="false" onMouseClicked="#QuitBtnClicked" text="Quit Game">
-                           <opaqueInsets>
-                              <Insets />
-                           </opaqueInsets>
-                           <VBox.margin>
-                              <Insets left="50.0" right="50.0" top="20.0" />
-                           </VBox.margin>
-                        </Button>
-                  <Button fx:id="mBtnExitGame" mnemonicParsing="false" text="Button" VBox.vgrow="ALWAYS">
-                    <VBox.margin>
-                      <Insets bottom="50.0" left="50.0" right="50.0" top="50.0" />
-                    </VBox.margin>
-                    <opaqueInsets>
-                      <Insets />
-                    </opaqueInsets>
-                  </Button>
                 </children>
                      <BorderPane.margin>
                         <Insets left="10.0" top="10.0" />
                      </BorderPane.margin>
               </VBox>
             </left>
-            <bottom>
-              <FlowPane fx:id="mBottomProgressPane" orientation="VERTICAL" prefHeight="156.0" prefWidth="607.0" BorderPane.alignment="CENTER">
-                <children>
-                  <Label fx:id="mProgressTextLabel" prefHeight="27.0" prefWidth="400.0" text="Loading..." wrapText="true">
-                    <padding>
-                      <Insets left="5.0" />
-                    </padding>
-                  </Label>
-                  <ProgressBar fx:id="mProgressBar" prefHeight="13.0" prefWidth="595.0" progress="0.0">
-                    <opaqueInsets>
-                      <Insets top="15.0" />
-                    </opaqueInsets>
-                    <FlowPane.margin>
-                      <Insets left="5.0" right="5.0" />
-                    </FlowPane.margin>
-                  </ProgressBar>
-                </children>
-              </FlowPane>
-            </bottom>
                <right>
                   <VBox fx:id="mVBoxPlayerDetails" prefHeight="260.0" prefWidth="147.0" BorderPane.alignment="CENTER_RIGHT">
                      <BorderPane.margin>

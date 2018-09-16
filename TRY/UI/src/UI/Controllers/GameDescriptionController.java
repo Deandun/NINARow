@@ -39,7 +39,7 @@ public class GameDescriptionController {
         this.mGameDescriptionData = data;
         this.mGameState = data.getmGameState();
         this.mGameStateLabel.setText(this.mGameState.name());
-        this.mGameTypeLabel.setText(data.getmGameType());
+        this.mGameTypeLabel.setText(data.getmVariant().name());
         this.mBoardDimentionsLabel.setText(Integer.toString(data.getmRows()) + "x" + Integer.toString(data.getmColumns()));
         this.mParticipantsLabel.setText(Integer.toString(data.getmNumberOfPlayers()) + "/" + Integer.toString(data.getmMaxPlayers()));
         this.mTargetLabel.setText(Integer.toString(data.getmTarget()));

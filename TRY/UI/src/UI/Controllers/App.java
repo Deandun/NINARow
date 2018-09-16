@@ -2,40 +2,36 @@ package UI.Controllers;
 
 import Logic.Enums.eGameState;
 import Logic.Enums.eTurnType;
-import Logic.Enums.eVariant;
-import Logic.Interfaces.ILogicDelegate;
-import Logic.Logic;
-import Logic.Models.*;
+import NinaRowHTTPClient.Game.IGameClientLogicDelegate;
 import Logic.Models.Cell;
-import Tasks.ReadGameFileTask;
+import Logic.Models.PlayTurnParameters;
+import Logic.Models.PlayedTurnData;
+import Logic.Models.Player;
+import NinaRowHTTPClient.Game.GameClientLogic;
 import UI.ChangeListeners.TextChangingListeners;
 import UI.Controllers.ControllerDelegates.IBoardControllerDelegate;
 import UI.UIMisc.FinalSettings;
 import UI.Replay.ReplayTurnDataAdapter;
 import UI.Theme.Theme;
+import UI.UIMisc.GameDescriptionData;
 import UI.UIMisc.ImageManager;
 import UI.UIMisc.eInvalidMoveType;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.fxml.FXML;
-import javafx.geometry.Insets;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
-import javafx.stage.FileChooser;
-import javafx.stage.Stage;
 import UI.Theme.eThemeType;
 import javafx.event.ActionEvent;
-import java.io.File;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static UI.UIMisc.FinalSettings.*;
 
-public class App implements IBoardControllerDelegate, ILogicDelegate {
+public class App implements IBoardControllerDelegate, IGameClientLogicDelegate {
 
     @FXML private ScrollPane mScrollPane;
     @FXML private AnchorPane mAnchorPane;
@@ -43,24 +39,18 @@ public class App implements IBoardControllerDelegate, ILogicDelegate {
     @FXML private BorderPane mBorderPane;
     @FXML private GridPane mGridPaneConfig;
     @FXML private Button mBtnQuitGame;
-    @FXML private Button mBtnLoadFile;
-    @FXML private Button mBtnStartGame;
-    @FXML private Button mBtnExitGame;
     @FXML private VBox mVBoxGameDetails;
     @FXML private Label mLblTurnNumber;
     @FXML private Label mLblTargetSize;
     @FXML private Label mLblVariant;
-    @FXML private FlowPane mBottomProgressPane;
-    @FXML private Label mProgressTextLabel;
-    @FXML private ProgressBar mProgressBar;
     @FXML private ComboBox<eThemeType> mComboBoxTheame;
 
     // On player quit game
+    private Runnable mOnCurrentPlayerLeftGame;
+    private Player mLoggedInPlayer;
 
-    private Runnable mOnPlayerQuitGame;
-
-    public void setOnPlayerQuitGame(Runnable mOnPlayerQuitGame) {
-        this.mOnPlayerQuitGame = mOnPlayerQuitGame;
+    public void setOnPlayerLeftGame(Runnable mOnPlayerQuitGame) {
+        this.mOnCurrentPlayerLeftGame = mOnPlayerQuitGame;
     }
 
     private Button mBtnReplay = new Button("Start Replay");
@@ -73,154 +63,57 @@ public class App implements IBoardControllerDelegate, ILogicDelegate {
 
     //PlayerDetails (right pane)
     private PlayerDetailsController mPlayerDetailsController;
-    private Logic mLogic;
+    private GameClientLogic mNinaRowHTTPClientLogic;
 
     // Replay
     private BooleanProperty mIsReplayInProgressProperty = new SimpleBooleanProperty();
     private ReplayTurnDataAdapter mReplayAdapter = new ReplayTurnDataAdapter();
 
     //States
-    private BooleanProperty mIsAppInInitModeProperty = new SimpleBooleanProperty();
-    private BooleanProperty mIsFileGameLoaded = new SimpleBooleanProperty();
     private BooleanProperty mIsGameActiveProperty = new SimpleBooleanProperty();
 
     // Change listeners
     private TextChangingListeners mReplayTextChangingListener;
-    private TextChangingListeners mRestartTextChangingListener;
-
-    // Concurrency
-    private boolean mIsTurnInProgress;
 
     // Themes
     private Theme mTheme;
 
     public App() {
-        this.mLogic = new Logic(this);
         this.mPlayerDetailsController = new PlayerDetailsController();
         this.mCurrentTurnProperty = new SimpleIntegerProperty();
         this.mTheme = new Theme();
-        this.mIsTurnInProgress = false;
-        this.mRestartTextChangingListener = new TextChangingListeners(FinalSettings.RESTART_BTN_TEXT,
-                FinalSettings.START_BTN_TEXT,
-                (str) -> this.mBtnStartGame.setText(str)
-                );
-
         this.mReplayTextChangingListener = new TextChangingListeners(FinalSettings.REPLAY_STOP_BTN_TEXT,
                 FinalSettings.REPLAY_START_BTN_TEXT,
                 (str) -> this.mBtnReplay.setText(str)
         );
     }
 
-    @FXML
-    private void initialize() {
-        setOnAction();
+    // Use this function instead of initialize in order to be able to pass in the gameData param.
+    // This param is needed to initialize the UI, and if initialize is used through the loader, passing the param would not be possible.
+    public void init(GameDescriptionData gameData, Player loggedInPlayer) {
+        this.mLoggedInPlayer = loggedInPlayer;
+        this.mNinaRowHTTPClientLogic = new GameClientLogic(gameData, this.mLoggedInPlayer, this);
         this.mBorderPane.setRight(this.mVBoxPlayerDetails);
-        this.mBtnExitGame.setGraphic(new ImageView(new Image(getClass().getResourceAsStream("/UI/Images/Exit.JPG"), EXIT_BTN_SIZE, EXIT_BTN_SIZE, true, true)));
-        this.mBtnExitGame.setText(null);
-        this.mBtnExitGame.setPadding(new Insets(1));
-        this.mBtnQuitGame.setDisable(true);
-        this.mComboBoxTheame.getItems().addAll(eThemeType.Default, eThemeType.Aviad, eThemeType.Binsk);
-        this.mIsAppInInitModeProperty.setValue(true);
+        this.mIsGameActiveProperty.setValue(false);
         this.mScrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         this.mScrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
         this.mPlayerDetailsController.setVBox(mVBoxPlayerDetails);
-        initReplay();
-        initBinding();
-        setDefaultDesign();
+        this.initTopPane();
+        this.initGameDetailsPane();
+        this.initBoardPane();
+        this.initReplay();
+        this.initBinding();
+        this.setDefaultDesign();
     }
 
-    private void setDefaultDesign() {
-        this.mVBoxGameDetails.setId("mVBoxGameDetails");
-        changeOpacity(LOW_OPACITY);
-        this.mBtnExitGame.setId("mBtnExitGame");
-        this.mTheme.setDefaultTheme();
-        setTheme(eThemeType.Default);
-        changeTheme();
+    private void initTopPane() {
+        this.mComboBoxTheame.getItems().addAll(eThemeType.Default, eThemeType.Aviad, eThemeType.Binsk);
+        this.mBtnQuitGame.setOnMouseClicked(this::onExitGame);
     }
 
-    private void initBinding() {
-        //disabled binding
-        this.mBtnLoadFile.disableProperty().bind(this.mIsGameActiveProperty);
-        this.mBtnStartGame.disableProperty().bind(this.mIsAppInInitModeProperty);
-        this.mBtnReplay.disableProperty().bind(this.mIsGameActiveProperty.not());
-        this.mBtnExitGame.disableProperty().bind(this.mIsGameActiveProperty.not());
-        this.mBtnQuitGame.disableProperty().bind(this.mIsGameActiveProperty.not());
-        this.mBtnBackReplay.disableProperty().bind(
-                Bindings.or(this.mIsReplayInProgressProperty.not(), this.mReplayAdapter.getCurrentTurnNumberInReplayProperty().isEqualTo(0)));
-
-        // Panes visibility bindings.
-        this.mVBoxGameDetails.visibleProperty().bind(this.mIsAppInInitModeProperty.not());
-        this.mVBoxPlayerDetails.visibleProperty().bind(this.mIsAppInInitModeProperty.not());
-
-        // Text listeners
-        this.mIsReplayInProgressProperty.addListener(this.mReplayTextChangingListener);
-        this.mIsGameActiveProperty.addListener(this.mRestartTextChangingListener);
-    }
-
-    @FXML
-    public void loadFile() {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Select xml file");
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("xml files", "*.xml"));
-        File selectedFile = fileChooser.showOpenDialog(new Stage());
-
-        if (selectedFile == null) {
-            return;
-        } else {
-            this.mBottomProgressPane.setVisible(true);
-
-            this.clear();
-            ReadGameFileTask readGameFileTask = new ReadGameFileTask(selectedFile.getAbsolutePath(), this.mLogic,
-                    this::onReadGameFileFinish, this::onReadGameFileError);
-            this.bindTaskToUI(readGameFileTask);
-            // TODO: make it so setCenter doesn't "pull" top, left and right panes towards the center.
-            new Thread(readGameFileTask).start();
-        }
-    }
-
-    private void bindTaskToUI(ReadGameFileTask readGameFileTask) {
-        // task message
-        this.mProgressTextLabel
-                .textProperty()
-                // Concat between "task message" + "task percentage" + "%"
-                .bind(Bindings.concat(
-                        readGameFileTask.messageProperty(),
-                        Bindings.format(
-                                " (Progress: %.0f",
-                                Bindings.multiply(
-                                        readGameFileTask.progressProperty(),
-                                        100)),
-                        " %)")
-                );
-
-        // task progress bar
-        this.mProgressBar.progressProperty().bind(readGameFileTask.progressProperty());
-    }
-
-    private void onReadGameFileFinish() {
-        Platform.runLater(
-                () -> {
-                    this.updateUIAfterGameFileRead();
-                    this.mPlayerDetailsController.setPlayersDetails(GameSettings.getInstance().getPlayers());
-                    this.mIsAppInInitModeProperty.setValue(false);
-                    this.mIsFileGameLoaded.setValue(true);
-                });
-    }
-
-    private void onReadGameFileError(String errorDescription) {
-        Platform.runLater(
-                () -> this.showAlert("File error!", errorDescription)
-        );
-    }
-
-    private void updateUIAfterGameFileRead() {
-        this.mBottomProgressPane.setVisible(false);
-        this.mBoardController = new BoardController(GameSettings.getInstance().getRows(), GameSettings.getInstance().getColumns(), this);
-        this.mBoardController.InitBoard();
-        this.mBorderPane.setCenter(this.mBoardController.getBoardPane());
-        this.initImageManagerWithPlayerImages();
-        this.mLblTargetSize.setText("Target: " + Integer.toString(GameSettings.getInstance().getTarget()));
-        this.mLblVariant.setText("Variant: " + GameSettings.getInstance().getVariant().name());
+    private void initGameDetailsPane() {
+        this.mLblTargetSize.setText("Target: " + Integer.toString(this.mNinaRowHTTPClientLogic.getmGameData().getmTarget()));
+        this.mLblVariant.setText("Variant: " + this.mNinaRowHTTPClientLogic.getmGameData().getmVariant());
         this.mCurrentTurnProperty.setValue(0);
         this.mLblTurnNumber.textProperty().bind(
                 Bindings.concat(
@@ -230,42 +123,32 @@ public class App implements IBoardControllerDelegate, ILogicDelegate {
         );
     }
 
-    @FXML
-    void startGame() {
-        // Start game only if game is not in progress - could happen when user tries to restart game while
-        // The computer player is playing.
-        if(!this.mIsTurnInProgress) {
-            if (GameSettings.getInstance().getPlayers().size() > 1) {
-                this.mBoardController.getBoardPane().setDisable(false);
-                this.mBoardController.ResetBoard();
-                setLabelsStyle(LABEL_STYLE_DEFAULT);
-                this.mPlayerDetailsController.reset();
-                this.mCurrentTurnProperty.setValue(0);
-                this.mLogic.StartGame();
-            } else {
-                this.showAlert("Now hold on just a minute.", "We will not allow you to play alone! The game requires at least 2 players to start");
-            }
-        }
+    private void initBoardPane() {
+        this.mBoardController = new BoardController(this.mNinaRowHTTPClientLogic.getmGameData().getmRows(), this.mNinaRowHTTPClientLogic.getmGameData().getmColumns(), this);
+        this.mBoardController.InitBoard();
+        this.mBorderPane.setCenter(this.mBoardController.getBoardPane());
     }
 
-    public void setOnAction() {
-        this.mBtnLoadFile.setOnAction(e -> loadFile());
-        this.mBtnStartGame.setOnAction(e -> {
-            try {
-                this.mIsFileGameLoaded.setValue(false);
-                this.mIsGameActiveProperty.setValue(true);
-                this.startGame();
-                changeOpacity(HIGH_OPACITY);
-            } catch (Exception e1) {
-                // This method throws an exception that should'nt occure. If it does, then theres something wrong with the computer player algo.
-                e1.printStackTrace();
-            }
-        });
 
-        this.mBtnExitGame.setOnMouseClicked(e -> exitGame());
+    private void setDefaultDesign() {
+        this.mVBoxGameDetails.setId("mVBoxGameDetails");
+        changeOpacity(LOW_OPACITY);
+        this.mTheme.setDefaultTheme();
+        setTheme(eThemeType.Default);
+        changeTheme();
     }
 
-    private void exitGame() {
+    private void initBinding() {
+        //disabled binding
+        this.mBtnReplay.disableProperty().bind(this.mIsGameActiveProperty.not());
+        this.mBtnBackReplay.disableProperty().bind(
+                Bindings.or(this.mIsReplayInProgressProperty.not(), this.mReplayAdapter.getCurrentTurnNumberInReplayProperty().isEqualTo(0)));
+
+        // Text listeners
+        this.mIsReplayInProgressProperty.addListener(this.mReplayTextChangingListener);
+    }
+
+    private void onExitGame(MouseEvent e) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Exit Game");
         alert.setHeaderText("Exit Game Button pressed");
@@ -279,26 +162,24 @@ public class App implements IBoardControllerDelegate, ILogicDelegate {
             }
 
             this.mIsGameActiveProperty.setValue(false);
-            this.mIsAppInInitModeProperty.setValue(true);
             this.mComboBoxTheame.setValue(eThemeType.Default);
             this.setDefaultDesign();
-            this.mLogic.exitGame();
+            this.mNinaRowHTTPClientLogic.exitGame();
             this.clear();
-            this.mOnPlayerQuitGame.run();
+            this.mOnCurrentPlayerLeftGame.run();
         }
     }
 
     private void initImageManagerWithPlayerImages() {
         List<String> playerIDs = new ArrayList<>();
+        ImageManager.Clear(); // Reset existing images if there are any.
 
-        GameSettings
-                .getInstance()
+        this.mNinaRowHTTPClientLogic
                 .getPlayers()
                 .forEach(
-                        player -> playerIDs.add(player.getID())
+                        player -> playerIDs.add(player.getName())
                 );
 
-        ImageManager.Clear(); // Reset existing images if there are any.
         ImageManager.SetImagesForPlayerIDs(playerIDs);
     }
 
@@ -311,7 +192,6 @@ public class App implements IBoardControllerDelegate, ILogicDelegate {
         this.mBtnForwardReplay.setOnMouseClicked(this::onForwardReplayButtonClick);
 
         this.mBtnForwardReplay.setDisable(true); // Manually set forward button's disableness
-        //TODO: remove temp adding buttons manually
         this.mGridPaneConfig.add(this.mBtnBackReplay, 4, 0);
         this.mGridPaneConfig.add(this.mBtnReplay, 5, 0);
         this.mGridPaneConfig.add(this.mBtnForwardReplay, 6, 0);
@@ -324,7 +204,7 @@ public class App implements IBoardControllerDelegate, ILogicDelegate {
             this.mBtnForwardReplay.setDisable(true); // Manually set forward button's disableness
         } else {
             // Replay is not in progress - User wants to start replaying.
-            this.mReplayAdapter.start(this.mLogic.GetTurnHistory());
+            this.mReplayAdapter.start(this.mNinaRowHTTPClientLogic.GetTurnHistory());
             this.mBoardController.disableAllPopoutButtons();
             // Replay just begun, we start at the final turn - can't go forward in replay.
             this.mBtnForwardReplay.setDisable(true); // Manually set forward button's disableness
@@ -352,7 +232,35 @@ public class App implements IBoardControllerDelegate, ILogicDelegate {
         }
     }
 
-    // ILogicDelegate Implementation
+    // IHTTPClientDelegate implementation
+
+    @Override
+    public void myTurnStarted() {
+        Platform.runLater(this::handlePopoutUIIfNeeded);
+    }
+
+    @Override
+    public void gameStarted() {
+        setLabelsStyle(LABEL_STYLE_DEFAULT);
+        Platform.runLater(
+                () -> {
+                    this.showAlert("The game has begun!", "Best of luck.");
+                    this.mBoardController.getBoardPane().setDisable(false);
+                    this.mBoardController.ResetBoard();
+                    this.initImageManagerWithPlayerImages(); // Do this when game starts because that's when all players are present.
+                    this.mPlayerDetailsController.reset();
+                    this.mCurrentTurnProperty.setValue(0);
+                    this.mIsGameActiveProperty.setValue(true);
+                }
+        );
+    }
+
+    @Override
+    public void updatePlayers(List<Player> playerList) {
+        Platform.runLater(
+                () -> this.mPlayerDetailsController.setPlayersDetails(playerList)
+        );
+    }
 
     @Override
     public void onTurnPlayedSuccess(PlayedTurnData playedTurnData) {
@@ -363,33 +271,27 @@ public class App implements IBoardControllerDelegate, ILogicDelegate {
 
     @Override
     public void discAddedToFullColumn(int column) {
-        try {
-            this.mBoardController.handelInvalidAction(column, eInvalidMoveType.ColumnFull); //notify user
-        } catch (InterruptedException e) {
-            System.out.println("SleepError. "+ e.getMessage());
-        }
+        Platform.runLater(
+                () -> {
+                    try {
+                        this.mBoardController.handelInvalidAction(column, eInvalidMoveType.ColumnFull); //notify user
+                    } catch (InterruptedException e) {
+                        System.out.println("SleepError. " + e.getMessage());
+                    }
+                }
+        );
     }
 
     @Override
     public void currentPlayerCannotPopoutAtColumn(int column) {
-        try {
-            this.mBoardController.handelInvalidAction(column, eInvalidMoveType.InvalidPopout);
-        } catch (InterruptedException e) {
-            System.out.println("SleepError. "+ e.getMessage());
-        }
-    }
-
-    @Override
-    public void turnInProgress() {
-        // Turn is in progress, human player cannot make any moves.
-        this.mIsTurnInProgress = true;
-    }
-
-    @Override
-    public void noTurnInProgress() {
-        // Notify (in the UI thread) that there's no longer a turn in progress.
         Platform.runLater(
-                () -> this.mIsTurnInProgress = false
+                () -> {
+                    try {
+                        this.mBoardController.handelInvalidAction(column, eInvalidMoveType.InvalidPopout);
+                    } catch (InterruptedException e) {
+                        System.out.println("SleepError. " + e.getMessage());
+                    }
+                }
         );
     }
 
@@ -397,12 +299,8 @@ public class App implements IBoardControllerDelegate, ILogicDelegate {
 
     @Override
     public void PopoutBtnClicked(int btnIndex) {
-        try {
-            PlayTurnParameters playTurnParameters = new PlayTurnParameters(btnIndex, eTurnType.Popout);
-            this.playTurn(playTurnParameters);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
+        PlayTurnParameters playTurnParameters = new PlayTurnParameters(btnIndex, eTurnType.Popout);
+        this.playTurn(playTurnParameters);
     }
 
     @Override
@@ -411,23 +309,27 @@ public class App implements IBoardControllerDelegate, ILogicDelegate {
         this.playTurn(playTurnParameters);
     }
 
-    private void playTurn(PlayTurnParameters playTurnParameters)  {
-        // Cannot play turn if the computer player is in progress or replay is in progress.
+    @Override
+    public boolean isPopoutAllowed() {
+        return this.mNinaRowHTTPClientLogic.isPopoutAllowed();
+    }
 
-        if(this.mLogic.GetGameState().equals(eGameState.Active)) {
-            if(!this.mIsTurnInProgress) { // TODO: after game won/draw turn in progress is stuck as true.
-                if(!this.mIsReplayInProgressProperty.getValue()) {
-                    this.mLogic.playTurnAsync(playTurnParameters);
+    private void playTurn(PlayTurnParameters playTurnParameters)  {
+
+        if(this.mNinaRowHTTPClientLogic.isGameActive()) { // Check if game is active.
+            if(!this.mNinaRowHTTPClientLogic.isMyTurn()) { // Check if its the user's turn.
+                if(!this.mIsReplayInProgressProperty.getValue()) { // Check if a replay is in progress.
+                    this.mNinaRowHTTPClientLogic.playTurnAsync(playTurnParameters); // Play turn.
                 } else {
-                    // Replay in progress
+                    // Handle replay in progress.
                     this.showAlert("Oh no you didn't", "Cannot play turn while replay is in progress.");
                 }
             } else {
-                // Computer player turn in progress.
-                // Notify user that the computer is making his turn.
+                // Handle not the user's turn.
+                this.showAlert("Follow the damn rules!", "Cannot play turn while another precious soul is playing.");
             }
         } else {
-            // Game no longer active.
+            // Handle game is no longer active.
             this.showAlert("Cannot play turn after the game has ended.", "Either restart or move on with your life.");
         }
     }
@@ -440,7 +342,7 @@ public class App implements IBoardControllerDelegate, ILogicDelegate {
         this.handleBoardControllerUIAfterTurn(turnData);
         this.handlePlayerDetailsControllerUIAfterTurn(turnData, isReverseTurn);
         this.handleGameDetailsUIAfterTurn(isReverseTurn);
-        //TODO: remove marked border from current player that moved
+
         if(!this.mIsReplayInProgressProperty.getValue()) {
             this.handleGameStateEvents(turnData.getGameState());
         }
@@ -448,12 +350,19 @@ public class App implements IBoardControllerDelegate, ILogicDelegate {
 
     private void handleGameStateEvents(eGameState gameState) {
         if(gameState.equals(eGameState.Won)) {
-            Map<Player, Collection<Cell>> playerToWinningSequenceMap = this.mLogic.getPlayerToWinningSequencesMap();
-            this.mBoardController.DisplayWinningSequences(playerToWinningSequenceMap);
-            gameWonMsg(playerToWinningSequenceMap.keySet());
+            this.mNinaRowHTTPClientLogic.fetchPlayerToWinningSequencesMap(this::finishedFetchingWinningSequencesMap); // Response through delegate.
         } else if (gameState.equals(eGameState.Draw)) {
             this.showAlert("Draw!", "The game has ended in a draw. Please start a new game or exit.");
         }
+    }
+
+    public void finishedFetchingWinningSequencesMap(Map<Player, Collection<Cell>> playerToWinningSequenceMap) {
+        Platform.runLater(
+                () -> {
+                    this.mBoardController.DisplayWinningSequences(playerToWinningSequenceMap);
+                    gameWonMsg(playerToWinningSequenceMap.keySet());
+                }
+        );
     }
 
     private void handleGameDetailsUIAfterTurn(boolean isReverseTurn) {
@@ -482,15 +391,23 @@ public class App implements IBoardControllerDelegate, ILogicDelegate {
             this.mBoardController.UpdateDiscs(turnData.getUpdatedCellsCollection());
             this.mBoardController.UpdateDiscs(turnData.getUpdatedCellsCollection());
         }
+    }
 
-        boolean shouldEnablePopoutButtons = !this.mIsReplayInProgressProperty.getValue() && GameSettings.getInstance().getVariant().equals(eVariant.Popout);
+    private void handlePopoutUIIfNeeded() {
+        boolean shouldEnablePopoutButtons = !this.mIsReplayInProgressProperty.getValue();
 
         if(shouldEnablePopoutButtons) {
             // Enable popout buttons that the user is allowed to click.
-            List<Integer> availablePopoutColumnSortedList = this.mLogic.getAvailablePopoutColumnsForCurrentPlayer();
-            this.mBoardController.DisablePopoutButtonsForColumns(availablePopoutColumnSortedList);
+            this.mNinaRowHTTPClientLogic.fetchAvailablePopoutColumnsForCurrentPlayer(this::finishedFetchingAvailableColumnsForPopout); // Response through delegate.
         }
     }
+
+    private void finishedFetchingAvailableColumnsForPopout(List<Integer> availablePopoutColumnsForCurrentUser) {
+        Platform.runLater(
+                () -> this.mBoardController.DisablePopoutButtonsForColumns(availablePopoutColumnsForCurrentUser)
+        );
+    }
+
 
     private void gameWonMsg(Set<Player> winnersSet) {
         Set<String> winnerNamesSet = winnersSet.stream().map(Player::getName).collect(Collectors.toSet());
@@ -521,6 +438,9 @@ public class App implements IBoardControllerDelegate, ILogicDelegate {
 
         this.mTheme.setAviadTheme();
     }
+
+
+    // Theme
 
     public void changeTheme(){
       //  this.mScrollPane.setStyle(this.mTheme.getCurrentThemeBackground());
@@ -571,8 +491,6 @@ public class App implements IBoardControllerDelegate, ILogicDelegate {
     }
 
     private void setButtonsFill(String style) {
-        this.mBtnStartGame.setStyle(style);
-        this.mBtnLoadFile.setStyle(style);
         this.mComboBoxTheame.setStyle(style);
         this.mBtnReplay.setStyle(style);
         this.mBtnForwardReplay.setStyle(style);

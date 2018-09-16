@@ -1,11 +1,12 @@
 package UI.UIMisc;
 
+import Logic.Enums.eVariant;
 import UI.Enums.eGameState;
 
 public class GameDescriptionData {
 
     private eGameState mGameState;
-    private String mGameType;
+    private eVariant mVariant; //TODO: change to eGameType enum!!
     private int mRows;
     private int mColumns;
     private int mMaxPlayers;
@@ -22,12 +23,12 @@ public class GameDescriptionData {
         this.mGameState = mGameState;
     }
 
-    public String getmGameType() {
-        return mGameType;
+    public eVariant getmVariant() {
+        return mVariant;
     }
 
-    public void setmGameType(String mGameType) {
-        this.mGameType = mGameType;
+    public void setmVariant(eVariant mVariant) {
+        this.mVariant = mVariant;
     }
 
     public int getmRows() {

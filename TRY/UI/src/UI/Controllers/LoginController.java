@@ -1,15 +1,26 @@
 package UI.Controllers;
 
+import Logic.Models.Player;
+import NinaRowHTTPClient.Login.ILoginClientLogicDelegate;
+import NinaRowHTTPClient.Login.LoginClientLogic;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 
 import javafx.scene.input.*;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+
+import java.io.IOException;
 import java.util.function.Consumer;
 
-public class LoginController {
-    private Consumer<String> mOnFinishedLogin; // TODO: maybe consumer<Player>?
+public class LoginController implements ILoginClientLogicDelegate {
+    private Consumer<Player> mOnFinishedLogin;
+    private LoginClientLogic mLoginClientLogic;
 
     @FXML
     private TextField muiNameTextField;
@@ -22,26 +33,29 @@ public class LoginController {
 
     @FXML
     private void initialize() {
+        this.mLoginClientLogic = new LoginClientLogic(this);
         this.muiLoginButton.setOnMouseClicked(this::onLoginClick);
         this.muiErrorLabel.setText(""); // Set error message to be invisible at the start.
     }
 
-    public void setmOnFinishedLogin(Consumer<String> mOnFinishedLogin) {
+    public void setmOnFinishedLogin(Consumer<Player> mOnFinishedLogin) {
         this.mOnFinishedLogin = mOnFinishedLogin;
     }
 
     private void onLoginClick(MouseEvent e) {
         String name = this.muiNameTextField.getText();
-
-        // TODO: send request to add player. call login error/success
-        this.onLoginSuccess(name);
+        this.mLoginClientLogic.performLogin(name);
     }
 
-    private void onLoginError(String errorMessage) {
-        this.muiErrorLabel.setText(errorMessage);
+    public void onLoginError(String errorMessage) {
+        Platform.runLater(
+                () -> this.muiErrorLabel.setText(errorMessage)
+        );
     }
 
-    private void onLoginSuccess(String playerID) {
-        this.mOnFinishedLogin.accept(playerID);
+    public void onLoginSuccess(Player player) {
+        Platform.runLater(
+                () -> this.mOnFinishedLogin.accept(player)
+        );
     }
 }

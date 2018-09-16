@@ -1,10 +1,15 @@
 package chat.servlets;
 
 import ChatLogicEngine.users.*;
+import Logic.Enums.ePlayerType;
+import Logic.Models.Player;
 import chat.constants.Constants;
 import chat.utils.SessionUtils;
 import chat.utils.ServletUtils;
+import com.google.gson.Gson;
+
 import java.io.IOException;
+import java.io.PrintWriter;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -35,9 +40,13 @@ public class LoginServlet extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
+        //response.setContentType("text/html;charset=UTF-8"); //TODO: figure out if returning JSON (and relying on JS) or html.
+        response.setContentType("application/json");
+        System.out.println("Entered login servlet.");
+
         String usernameFromSession = SessionUtils.getUsername(request);
         UserManager userManager = ServletUtils.getUserManager(getServletContext());
+
         if (usernameFromSession == null) {
             //user is not logged in yet
             String usernameFromParameter = request.getParameter(USERNAME);
@@ -50,18 +59,6 @@ public class LoginServlet extends HttpServlet {
                 //normalize the username value
                 usernameFromParameter = usernameFromParameter.trim();
 
-                /*
-                One can ask why not enclose all the synchronizations inside the userManager object ?
-                Well, the atomic question we need to perform here includes both the question (isUserExists) and (potentially) the insertion
-                of the new user (addUser). These two actions needs to be considered atomic, and synchronizing only each one of them solely is not enough.
-                (off course there are other more sophisticated and performable means for that (atomic objects etc) but these are not in our scope)
-
-                The synchronized is on this instance (the servlet).
-                As the servlet is singleton - it is promised that all threads will be synchronized on the same instance (crucial here)
-
-                A better code would be to perform only as little and as nessessary things we need here inside the synchronized block and avoid
-                do here other not related actions (such as request dispatcher\redirection etc. this is shown here in that manner just to stress this issue
-                 */
                 synchronized (this) {
                     if (userManager.isUserExists(usernameFromParameter)) {
                         String errorMessage = "Username " + usernameFromParameter + " already exists. Please enter a different username.";
@@ -69,21 +66,35 @@ public class LoginServlet extends HttpServlet {
                         // with a parameter that indicates that an error should be displayed
                         // the request dispatcher obtained from the servlet context is one that MUST get an absolute path (starting with'/')
                         // and is relative to the web app root
-                        // see this link for more details:
-                        // http://timjansen.github.io/jarfiller/guide/servlet25/requestdispatcher.xhtml
-                        request.setAttribute(Constants.USER_NAME_ERROR, errorMessage);
-                        getServletContext().getRequestDispatcher(LOGIN_ERROR_URL).forward(request, response);
-                    } else {
-                        //add the new user to the users list
-                        userManager.addUser(usernameFromParameter);
-                        //set the username in a session so it will be available on each request
-                        //the true parameter means that if a session object does not exists yet
-                        //create a new one
-                        request.getSession(true).setAttribute(Constants.USERNAME, usernameFromParameter);
 
-                        //redirect the request to the chat room - in order to actually change the URL
-                        System.out.println("On login, request URI is: " + request.getRequestURI());
-                        response.sendRedirect(CHAT_ROOM_URL);
+                        //request.setAttribute(Constants.USER_NAME_ERROR, errorMessage);
+                        //getServletContext().getRequestDispatcher(LOGIN_ERROR_URL).forward(request, response);
+                        response.setStatus(499);
+                    } else {
+                        userManager.addUser(usernameFromParameter);
+                        Player logingPlayer = new Player();
+                        logingPlayer.setTurnCounter(0);
+                        logingPlayer.setType(ePlayerType.Human);
+                        logingPlayer.setName(usernameFromParameter);
+
+                        Gson gson = new Gson();
+                        String playerJson = gson.toJson(logingPlayer);
+                        System.out.println(playerJson);
+                        try (PrintWriter out = response.getWriter()) {
+                            out.print(playerJson);
+                            out.flush();
+                        }
+                        //TODO: figure out if returning JSON (and relying on JS) or html.
+//                        //add the new user to the users list
+//                        userManager.addUser(usernameFromParameter);
+//                        //set the username in a session so it will be available on each request
+//                        //the true parameter means that if a session object does not exists yet
+//                        //create a new one
+//                        request.getSession(true).setAttribute(Constants.USERNAME, usernameFromParameter);
+//
+//                        //redirect the request to the chat room - in order to actually change the URL
+//                        System.out.println("On login, request URI is: " + request.getRequestURI());
+//                        response.sendRedirect(CHAT_ROOM_URL);
                     }
                 }
             }

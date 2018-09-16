@@ -1,5 +1,6 @@
 package UI.Controllers;
 
+import Logic.Enums.eVariant;
 import UI.Enums.eGameState;
 import UI.UIMisc.GameDescriptionData;
 import javafx.fxml.FXML;
@@ -67,7 +68,7 @@ public class LobbyController {
         //TODO: set interval for getting games. For now, dummy init games.
         GameDescriptionData data = new GameDescriptionData();
         data.setmGameState(eGameState.Ready);
-        data.setmGameType("Popout");
+        data.setmVariant(eVariant.Popout);
         data.setmRows(7);
         data.setmColumns(8);
         data.setmCurrentNumberOfPlayers(2);
@@ -77,6 +78,21 @@ public class LobbyController {
         data.setmUploaderName("Dividend");
 
         GameDescriptionController controller = new GameDescriptionController(data, this::onJoinGameClick);
+        this.muiGameDetailsFlowPane.getChildren().add(controller.getRoot());
+
+        GameDescriptionData data2 = new GameDescriptionData();
+
+        data2.setmGameState(eGameState.Ready);
+        data2.setmVariant(eVariant.Circular);
+        data2.setmRows(5);
+        data2.setmColumns(5);
+        data2.setmCurrentNumberOfPlayers(4);
+        data2.setmMaxPlayers(6);
+        data2.setmTarget(3);
+        data2.setmGameName("Second best game, but still a pretty decent game altogether. I mean, can't really complain.");
+        data2.setmUploaderName("Dividend's wonderful dream of love");
+
+        controller = new GameDescriptionController(data2, this::onJoinGameClick);
         this.muiGameDetailsFlowPane.getChildren().add(controller.getRoot());
     }
 
@@ -91,6 +107,4 @@ public class LobbyController {
     public void setmOnLogout(Runnable mOnLogout) {
         this.mOnLogout = mOnLogout;
     }
-
-
 }
