@@ -7,6 +7,8 @@ import java.util.stream.Collectors;
 
 public class Board{
     private Cell[][] mBoard;
+    private int mRows;
+    private int mColumns;
 
     public Board(int numRows, int numCols) {
         this.Init(numRows, numCols);
@@ -22,11 +24,23 @@ public class Board{
                 mBoard[i][j].setColumnIndex(j);
             }
         }
+
+        this.mRows = numRows;
+        this.mColumns = numCols;
     }
 
     public Cell[][] getCellArray() {
         return mBoard;
     }
+
+    public int getRows() {
+        return mRows;
+    }
+
+    public int getColumns() {
+        return mColumns;
+    }
+
 
     public Cell UpdateBoard(int column, Player player) throws InvalidUserInputException {
         // Selected column is full
@@ -53,7 +67,7 @@ public class Board{
         List<Integer> popoutAvailableColumnSortedList = new ArrayList<>();
         int lastRowIndex = mBoard.length - 1;
 
-        for(int i = 0; i < GameSettings.getInstance().getColumns(); i++) { // Go over columns.
+        for(int i = 0; i < this.mColumns; i++) { // Go over columns.
             if(this.mBoard[lastRowIndex][i].getPlayer() != null && this.mBoard[lastRowIndex][i].getPlayer().equals(mPlayer)) { // Check cell in column's last row.
                 popoutAvailableColumnSortedList.add(i); // If cell belongs to the current player, player can popout at column - add to list.
             }
@@ -110,7 +124,7 @@ public class Board{
         boolean isBoardFull = true;
 
         // Check if all columns are full
-        for(int i = 0; i < GameSettings.getInstance().getColumns(); i++) {
+        for(int i = 0; i < this.mColumns; i++) {
             if(!IsColumnFull(i)) {
                 isBoardFull = false; // Found a column that is not full.
                 break;
@@ -128,7 +142,7 @@ public class Board{
         Cell firstAvailableCell = null;
 
         // Start bottom to top and return the first empty cell.
-        for(int i = GameSettings.getInstance().getRows() - 1; i >= 0 ; i--) {
+        for(int i = this.mRows - 1; i >= 0 ; i--) {
             if(mBoard[i][columnIndex].isEmpty()) {
                 firstAvailableCell = mBoard[i][columnIndex];
                 break;

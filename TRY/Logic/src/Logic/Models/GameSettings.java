@@ -3,8 +3,6 @@ package Logic.Models;
 import Logic.Enums.eVariant;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 // This class will contain all of the game related details that were read from the XML file.
 
@@ -18,12 +16,13 @@ public class GameSettings implements Serializable {
     public static final int MIN_NUM_OF_PLAYERS = 2;
     public static final int MAX_NUM_OF_PLAYERS = 6;
 
-    private List<Player> mPlayers = new ArrayList<>();
     private int mGameNumberOfPlayers;
     private int mTarget;
     private int mRows;
     private int mColumns;
     private eVariant mVariant;
+    private String mUploaderName;
+    private String mGameName;
 
     private GameSettings() {
     }
@@ -52,10 +51,6 @@ public class GameSettings implements Serializable {
         return mVariant;
     }
 
-    public List<Player> getPlayers() {
-        return mPlayers;
-    }
-
     public void setTarget(int target) {
         this.mTarget = target;
     }
@@ -72,7 +67,19 @@ public class GameSettings implements Serializable {
         this.mVariant = variant;
     }
 
-    public void Clear(){
-        this.mPlayers.clear();
+    public String getUploaderName() {
+        return this.mUploaderName;
+    }
+
+    public void setUploaderName(String uploaderName) {
+        this.mUploaderName = uploaderName;
+    }
+
+    public String getmGameName() {
+        return mGameName;
+    }
+
+    public void setmGameName(String mGameName) {
+        this.mGameName = mGameName;
     }
 }

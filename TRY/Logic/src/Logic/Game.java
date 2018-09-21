@@ -11,11 +11,9 @@ import Logic.Exceptions.InvalidUserInputException;
 import Logic.Interfaces.IComputerPlayerAlgo;
 import Logic.Interfaces.IGameStatus;
 import Logic.Managers.FileManager;
-import Logic.Managers.HistoryFileManager;
 import Logic.Managers.HistoryManager;
 import Logic.Models.*;
 import Logic.SequenceSearchers.SequenceSearcher;
-import Logic.SequenceSearchers.SequenceSearcherStrategyFactory;
 
 import javax.xml.bind.JAXBException;
 import java.io.FileNotFoundException;
@@ -31,7 +29,8 @@ public class Game {
     private Board mGameBoard;
     private SequenceSearcher mSequenceSearcher;
     private IComputerPlayerAlgo mComputerPlayerAlgo;
-    private GameSettings mGameSettings;
+    private List<Player> mPlayerList;
+    private GameSettings mGameSettings; //TODO: assign game settings
 
     public Game() {
         this.mFileManager = new FileManager();
@@ -39,12 +38,12 @@ public class Game {
         this.mGameStatus = new GameStatus();
         this.mSequenceSearcher = new SequenceSearcher();
         this.mComputerPlayerAlgo = new ComputerPlayerAlgo();
+        this.mPlayerList = new ArrayList<>();
     }
 
     // ILogic interface implementation.
 
     public void ReadGameFile(String filePath, Runnable onLoadFileFinish, Runnable onFinishedCheckingFileValidity) throws FileNotFoundException, InvalidFileInputException, IOException, JAXBException, InterruptedException {
-        mGameSettings.Clear();
         this.mFileManager.LoadGameFile(filePath, onLoadFileFinish, onFinishedCheckingFileValidity);
         this.mGameBoard = new Board(mGameSettings.getRows(), mGameSettings.getColumns());
     }
@@ -54,7 +53,9 @@ public class Game {
         this.mGameBoard.Init(mGameSettings.getRows(), mGameSettings.getColumns());
         this.mSequenceSearcher.Clear();
         this.mSequenceSearcher.setBoard(this.mGameBoard);
-        this.mComputerPlayerAlgo.Init(this.mGameBoard);
+        this.mSequenceSearcher.setGameSettings(this.mGameSettings);
+        boolean isPopoutMode = this.mGameSettings.getVariant().equals(eVariant.Popout);
+        this.mComputerPlayerAlgo.Init(this.mGameBoard, this.mGameSettings, isPopoutMode);
         this.mHistoryManager.Clear();
         this.mGameStatus.StartNewGame();
     }
@@ -62,7 +63,7 @@ public class Game {
     public Map<Player, Collection<Cell>> getPlayerToWinningSequencesMap() {
         Map<Player, Collection<Cell>> playerToWinningSequenceMap;
 
-        if(mGameSettings.getPlayers().size() == 1) {
+        if(this.mPlayerList.size() == 1) {
             // Player won by default, not by winning sequence.
             playerToWinningSequenceMap = new HashMap<>();
             playerToWinningSequenceMap.put(this.GetCurrentPlayer(), null);
@@ -75,6 +76,22 @@ public class Game {
 
     public GameStatus GetGameStatus() {
         return mGameStatus;
+    }
+
+    public GameDescriptionData getGameDescriptionData() {
+        GameDescriptionData gameDescriptionData = new GameDescriptionData();
+
+        gameDescriptionData.setmGameName(this.mGameSettings.getmGameName());
+        gameDescriptionData.setmGameState(this.mGameStatus.getGameState());
+        gameDescriptionData.setmMaxPlayers(this.mGameSettings.getGameNumberOfPlayers());
+        gameDescriptionData.setmCurrentNumberOfPlayers(this.mPlayerList.size());
+        gameDescriptionData.setmVariant(this.mGameSettings.getVariant());
+        gameDescriptionData.setmRows(this.mGameSettings.getRows());
+        gameDescriptionData.setmColumns(this.mGameSettings.getColumns());
+        gameDescriptionData.setmTarget(this.mGameSettings.getTarget());
+        gameDescriptionData.setmUploaderName(this.mGameSettings.getUploaderName());
+
+        return gameDescriptionData;
     }
 
     private void executeTurn(PlayTurnParameters playTurnParameters) throws InvalidInputException {
@@ -146,7 +163,7 @@ public class Game {
         Collection<Cell> updatedCells = this.mGameBoard.RemoveAllPlayerDiscsFromBoardAndGetUpdatedCells(this.mGameStatus.getPlayer());
         playedTurnData.setUpdatedCellsCollection(updatedCells);
 
-        if(mGameSettings.getPlayers().size() > 2) {
+        if(this.mPlayerList.size() > 2) {
             if (this.mSequenceSearcher.CheckEntireBoardForWinningSequences()){  //run all over board and check if someone won
                 gameState = eGameState.Won;
             } else if(this.isDrawForNextPlayer()) {
@@ -217,8 +234,6 @@ public class Game {
         this.mGameBoard.Clear();
         this.mHistoryManager.Clear();
         this.mSequenceSearcher.Clear();
-        mGameSettings.Clear();
-        SequenceSearcherStrategyFactory.ClearCache();
     }
 
     public List<Integer> getAvailablePopoutColumnsForCurrentPlayer() {
@@ -290,10 +305,10 @@ public class Game {
         // API
 
         private void StartNewGame() {
-            this.mPlayerIterator = mGameSettings.getPlayers().listIterator();
+            this.mPlayerIterator = mPlayerList.listIterator();
             this.mCurrentPlayer = this.mPlayerIterator.next();
             this.mGameState = eGameState.Active;
-            mGameSettings.getPlayers().forEach(
+            mPlayerList.forEach(
                     (player) -> player.setTurnCounter(0) // Reset turn counter
             );
             this.mGameStart = Instant.now();
@@ -308,10 +323,10 @@ public class Game {
         private void CurrentPlayerQuitGame() {
             // Was unable to perform this logic by using Iterator's remove function. Instead, using the following brute force technique.
             Player quittingPlayer = this.mCurrentPlayer;
-            int quittingPlayerIndex = mGameSettings.getPlayers().indexOf(quittingPlayer);
+            int quittingPlayerIndex = mPlayerList.indexOf(quittingPlayer);
 
-            mGameSettings.getPlayers().remove(quittingPlayer); // Remove current player.
-            this.mPlayerIterator = mGameSettings.getPlayers().listIterator(quittingPlayerIndex); // Reset iterator after list was changed.
+            mPlayerList.remove(quittingPlayer); // Remove current player.
+            this.mPlayerIterator = mPlayerList.listIterator(quittingPlayerIndex); // Reset iterator after list was changed.
             this.nextPlayer(); // Assign the current player to the iterator's next element.
         }
 
@@ -320,7 +335,7 @@ public class Game {
         private void nextPlayer() {
             // If done iterating over players, reset iterator.
             if(!this.mPlayerIterator.hasNext()) {
-                this.mPlayerIterator = mGameSettings.getPlayers().listIterator();
+                this.mPlayerIterator = mPlayerList.listIterator();
             }
 
             this.mCurrentPlayer = this.mPlayerIterator.next();
@@ -333,7 +348,7 @@ public class Game {
                 nextPlayer = this.mPlayerIterator.next(); // Go next and then set back to previous element
                 this.mPlayerIterator.previous();
             } else {
-                nextPlayer = mGameSettings.getPlayers().iterator().next(); // Get first element.
+                nextPlayer = mPlayerList.iterator().next(); // Get first element.
             }
 
             return nextPlayer;

@@ -67,13 +67,14 @@ public class FileManager {
     }
 
     private void setGameInfoData(Game gameInfo) {
-        GameSettings gameSettings = GameSettings.getInstance();
-        Board boardInfo = gameInfo.getBoard();
-
-        gameSettings.setColumns(boardInfo.getColumns().intValue());
-        gameSettings.setRows(boardInfo.getRows());
-        gameSettings.setTarget(gameInfo.getTarget().intValue());
-        gameSettings.setVariant(eVariant.valueOf(gameInfo.getVariant()));
+        //TODO: change how game settings is set.
+//        GameSettings gameSettings = GameSettings.getInstance();
+//        Board boardInfo = gameInfo.getBoard();
+//
+//        gameSettings.setColumns(boardInfo.getColumns().intValue());
+//        gameSettings.setRows(boardInfo.getRows());
+//        gameSettings.setTarget(gameInfo.getTarget().intValue());
+//        gameSettings.setVariant(eVariant.valueOf(gameInfo.getVariant()));
     }
 
     // Parameter is generated player class.
@@ -83,7 +84,7 @@ public class FileManager {
                 playerFromFile -> {
                     Logic.Models.Player newPlayer = new Logic.Models.Player();
                     newPlayer.init(playerFromFile.getName(), ePlayerType.valueOf(playerFromFile.getType()));
-                    GameSettings.getInstance().getPlayers().add(newPlayer);
+                    //GameSettings.getInstance().getPlayers().add(newPlayer);
                 }
         );
     }

@@ -11,11 +11,16 @@ import java.util.*;
 public class ComputerPlayerAlgo implements IComputerPlayerAlgo {
     private Board mBoard; // The game board.
     private SequenceSearcher mSequenceSearcher;
+    private int mTarget;
+    private boolean isPopoutMode;
 
-    public void Init(Board board) {
+    public void Init(Board board, GameSettings gameSettings, boolean isPopoutMode) {
         this.mBoard = board;
         mSequenceSearcher = new SequenceSearcher();
         mSequenceSearcher.setBoard(mBoard);
+        this.mTarget = gameSettings.getTarget();
+        this.mSequenceSearcher.setGameSettings(gameSettings);
+        this.isPopoutMode = isPopoutMode;
     }
 
     @Override
@@ -37,7 +42,7 @@ public class ComputerPlayerAlgo implements IComputerPlayerAlgo {
     @Override
     public boolean hasNextPlay(Player playingPlayer) {
         boolean isBoardFull = mBoard.IsBoardFull();
-        boolean canPopout = GameSettings.getInstance().getVariant().equals(eVariant.Popout) && mBoard.CanPlayerPerformPopout(playingPlayer);
+        boolean canPopout = this.isPopoutMode && mBoard.CanPlayerPerformPopout(playingPlayer);
 
         return !isBoardFull || canPopout; // If the board is full and the computer player is unable to popout - Draw.
     }
@@ -45,7 +50,7 @@ public class ComputerPlayerAlgo implements IComputerPlayerAlgo {
     private int getPopoutColumn(Player playingPlayer) {
         int selectedColumn = 0;
 
-        for(int i = 0; i < GameSettings.getInstance().getColumns(); i++) {
+        for(int i = 0; i < this.mBoard.getColumns(); i++) {
             if(mBoard.CanPlayerPerformPopoutForColumn(playingPlayer, i)) {
                 selectedColumn = i;
                 break;
@@ -57,7 +62,7 @@ public class ComputerPlayerAlgo implements IComputerPlayerAlgo {
 
     private boolean shouldPopout(Player playingPlayer){
         boolean isBoardFull = mBoard.IsBoardFull();
-        boolean canPopout = GameSettings.getInstance().getVariant().equals(eVariant.Popout) && mBoard.CanPlayerPerformPopout(playingPlayer);
+        boolean canPopout = isPopoutMode && mBoard.CanPlayerPerformPopout(playingPlayer);
         boolean shouldPopout = false;
 
         if(isBoardFull && canPopout) {
@@ -71,7 +76,7 @@ public class ComputerPlayerAlgo implements IComputerPlayerAlgo {
     private int getColumnIndexOfLargestSequence(Player playingPlayer) {
         Map<Cell, Integer> firstAvailableCellToMaxSequenceLengthMap = new HashMap<>(); // a list of all the cells that are available for disc insertion
 
-        for(int i = 0; i < GameSettings.getInstance().getColumns(); i++) {
+        for(int i = 0; i < this.mBoard.getColumns(); i++) {
             Cell firstAvailableCellInColumn = this.mBoard.getFirstAvailableCellForColumn(i);
 
             if(firstAvailableCellInColumn == null) {
@@ -110,7 +115,7 @@ public class ComputerPlayerAlgo implements IComputerPlayerAlgo {
     private int getFirstAvailableColumn() {
         int selectedColumn = 0;
 
-        for(int i = 0; i < GameSettings.getInstance().getColumns(); i++) {
+        for(int i = 0; i < this.mBoard.getColumns(); i++) {
             if(!mBoard.IsColumnFull(i)) {
                 selectedColumn = i;
                 break;

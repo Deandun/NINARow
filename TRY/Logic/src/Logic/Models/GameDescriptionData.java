@@ -1,7 +1,9 @@
-package UI.UIMisc;
+package Logic.Models;
 
+// A class that holds the relevant game information according to Ex03.
+
+import Logic.Enums.eGameState;
 import Logic.Enums.eVariant;
-import UI.Enums.eGameState;
 
 public class GameDescriptionData {
 

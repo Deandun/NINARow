@@ -4,6 +4,12 @@ import Logic.Interfaces.ISequenceSearcherStrategy;
 import Logic.Models.GameSettings;
 
 public class BotLeftSequenceSearcherStrategy implements ISequenceSearcherStrategy {
+    int mNumberOfRows;
+
+    public BotLeftSequenceSearcherStrategy(int rows) {
+        this.mNumberOfRows = rows;
+    }
+
     @Override
     public int GetNextRow(int currentRow) {
         return currentRow + 1;
@@ -16,6 +22,6 @@ public class BotLeftSequenceSearcherStrategy implements ISequenceSearcherStrateg
 
     @Override
     public boolean shouldStopLooking(int row, int column) {
-        return row >= GameSettings.getInstance().getRows() || column < 0;
+        return row >= this.mNumberOfRows || column < 0;
     }
 }

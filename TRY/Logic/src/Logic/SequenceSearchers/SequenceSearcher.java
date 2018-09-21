@@ -10,11 +10,16 @@ import Logic.Models.Player;
 import java.util.*;
 
 public class SequenceSearcher {
-    private Cell[][] mBoard;
+    private Board mBoard;
     private Map<Player, Collection<Cell>> mPlayerToWinningSequencesMap = new HashMap<>(); // A map between a player's ID and his winning sequence (if exists)
+    private GameSettings mGameSettings;
+    private Map<eSequenceSearcherType, ISequenceSearcherStrategy> mTypeToStrategyCache = new HashMap<>();
 
+    public void setGameSettings(GameSettings gameSettings) {
+        this.mGameSettings = gameSettings;
+    }
     public void setBoard(Board board) {
-        mBoard = board.getCellArray();
+        this.mBoard = board;
     }
 
     public Map<Player, Collection<Cell>> getPlayerToWinningSequencesMap() {
@@ -22,13 +27,15 @@ public class SequenceSearcher {
     }
 
     public void Clear() {
-        mPlayerToWinningSequencesMap.clear();
-        mBoard = null;
+        this.mPlayerToWinningSequencesMap.clear();
+        this.mTypeToStrategyCache.clear();
+        this.mBoard = null;
+        this.mGameSettings = null;
     }
 
     public boolean CheckEntireBoardForWinningSequences() {
         // Check for winning sequences in all of the boards columns.
-        for(int i = 0; i < GameSettings.getInstance().getColumns(); i++) {
+        for(int i = 0; i < this.mBoard.getColumns(); i++) {
             this.CheckColumnForWinningSequences(i);
         }
 
@@ -37,8 +44,8 @@ public class SequenceSearcher {
 
     public boolean CheckColumnForWinningSequences(int column) {
         // Check for winning sequences in all of the column's cells
-        for(int i = 0; i < GameSettings.getInstance().getRows(); i++) {
-            this.CheckCellForWinningSequence(mBoard[i][column]);
+        for(int i = 0; i < this.mBoard.getRows(); i++) {
+            this.CheckCellForWinningSequence(this.mBoard.getCellArray()[i][column]);
         }
 
         return !mPlayerToWinningSequencesMap.isEmpty(); // If winning sequence is found, winning sequences map won't be empty;
@@ -73,7 +80,7 @@ public class SequenceSearcher {
     }
 
     private boolean isSequenceBigEnough(Collection<Cell> cellSequence, Player player) {
-        boolean isSequenceBigEnough = cellSequence.size() >= GameSettings.getInstance().getTarget();
+        boolean isSequenceBigEnough = cellSequence.size() >= this.mGameSettings.getTarget();
 
         if(isSequenceBigEnough) {
             mPlayerToWinningSequencesMap.put(player, cellSequence);
@@ -91,7 +98,7 @@ public class SequenceSearcher {
         int currentColumn = updatedCell.getColumnIndex();
 
         while(isSamePlayer) {
-            cellSequence.add(mBoard[currentRow][currentColumn]);
+            cellSequence.add(this.mBoard.getCellArray()[currentRow][currentColumn]);
             currentRow = sequenceSearcher.GetNextRow(currentRow);
             currentColumn = sequenceSearcher.GetNextColumn(currentColumn);
 
@@ -99,7 +106,7 @@ public class SequenceSearcher {
                 break;
             } else {
                 // True if cell is not empty and cell is occupied by the same player we're sequence searching for.
-                isSamePlayer = playerSequenceIsSearchedFor.equals(mBoard[currentRow][currentColumn].getPlayer());
+                isSamePlayer = playerSequenceIsSearchedFor.equals(this.mBoard.getCellArray()[currentRow][currentColumn].getPlayer());
             }
         }
 
@@ -117,8 +124,8 @@ public class SequenceSearcher {
 
     // Check horizontal sequence: "---"
     private Collection<Cell> getkHorizontalSequence(Cell sequenceStartingCell, Player playingPlayer) {
-        ISequenceSearcherStrategy rightSequenceSearcher = SequenceSearcherStrategyFactory.getSequenceSearcherStrategyForType(eSequenceSearcherType.Right);
-        ISequenceSearcherStrategy leftSequenceSearcher = SequenceSearcherStrategyFactory.getSequenceSearcherStrategyForType(eSequenceSearcherType.Left);
+        ISequenceSearcherStrategy rightSequenceSearcher = getStrategyForType(eSequenceSearcherType.Right);
+        ISequenceSearcherStrategy leftSequenceSearcher = getStrategyForType(eSequenceSearcherType.Left);
 
         return getSequenceFinalSet(sequenceStartingCell, rightSequenceSearcher, leftSequenceSearcher, playingPlayer);
     }
@@ -128,8 +135,8 @@ public class SequenceSearcher {
     //      |
     //      |
     private Collection<Cell> getVerticalSequence(Cell sequenceStartingCell, Player playingPlayer) {
-        ISequenceSearcherStrategy topSequenceSearcher = SequenceSearcherStrategyFactory.getSequenceSearcherStrategyForType(eSequenceSearcherType.Top);
-        ISequenceSearcherStrategy bottomSequenceSearcher = SequenceSearcherStrategyFactory.getSequenceSearcherStrategyForType(eSequenceSearcherType.Bottom);
+        ISequenceSearcherStrategy topSequenceSearcher = getStrategyForType(eSequenceSearcherType.Top);
+        ISequenceSearcherStrategy bottomSequenceSearcher = getStrategyForType(eSequenceSearcherType.Bottom);
         return getSequenceFinalSet(sequenceStartingCell, topSequenceSearcher, bottomSequenceSearcher, playingPlayer);
     }
 
@@ -139,17 +146,27 @@ public class SequenceSearcher {
     //    \           /
     private Collection<Cell> getMaxDiagonalSequence(Cell sequenceStartingCell, Player playingPlayer) {
         // Get bottom left to top right diagonal cell set.
-        ISequenceSearcherStrategy topRightSequenceSearcher = SequenceSearcherStrategyFactory.getSequenceSearcherStrategyForType(eSequenceSearcherType.TopRight);
-        ISequenceSearcherStrategy bottomLeftSequenceSearcher = SequenceSearcherStrategyFactory.getSequenceSearcherStrategyForType(eSequenceSearcherType.BottomLeft);
+        ISequenceSearcherStrategy topRightSequenceSearcher = getStrategyForType(eSequenceSearcherType.TopRight);
+        ISequenceSearcherStrategy bottomLeftSequenceSearcher = getStrategyForType(eSequenceSearcherType.BottomLeft);
         Set<Cell> finalBotLeftToTopRightDiagonalSet = getSequenceFinalSet(sequenceStartingCell, topRightSequenceSearcher, bottomLeftSequenceSearcher, playingPlayer);
 
         // Get top left to bottom right diagonal cell set.
-        ISequenceSearcherStrategy topLeftSequenceSearcher = SequenceSearcherStrategyFactory.getSequenceSearcherStrategyForType(eSequenceSearcherType.TopLeft);
-        ISequenceSearcherStrategy bottomRightSequenceSearcher = SequenceSearcherStrategyFactory.getSequenceSearcherStrategyForType(eSequenceSearcherType.BottomRight);
+        ISequenceSearcherStrategy topLeftSequenceSearcher = getStrategyForType(eSequenceSearcherType.TopLeft);
+        ISequenceSearcherStrategy bottomRightSequenceSearcher = getStrategyForType(eSequenceSearcherType.BottomRight);
         Set<Cell> finalTopLeftToBotRightDiagonalSet = getSequenceFinalSet(sequenceStartingCell, bottomRightSequenceSearcher, topLeftSequenceSearcher, playingPlayer);
 
         // Return max sequence
         return finalBotLeftToTopRightDiagonalSet.size() > finalTopLeftToBotRightDiagonalSet.size() ?
                 finalBotLeftToTopRightDiagonalSet : finalTopLeftToBotRightDiagonalSet;
+    }
+
+    private ISequenceSearcherStrategy getStrategyForType(eSequenceSearcherType type) {
+        // If strategy is not in cache, create a new one.
+        if(!this.mTypeToStrategyCache.containsKey(type)) {
+            ISequenceSearcherStrategy strategy = SequenceSearcherStrategyFactory.getSequenceSearcherStrategyForType(type, this.mGameSettings);
+            this.mTypeToStrategyCache.put(type, strategy);
+        }
+
+        return this.mTypeToStrategyCache.get(type);
     }
 }
