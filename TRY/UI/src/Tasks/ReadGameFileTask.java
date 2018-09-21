@@ -2,7 +2,7 @@ package Tasks;
 
 import Logic.Exceptions.InvalidFileInputException;
 import javafx.concurrent.Task;
-import Logic.Logic;
+import Logic.Game;
 
 import javax.xml.bind.JAXBException;
 import java.io.FileNotFoundException;
@@ -14,11 +14,11 @@ public class ReadGameFileTask extends Task<Void> {
     private String mAbsoluteGameFilePath;
     private Runnable mOnFinish;
     private Consumer<String> mOnErrorCallback;
-    private Logic mLogic;
+    private Game mGame;
 
-    public ReadGameFileTask(String absoluteGameFilePath, Logic logic, Runnable onFinish, Consumer<String> onErrorCallback) {
+    public ReadGameFileTask(String absoluteGameFilePath, Game game, Runnable onFinish, Consumer<String> onErrorCallback) {
         this.mAbsoluteGameFilePath = absoluteGameFilePath;
-        this.mLogic = logic;
+        this.mGame = game;
         this.mOnFinish = onFinish;
         this.mOnErrorCallback = onErrorCallback;
     }
@@ -47,7 +47,7 @@ public class ReadGameFileTask extends Task<Void> {
         String errorDescription = null;
 
         try {
-            this.mLogic.ReadGameFile(mAbsoluteGameFilePath, onLoadFileFinish, onFinishedCheckingFileValidity);
+            this.mGame.ReadGameFile(mAbsoluteGameFilePath, onLoadFileFinish, onFinishedCheckingFileValidity);
             didErrorOccur = false; // Only reach this line if error did not occur during file reading.
         } catch(FileNotFoundException e) {
             errorDescription = e.getMessage();

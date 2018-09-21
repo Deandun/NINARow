@@ -24,16 +24,16 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
 
-public class Logic{
-
+public class Game {
     private FileManager mFileManager;
     private HistoryManager mHistoryManager;
     private GameStatus mGameStatus;
     private Board mGameBoard;
     private SequenceSearcher mSequenceSearcher;
     private IComputerPlayerAlgo mComputerPlayerAlgo;
+    private GameSettings mGameSettings;
 
-    public Logic() {
+    public Game() {
         this.mFileManager = new FileManager();
         this.mHistoryManager = new HistoryManager();
         this.mGameStatus = new GameStatus();
@@ -44,14 +44,14 @@ public class Logic{
     // ILogic interface implementation.
 
     public void ReadGameFile(String filePath, Runnable onLoadFileFinish, Runnable onFinishedCheckingFileValidity) throws FileNotFoundException, InvalidFileInputException, IOException, JAXBException, InterruptedException {
-        GameSettings.getInstance().Clear();
+        mGameSettings.Clear();
         this.mFileManager.LoadGameFile(filePath, onLoadFileFinish, onFinishedCheckingFileValidity);
-        this.mGameBoard = new Board(GameSettings.getInstance().getRows(), GameSettings.getInstance().getColumns());
+        this.mGameBoard = new Board(mGameSettings.getRows(), mGameSettings.getColumns());
     }
 
     public void StartGame() {
         // Set game board
-        this.mGameBoard.Init(GameSettings.getInstance().getRows(), GameSettings.getInstance().getColumns());
+        this.mGameBoard.Init(mGameSettings.getRows(), mGameSettings.getColumns());
         this.mSequenceSearcher.Clear();
         this.mSequenceSearcher.setBoard(this.mGameBoard);
         this.mComputerPlayerAlgo.Init(this.mGameBoard);
@@ -62,7 +62,7 @@ public class Logic{
     public Map<Player, Collection<Cell>> getPlayerToWinningSequencesMap() {
         Map<Player, Collection<Cell>> playerToWinningSequenceMap;
 
-        if(GameSettings.getInstance().getPlayers().size() == 1) {
+        if(mGameSettings.getPlayers().size() == 1) {
             // Player won by default, not by winning sequence.
             playerToWinningSequenceMap = new HashMap<>();
             playerToWinningSequenceMap.put(this.GetCurrentPlayer(), null);
@@ -146,7 +146,7 @@ public class Logic{
         Collection<Cell> updatedCells = this.mGameBoard.RemoveAllPlayerDiscsFromBoardAndGetUpdatedCells(this.mGameStatus.getPlayer());
         playedTurnData.setUpdatedCellsCollection(updatedCells);
 
-        if(GameSettings.getInstance().getPlayers().size() > 2) {
+        if(mGameSettings.getPlayers().size() > 2) {
             if (this.mSequenceSearcher.CheckEntireBoardForWinningSequences()){  //run all over board and check if someone won
                 gameState = eGameState.Won;
             } else if(this.isDrawForNextPlayer()) {
@@ -205,10 +205,6 @@ public class Logic{
         return this.mGameStatus.getPlayer();
     }
 
-    public void SaveGame() throws IOException, ClassNotFoundException, Exception {
-        HistoryFileManager.SaveGameHistoryInXMLFile(GameSettings.getSavedGameFileName(), mHistoryManager.GetGameHistory());
-    }
-
     public Board getBoard() {
         return mGameBoard;
     }
@@ -221,7 +217,7 @@ public class Logic{
         this.mGameBoard.Clear();
         this.mHistoryManager.Clear();
         this.mSequenceSearcher.Clear();
-        GameSettings.getInstance().Clear();
+        mGameSettings.Clear();
         SequenceSearcherStrategyFactory.ClearCache();
     }
 
@@ -230,7 +226,7 @@ public class Logic{
     }
 
     private boolean isDrawForNextPlayer() {
-        boolean isPopoutGameMode = GameSettings.getInstance().getVariant().equals(eVariant.Popout);
+        boolean isPopoutGameMode = mGameSettings.getVariant().equals(eVariant.Popout);
         // Check if next player can perform popout. If he can't, and the board is full - game is in a draw.
         boolean canNextPlayerPopout = this.mGameBoard.CanPlayerPerformPopout(this.mGameStatus.getNextPlayer());
         boolean isBoardFull = this.mGameBoard.IsBoardFull();
@@ -294,10 +290,10 @@ public class Logic{
         // API
 
         private void StartNewGame() {
-            this.mPlayerIterator = GameSettings.getInstance().getPlayers().listIterator();
+            this.mPlayerIterator = mGameSettings.getPlayers().listIterator();
             this.mCurrentPlayer = this.mPlayerIterator.next();
             this.mGameState = eGameState.Active;
-            GameSettings.getInstance().getPlayers().forEach(
+            mGameSettings.getPlayers().forEach(
                     (player) -> player.setTurnCounter(0) // Reset turn counter
             );
             this.mGameStart = Instant.now();
@@ -312,10 +308,10 @@ public class Logic{
         private void CurrentPlayerQuitGame() {
             // Was unable to perform this logic by using Iterator's remove function. Instead, using the following brute force technique.
             Player quittingPlayer = this.mCurrentPlayer;
-            int quittingPlayerIndex = GameSettings.getInstance().getPlayers().indexOf(quittingPlayer);
+            int quittingPlayerIndex = mGameSettings.getPlayers().indexOf(quittingPlayer);
 
-            GameSettings.getInstance().getPlayers().remove(quittingPlayer); // Remove current player.
-            this.mPlayerIterator = GameSettings.getInstance().getPlayers().listIterator(quittingPlayerIndex); // Reset iterator after list was changed.
+            mGameSettings.getPlayers().remove(quittingPlayer); // Remove current player.
+            this.mPlayerIterator = mGameSettings.getPlayers().listIterator(quittingPlayerIndex); // Reset iterator after list was changed.
             this.nextPlayer(); // Assign the current player to the iterator's next element.
         }
 
@@ -324,7 +320,7 @@ public class Logic{
         private void nextPlayer() {
             // If done iterating over players, reset iterator.
             if(!this.mPlayerIterator.hasNext()) {
-                this.mPlayerIterator = GameSettings.getInstance().getPlayers().listIterator();
+                this.mPlayerIterator = mGameSettings.getPlayers().listIterator();
             }
 
             this.mCurrentPlayer = this.mPlayerIterator.next();
@@ -337,7 +333,7 @@ public class Logic{
                 nextPlayer = this.mPlayerIterator.next(); // Go next and then set back to previous element
                 this.mPlayerIterator.previous();
             } else {
-                nextPlayer = GameSettings.getInstance().getPlayers().iterator().next(); // Get first element.
+                nextPlayer = mGameSettings.getPlayers().iterator().next(); // Get first element.
             }
 
             return nextPlayer;

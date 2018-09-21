@@ -7,12 +7,12 @@ import java.io.*;
 import java.util.List;
 
 
-public class HistoryFileManager{
+public class HistoryFileManager {
 
     //Convert Object to XML
     public static void SaveGameHistoryInXMLFile(String path, List<PlayedTurnData> currentGameHistory) throws IOException, ClassNotFoundException, Exception {
         try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(path))) {
-            out.writeObject(GameSettings.getInstance()); //save gameSettings
+            //out.writeObject(GameSettings.getInstance()); //save gameSettings
             out.writeObject(currentGameHistory); //save history turns
             out.flush();
         }
@@ -23,7 +23,7 @@ public class HistoryFileManager{
         List<PlayedTurnData> turnHistory = null;
 
         try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(path))) {
-            GameSettings.LoadNewInstance( (GameSettings) in.readObject()); //load gameSettings
+            //GameSettings.LoadNewInstance( (GameSettings) in.readObject()); //load gameSettings
             turnHistory = (List<PlayedTurnData>) in.readObject(); //load history turns
         }
 
