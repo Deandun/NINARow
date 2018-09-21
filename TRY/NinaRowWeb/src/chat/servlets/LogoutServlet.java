@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-@WebServlet(urlPatterns = {"/chat/logout"})
+@WebServlet(urlPatterns = {"/pages/logout"})
 public class LogoutServlet extends HttpServlet {
 
 

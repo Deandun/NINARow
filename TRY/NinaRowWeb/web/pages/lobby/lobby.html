@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>DeaNoy Lobby</title>
+    <!-- <link rel="stylesheet" href="lobby.css"> -->
+    <link rel="stylesheet" href="games_table.css">
+    <script src="../../common/jquery-2.0.3.min.js"></script>
+    <script src="games_table.js"></script>
+
+</head>
+
+<body>
+    <div id="lobbyConfigs">
+        <ul>
+            <li>
+                <a href="../logout" class="btn btn-info btn-lg active" role="button">Logout</a>
+            </li>
+            <li>
+                <a href="logout" class="btn btn-info btn-lg active" role="button">Add Game</a>
+            </li>
+        </ul>
+    </div>
+
+    <div id="onlineUsers">
+        <section>
+            <div class="users-header">
+                <table cellpadding="0" cellspacing="0" border="0">
+                    <thead>
+                    <tr>
+                        <th>Online Users</th>
+                    </tr>
+                    </thead>
+                </table>
+            </div>
+
+            <div class="tbl-content">
+                <table cellpadding="0" cellspacing="0" border="0">
+                    <tbody id="users-names">
+                    <tr>
+                        <td>Noy's</td>
+                    </tr>
+                    <tr>
+                        <td>Dean</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+    <div id="existingGamesTable">
+        <section>
+            <h1>Existing Games</h1>
+            <div class="tbl-header">
+                <table cellpadding="0" cellspacing="0" border="0">
+                    <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Status</th>
+                        <th>Players</th>
+                        <th>Type</th>
+                        <th>Board Size</th>
+                        <th>Target</th>
+                        <th>Uploader</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                </table>
+            </div>
+
+            <div class="tbl-content">
+                <table cellpadding="0" cellspacing="0" border="0">
+                    <tbody id="game-details">
+                    <tr>
+                        <td>Noys Game</td>
+                        <td>Inactive</td>
+                        <td>2/5</td>
+                        <td>Popout</td>
+                        <td>5x6</td>
+                        <td>4</td>
+                        <td>NoyToy</td>
+                        <td>Join Game</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+
+</body>
+
+</html>
