@@ -3,13 +3,14 @@ package NinaRowHTTPClient.GeneralCommunication;
 import org.apache.http.client.utils.URIBuilder;
 
 import java.net.URISyntaxException;
+import java.util.HashMap;
 import java.util.Map;
 
 public class AddressBuilder {
     private String mScheme;
     private String mHost;
     private String mPath;
-    private Map<String, String> mParametersMap;
+    private Map<String, String> mParametersMap = new HashMap<>();
 
     public void setmScheme(String mScheme) {
         this.mScheme = mScheme;

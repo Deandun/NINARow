@@ -1,6 +1,5 @@
 package UI;
 
-import Logic.Models.Player;
 import UI.Controllers.App;
 import UI.Controllers.LobbyController;
 import UI.Controllers.LoginController;
@@ -20,7 +19,7 @@ public class UIGameHandler extends Application {
 
     private FXMLLoader mLoader = new FXMLLoader();
     private Stage mPrimaryStage;
-    private Player mLoggedInPlayer;
+    private String mLoggedInPlayerName;
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -38,11 +37,11 @@ public class UIGameHandler extends Application {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        this.mLoggedInPlayer = null;
+        this.mLoggedInPlayerName = null;
         LoginController loginController = mLoader.getController();
         loginController.setmOnFinishedLogin(
                 (playerID) ->  {
-                    this.mLoggedInPlayer = playerID;
+                    this.mLoggedInPlayerName = playerID;
                     this.loadLobbyController();
                 }
             );
@@ -63,6 +62,7 @@ public class UIGameHandler extends Application {
         }
 
         LobbyController lobbyController = mLoader.getController();
+        lobbyController.setmOnlineUserName(this.mLoggedInPlayerName);
         lobbyController.setmOnLogout(this::loadLoginController);
         lobbyController.setmOnEnteringGame(this::loadGameController);
 
@@ -85,7 +85,7 @@ public class UIGameHandler extends Application {
             e.printStackTrace();
         }
         App appController = mLoader.getController();
-        appController.init(data, this.mLoggedInPlayer);
+        appController.init(data, this.mLoggedInPlayerName);
         appController.setOnPlayerLeftGame(this::loadLobbyController);
 
         // wire up controller

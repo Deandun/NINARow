@@ -38,7 +38,9 @@ public class GameDescriptionController {
     private void setData(GameDescriptionData data) {
         this.mGameDescriptionData = data;
         this.mGameState = data.getmGameState();
-        this.mGameStateLabel.setText(this.mGameState.name());
+        this.mGameStateLabel.setText("Active");
+        //TODO: figure out why game state is null
+        //this.mGameStateLabel.setText(this.mGameState.name());
         this.mGameTypeLabel.setText(data.getmVariant().name());
         this.mBoardDimentionsLabel.setText(Integer.toString(data.getmRows()) + "x" + Integer.toString(data.getmColumns()));
         this.mParticipantsLabel.setText(Integer.toString(data.getmNumberOfPlayers()) + "/" + Integer.toString(data.getmMaxPlayers()));
@@ -61,11 +63,11 @@ public class GameDescriptionController {
     }
 
     private void handleGameState() {
-        // TODO: if in progress, paint in red. else, in green
-        if(this.mGameState.equals(eGameState.Ready)) {
-            this.mJoinGameBtn.setDisable(false);
-        } else {
-            this.mJoinGameBtn.setDisable(true);
-        }
+        // TODO: if in progress, paint in red. else, in green. Also, uncomment when game state is no longer sent as null
+//        if(this.mGameState.equals(eGameState.Ready)) {
+//            this.mJoinGameBtn.setDisable(false);
+//        } else {
+//            this.mJoinGameBtn.setDisable(true);
+//        }
     }
 }

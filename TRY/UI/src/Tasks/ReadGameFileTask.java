@@ -46,20 +46,20 @@ public class ReadGameFileTask extends Task<Void> {
         boolean didErrorOccur = true;
         String errorDescription = null;
 
-        try {
-            this.mGame.ReadGameFile(mAbsoluteGameFilePath, onLoadFileFinish, onFinishedCheckingFileValidity);
-            didErrorOccur = false; // Only reach this line if error did not occur during file reading.
-        } catch(FileNotFoundException e) {
-            errorDescription = e.getMessage();
-        } catch(InvalidFileInputException e) {
-            errorDescription = e.getMessage();
-        } catch(JAXBException e) {
-            errorDescription = "File is in the wrong xml format!";
-        } catch(IOException e) {
-            errorDescription = "Error reading from file.";
-        } catch (Exception e) {
-            errorDescription = "A general error has occurred";
-        }
+//        try {
+//            this.mGame.ReadGameFile(mAbsoluteGameFilePath, onLoadFileFinish, onFinishedCheckingFileValidity);
+//            didErrorOccur = false; // Only reach this line if error did not occur during file reading.
+//        } catch(FileNotFoundException e) {
+//            errorDescription = e.getMessage();
+//        } catch(InvalidFileInputException e) {
+//            errorDescription = e.getMessage();
+//        } catch(JAXBException e) {
+//            errorDescription = "File is in the wrong xml format!";
+//        } catch(IOException e) {
+//            errorDescription = "Error reading from file.";
+//        } catch (Exception e) {
+//            errorDescription = "A general error has occurred";
+//        }
 
         if(didErrorOccur) {
             this.updateMessage("");

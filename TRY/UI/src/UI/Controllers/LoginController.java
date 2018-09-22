@@ -19,7 +19,7 @@ import java.io.IOException;
 import java.util.function.Consumer;
 
 public class LoginController implements ILoginClientLogicDelegate {
-    private Consumer<Player> mOnFinishedLogin;
+    private Consumer<String> mOnFinishedLogin;
     private LoginClientLogic mLoginClientLogic;
 
     @FXML
@@ -38,7 +38,7 @@ public class LoginController implements ILoginClientLogicDelegate {
         this.muiErrorLabel.setText(""); // Set error message to be invisible at the start.
     }
 
-    public void setmOnFinishedLogin(Consumer<Player> mOnFinishedLogin) {
+    public void setmOnFinishedLogin(Consumer<String> mOnFinishedLogin) {
         this.mOnFinishedLogin = mOnFinishedLogin;
     }
 
@@ -53,9 +53,9 @@ public class LoginController implements ILoginClientLogicDelegate {
         );
     }
 
-    public void onLoginSuccess(Player player) {
+    public void onLoginSuccess(String playerName) {
         Platform.runLater(
-                () -> this.mOnFinishedLogin.accept(player)
+                () -> this.mOnFinishedLogin.accept(playerName)
         );
     }
 }

@@ -47,7 +47,8 @@ public class App implements IBoardControllerDelegate, IGameClientLogicDelegate {
 
     // On player quit game
     private Runnable mOnCurrentPlayerLeftGame;
-    private Player mLoggedInPlayer;
+
+    private String mLoggedInPlayerName;
 
     public void setOnPlayerLeftGame(Runnable mOnPlayerQuitGame) {
         this.mOnCurrentPlayerLeftGame = mOnPlayerQuitGame;
@@ -90,9 +91,9 @@ public class App implements IBoardControllerDelegate, IGameClientLogicDelegate {
 
     // Use this function instead of initialize in order to be able to pass in the gameData param.
     // This param is needed to initialize the UI, and if initialize is used through the loader, passing the param would not be possible.
-    public void init(GameDescriptionData gameData, Player loggedInPlayer) {
-        this.mLoggedInPlayer = loggedInPlayer;
-        this.mNinaRowHTTPClientLogic = new GameClientLogic(gameData, this.mLoggedInPlayer, this);
+    public void init(GameDescriptionData gameData, String loggedInPlayerName) {
+        this.mLoggedInPlayerName = loggedInPlayerName;
+        this.mNinaRowHTTPClientLogic = new GameClientLogic(gameData, this.mLoggedInPlayerName, this);
         this.mBorderPane.setRight(this.mVBoxPlayerDetails);
         this.mIsGameActiveProperty.setValue(false);
         this.mScrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);

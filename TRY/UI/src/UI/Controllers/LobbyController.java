@@ -1,8 +1,11 @@
 package UI.Controllers;
 
 import Logic.Enums.eVariant;
+import NinaRowHTTPClient.Lobby.ILobbyClientLogicDelegate;
+import NinaRowHTTPClient.Lobby.LobbyClientLogic;
 import UI.Enums.eGameState;
 import UI.UIMisc.GameDescriptionData;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -14,16 +17,16 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-public class LobbyController {
+public class LobbyController implements ILobbyClientLogicDelegate {
 
+    private String mOnlineUserName;
     private Consumer<GameDescriptionData> mOnEnteringGame;
     private Runnable mOnLogout;
-
-    // Maps between the game's name and hte game description controller (can't have 2 games with the same name).
-    private Map<String, GameDescriptionController> mGameNameToGameControllerMap = new HashMap<>();
+    private LobbyClientLogic mLobbyClientLogic;
 
     @FXML
     private ScrollPane muiScrollPane;
@@ -49,51 +52,25 @@ public class LobbyController {
     @FXML
     private void initialize() {
         this.muiLogoutBtn.setOnMouseClicked(
-                (e) -> this.mOnLogout.run()
+                (e) -> this.mLobbyClientLogic.logout(this.mOnlineUserName)
         );
 
+        this.mLobbyClientLogic = new LobbyClientLogic(this);
         this.initFetchingPlayers();
         this.initFetchingGames();
     }
 
     private void initFetchingPlayers() {
-        //TODO: set interval for getting player names. For now, dummy init names.
-        this.muiOnlinePlayers.getChildren().add(new Label("Aviad"));
-        this.muiOnlinePlayers.getChildren().add(new Label("Noy Toy"));
-        this.muiOnlinePlayers.getChildren().add(new Label("Rusty"));
-        this.muiOnlinePlayers.getChildren().add(new Label("Snek"));
+        this.mLobbyClientLogic.observeOnlinePlayerNames();
     }
 
+    public void setmOnlineUserName(String mOnlineUserName) {
+        this.mOnlineUserName = mOnlineUserName;
+    }
+
+
     private void initFetchingGames() {
-        //TODO: set interval for getting games. For now, dummy init games.
-        GameDescriptionData data = new GameDescriptionData();
-        data.setmGameState(eGameState.Ready);
-        data.setmVariant(eVariant.Popout);
-        data.setmRows(7);
-        data.setmColumns(8);
-        data.setmCurrentNumberOfPlayers(2);
-        data.setmMaxPlayers(5);
-        data.setmTarget(4);
-        data.setmGameName("Best game");
-        data.setmUploaderName("Dividend");
-
-        GameDescriptionController controller = new GameDescriptionController(data, this::onJoinGameClick);
-        this.muiGameDetailsFlowPane.getChildren().add(controller.getRoot());
-
-        GameDescriptionData data2 = new GameDescriptionData();
-
-        data2.setmGameState(eGameState.Ready);
-        data2.setmVariant(eVariant.Circular);
-        data2.setmRows(5);
-        data2.setmColumns(5);
-        data2.setmCurrentNumberOfPlayers(4);
-        data2.setmMaxPlayers(6);
-        data2.setmTarget(3);
-        data2.setmGameName("Second best game, but still a pretty decent game altogether. I mean, can't really complain.");
-        data2.setmUploaderName("Dividend's wonderful dream of love");
-
-        controller = new GameDescriptionController(data2, this::onJoinGameClick);
-        this.muiGameDetailsFlowPane.getChildren().add(controller.getRoot());
+        this.mLobbyClientLogic.observeGames();
     }
 
     private void onJoinGameClick(GameDescriptionData gameDescriptionData) {
@@ -106,5 +83,53 @@ public class LobbyController {
 
     public void setmOnLogout(Runnable mOnLogout) {
         this.mOnLogout = mOnLogout;
+    }
+
+    @Override
+    public void onPlayerNamesUpdate(List<String> playerNames) {
+        Platform.runLater(
+                () -> {
+                    this.muiOnlinePlayers.getChildren().clear();
+                    this.muiOnlinePlayers.getChildren().add(new Label("Online Players"));
+                    playerNames.forEach(
+                            (name) -> {
+                                Label nameLabel = new Label(name);
+                                this.muiOnlinePlayers.getChildren().add(nameLabel);
+                            }
+                    );
+                }
+        );
+    }
+
+    @Override
+    public void onErrorUpdatingPlayerNames(String errorMessage) {
+
+    }
+
+    @Override
+    public void onGamesUpdate(List<GameDescriptionData> updatedGamesList) {
+        Platform.runLater(
+                () -> {
+
+                    this.muiGameDetailsFlowPane.getChildren().clear();
+                    updatedGamesList.forEach(
+                            (gameDescriptionData) -> {
+                                GameDescriptionController gameController =
+                                        new GameDescriptionController(gameDescriptionData, this::onJoinGameClick);
+                                this.muiGameDetailsFlowPane.getChildren().add(gameController.getRoot());
+                            }
+                    );
+                }
+        );
+    }
+
+    @Override
+    public void onErrorUpdatingGames(String errorMessage) {
+
+    }
+
+    @Override
+    public void onLogoutFinish() {
+        Platform.runLater(this.mOnLogout);
     }
 }

@@ -25,8 +25,8 @@ public class GameClientLogic {
 
 
     //Players
-    private Player mLoggedInPlayer;
-    private Player mCurrentPlayer;
+    private String mLoggedInPlayerName;
+    private String mCurrentPlayerName;
     private List<Player> mCachedPlayersList;
 
     private Gson mGson;
@@ -36,8 +36,8 @@ public class GameClientLogic {
 
     // TODO: create a communication class, a static path class (to determine where the requests should go) and a parser. Implement all of the communication using those classes.
 
-    public GameClientLogic(GameDescriptionData mGameData, Player loggedInPlayer, IGameClientLogicDelegate delegate) {
-        this.mLoggedInPlayer = loggedInPlayer;
+    public GameClientLogic(GameDescriptionData mGameData, String loggedInPlayerName, IGameClientLogicDelegate delegate) {
+        this.mLoggedInPlayerName = loggedInPlayerName;
         this.mGameState = eGameState.Inactive;
         this.mGameData = mGameData;
         this.mDelegate = delegate;
@@ -67,7 +67,7 @@ public class GameClientLogic {
     }
 
     public boolean isMyTurn() {
-        return this.mLoggedInPlayer.equals(this.mCurrentPlayer);
+        return this.mLoggedInPlayerName.equals(this.mCurrentPlayerName);
     }
 
     public void playTurnAsync(PlayTurnParameters playTurnParameters) {
