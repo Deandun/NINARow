@@ -23,30 +23,25 @@ import java.time.Instant;
 import java.util.*;
 
 public class Game {
-    private FileManager mFileManager;
     private HistoryManager mHistoryManager;
     private GameStatus mGameStatus;
     private Board mGameBoard;
     private SequenceSearcher mSequenceSearcher;
     private IComputerPlayerAlgo mComputerPlayerAlgo;
     private List<Player> mPlayerList;
-    private GameSettings mGameSettings; //TODO: assign game settings
+    private GameSettings mGameSettings;
 
-    public Game() {
-        this.mFileManager = new FileManager();
+    public Game(GameSettings gameSettings) {
         this.mHistoryManager = new HistoryManager();
         this.mGameStatus = new GameStatus();
         this.mSequenceSearcher = new SequenceSearcher();
         this.mComputerPlayerAlgo = new ComputerPlayerAlgo();
         this.mPlayerList = new ArrayList<>();
+        this.mGameSettings = gameSettings;
+        this.mGameBoard = new Board(mGameSettings.getRows(), mGameSettings.getColumns());
     }
 
     // ILogic interface implementation.
-
-    public void ReadGameFile(String filePath, Runnable onLoadFileFinish, Runnable onFinishedCheckingFileValidity) throws FileNotFoundException, InvalidFileInputException, IOException, JAXBException, InterruptedException {
-        this.mFileManager.LoadGameFile(filePath, onLoadFileFinish, onFinishedCheckingFileValidity);
-        this.mGameBoard = new Board(mGameSettings.getRows(), mGameSettings.getColumns());
-    }
 
     public void StartGame() {
         // Set game board

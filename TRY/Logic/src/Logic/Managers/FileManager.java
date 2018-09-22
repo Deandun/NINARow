@@ -4,11 +4,7 @@ import Logic.Enums.ePlayerType;
 import Logic.Enums.eVariant;
 import Logic.Exceptions.InvalidFileInputException;
 import Logic.Models.GameSettings;
-import Logic.generated.Board;
-import Logic.generated.Game;
-import Logic.generated.GameDescriptor;
-import Logic.generated.Player;
-import Logic.generated.Players;
+import Logic.generated.*;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -21,35 +17,17 @@ import java.util.Set;
 public class FileManager {
 
     private final static String JAXB_XML_GAME_PACKAGE_NAME = "Logic.generated";
-    private boolean mIsFileLoaded = false;
 
-    public boolean getIsFileLoaded() {
-        return mIsFileLoaded;
-    }
-
-    public void LoadGameFile(String filePath, Runnable onLoadFileFinish, Runnable onFinishedCheckingFileValidity) throws InvalidFileInputException, FileNotFoundException, IOException, JAXBException, InterruptedException {
-        mIsFileLoaded = false; // Reset flag before checking if current file loaded successfully.
-        GameDescriptor gameDescriptor = getDataFromFile(filePath);
-        onLoadFileFinish.run();
-        Thread.sleep(300);
-
+    public GameSettings LoadGameFile(InputStream fileContentStream) throws InvalidFileInputException, FileNotFoundException, IOException, JAXBException, InterruptedException {
+        GameDescriptor gameDescriptor = getDataFromFile(fileContentStream);
         checkIfFileInputIsValid(gameDescriptor); // Throws if input is invalid
-        onFinishedCheckingFileValidity.run();
-        Thread.sleep(300);
-        setData(gameDescriptor);
-        mIsFileLoaded = true;
+        return createGameSettings(gameDescriptor);
     }
 
-    private GameDescriptor getDataFromFile(String filePath) throws FileNotFoundException, IOException, JAXBException {
+    private GameDescriptor getDataFromFile(InputStream fileContent) throws FileNotFoundException, IOException, JAXBException {
         GameDescriptor gameDescriptor;
 
-        if (!(new File(filePath)).exists()){
-            throw new FileNotFoundException("Couldn't find " + filePath + " file!");
-        }
-
-        try(InputStream inputStream = new FileInputStream(filePath)) {
-            gameDescriptor = deserializeFrom(inputStream);
-        }
+        gameDescriptor = deserializeFrom(fileContent);
 
         return gameDescriptor;
     }
@@ -61,20 +39,20 @@ public class FileManager {
         return (GameDescriptor) u.unmarshal(in);
     }
 
-    private void setData(GameDescriptor gameDescriptor) {
-        setPlayersData(gameDescriptor.getPlayers().getPlayer());
-        setGameInfoData(gameDescriptor.getGame());
-    }
+    private GameSettings createGameSettings(GameDescriptor gameDescriptor) {
+        GameSettings gameSettings = new GameSettings();
+        DynamicPlayers dynamicPlayers = gameDescriptor.getDynamicPlayers();
+        Game gameInfo = gameDescriptor.getGame();
+        Board boardInfo = gameInfo.getBoard();
 
-    private void setGameInfoData(Game gameInfo) {
-        //TODO: change how game settings is set.
-//        GameSettings gameSettings = GameSettings.getInstance();
-//        Board boardInfo = gameInfo.getBoard();
-//
-//        gameSettings.setColumns(boardInfo.getColumns().intValue());
-//        gameSettings.setRows(boardInfo.getRows());
-//        gameSettings.setTarget(gameInfo.getTarget().intValue());
-//        gameSettings.setVariant(eVariant.valueOf(gameInfo.getVariant()));
+        gameSettings.setColumns(boardInfo.getColumns().intValue());
+        gameSettings.setRows(boardInfo.getRows());
+        gameSettings.setTarget(gameInfo.getTarget().intValue());
+        gameSettings.setVariant(eVariant.valueOf(gameInfo.getVariant()));
+        gameSettings.setGameNumberOfPlayers(dynamicPlayers.getTotalPlayers());
+        gameSettings.setmGameName(dynamicPlayers.getGameTitle());
+
+        return gameSettings;
     }
 
     // Parameter is generated player class.
@@ -91,7 +69,12 @@ public class FileManager {
 
     private void checkIfFileInputIsValid(GameDescriptor gameDescriptor) throws InvalidFileInputException {
         checkIfGameDataIsValid(gameDescriptor.getGame());
-        checkIfPlayersDataIsValid(gameDescriptor.getPlayers());
+        //checkIfPlayersDataIsValid(gameDescriptor.getPlayers());
+        checkIfDynamicPlayersDataIsValid(gameDescriptor.getDynamicPlayers());
+    }
+
+    private void checkIfDynamicPlayersDataIsValid(DynamicPlayers dynamicPlayers) {
+        //TODO
     }
 
     private void checkIfGameDataIsValid(Game gameInfo) throws InvalidFileInputException {

@@ -24,9 +24,6 @@ public class GameSettings implements Serializable {
     private String mUploaderName;
     private String mGameName;
 
-    private GameSettings() {
-    }
-
     public int getGameNumberOfPlayers() {
         return mGameNumberOfPlayers;
     }
