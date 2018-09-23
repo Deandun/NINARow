@@ -3,6 +3,7 @@ package chat.servlets;
 import Logic.Exceptions.InvalidFileInputException;
 import MultiGamesLogic.GamesManager;
 import chat.utils.ServletUtils;
+import chat.utils.SessionUtils;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
@@ -28,7 +29,6 @@ public class UploadGameFileServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
 
         Collection<Part> parts = request.getParts();
-
         out.println("Total parts : " + parts.size() + " ");
 
         StringBuilder fileContent = new StringBuilder();
@@ -48,15 +48,18 @@ public class UploadGameFileServlet extends HttpServlet {
     private void initNewGameFromFileContent(InputStream fileContentStream) {
         GamesManager gamesManager = ServletUtils.getGamesManager(getServletContext());
         try {
-            gamesManager.addGame(fileContentStream);
+            gamesManager.addGame(fileContentStream, SessionUtils.getUsername(request));
             //TODO: take care of exceptions.
         } catch (InterruptedException e) {
+			out.append(e.getMessage());
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
-        } catch (JAXBException e) {
+        }  catch (InvalidFileInputException e) {
+            response.setStatus(HttpServletResponse.SC_CONFLICT);
+            out.append(e.getMessage());
             e.printStackTrace();
-        } catch (InvalidFileInputException e) {
+        }  catch (JAXBException e) {
             e.printStackTrace();
         }
     }

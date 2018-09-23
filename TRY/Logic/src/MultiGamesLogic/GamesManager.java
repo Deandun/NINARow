@@ -19,22 +19,22 @@ public class GamesManager {
 
     // User actions.
 
-    public void addGame(InputStream fileContentStream) throws InterruptedException, IOException, JAXBException, InvalidFileInputException {
+    public void addGame(InputStream fileContentStream, String uploaderName) throws InterruptedException, IOException, JAXBException, InvalidFileInputException {
         GameSettings gameSettingsFromFile;
 
         gameSettingsFromFile = this.mFileManager.LoadGameFile(fileContentStream);
+        gameSettingsFromFile.setUploaderName(uploaderName);
 
         if(!this.isGameNameAlreadyExist(gameSettingsFromFile.getmGameName())) {
             Game newGame = new Game(gameSettingsFromFile);
             this.mGameNameToGame.put(gameSettingsFromFile.getmGameName(), newGame);
         } else {
-            //TODO: throw exception.
+                throw new InvalidFileInputException("Invalid game file! Game name is already exists.");
         }
     }
 
     private boolean isGameNameAlreadyExist(String gameName) {
-        //TODO
-        return false;
+        return this.mGameNameToGame.keySet().stream().anyMatch(name -> name.equals(gameName));
     }
 
     public void userJoinedGame(String gameName, String playerName) {
@@ -70,7 +70,12 @@ public class GamesManager {
     }
 
     public List<PlayedTurnData> getTurnHistoryForGame(String gameName, int currentTurnForClient) {
+        //TODO implement
         // get the delta of played turn data.
+        List<PlayedTurnData> playedTurnsDataHistory = new ArrayList<>();
+
+
+
         return null;
     }
 }

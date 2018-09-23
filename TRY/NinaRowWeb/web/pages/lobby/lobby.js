@@ -45,11 +45,16 @@ function onFormSubmit() {
         contentType: false, // Set content type to false as jQuery will tell the server its a query string request
         timeout: 4000,
         error: function(e) {
+            if (e.status === 409) {
+                $("#result").text("ERROR: Duplicate game name !");
+            } else {
+                $("#result").text("Failed to get result from server " + e);
+            }
             console.error("Failed to submit");
-            $("#result").text("Failed to get result from server " + e);
         },
         success: function(r) {
-            $("#result").text("Success uploading file");
+            $("#result").text("Success uploading file: " + r);
+            console.log(r);
         }
     });
 
@@ -76,12 +81,25 @@ function pullGames() {
 function addGameDetails(index, dataJson) {
     var tableRow = $("<tr>");
 
-    tableRow.append("<td>").append(dataJson.mGameName);
-    tableRow.append("<td>").append(dataJson.mGameState);
-    tableRow.append("<td>").append(dataJson.mCurrentNumberOfPlayers + "/" + dataJson.mMaxPlayers);
-    tableRow.append("<td>").append(dataJson.mRows + "X" + dataJson.mColumns);
-    tableRow.append("<td>").append(dataJson.mTarget);
-    tableRow.append("<td>").append(dataJson.mUploader);
+    tableRow.append("<td>" + dataJson.mGameName + "</td>");
+    tableRow.append("<td>" + dataJson.mGameState + "</td>");
+    tableRow.append("<td>" + dataJson.mCurrentNumberOfPlayers + "/" + dataJson.mMaxPlayers + "</td>");
+    tableRow.append("<td>" + dataJson.mVariant + "</td>");
+    tableRow.append("<td>" + dataJson.mRows + "X" + dataJson.mColumns+ "</td>");
+    tableRow.append("<td>" +dataJson.mTarget+ "</td>");
+    tableRow.append("<td>" + dataJson.mUploader+ "</td>");
+    tableRow.append("<td><button onclick='joinGame(\"" + dataJson.mGameName + "\")'>Join Game</button></td>");
+
 
     $('#game-details').append(tableRow);
+}
+
+function joinGame(gameName, userName) {
+    console.log("Join " + gameName)
+
+    //check if game is inactive
+
+    //check if there is a free place for user to join the game
+
+    //update the game that new user has joined the game
 }
