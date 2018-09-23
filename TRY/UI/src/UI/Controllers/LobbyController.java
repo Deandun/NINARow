@@ -7,13 +7,12 @@ import UI.Enums.eGameState;
 import UI.UIMisc.GameDescriptionData;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 
 import java.util.HashMap;
@@ -55,9 +54,14 @@ public class LobbyController implements ILobbyClientLogicDelegate {
                 (e) -> this.mLobbyClientLogic.logout(this.mOnlineUserName)
         );
 
+        this.setUI();
         this.mLobbyClientLogic = new LobbyClientLogic(this);
         this.initFetchingPlayers();
         this.initFetchingGames();
+    }
+
+    private void setUI() {
+        this.muiScrollPane.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY, CornerRadii.EMPTY, Insets.EMPTY)));
     }
 
     private void initFetchingPlayers() {
@@ -90,7 +94,7 @@ public class LobbyController implements ILobbyClientLogicDelegate {
         Platform.runLater(
                 () -> {
                     this.muiOnlinePlayers.getChildren().clear();
-                    this.muiOnlinePlayers.getChildren().add(new Label("Online Players"));
+                    this.muiOnlinePlayers.getChildren().add(this.muiOnlinePlayerTitle);
                     playerNames.forEach(
                             (name) -> {
                                 Label nameLabel = new Label(name);
@@ -110,15 +114,14 @@ public class LobbyController implements ILobbyClientLogicDelegate {
     public void onGamesUpdate(List<GameDescriptionData> updatedGamesList) {
         Platform.runLater(
                 () -> {
-
                     this.muiGameDetailsFlowPane.getChildren().clear();
-                    updatedGamesList.forEach(
-                            (gameDescriptionData) -> {
-                                GameDescriptionController gameController =
-                                        new GameDescriptionController(gameDescriptionData, this::onJoinGameClick);
-                                this.muiGameDetailsFlowPane.getChildren().add(gameController.getRoot());
-                            }
-                    );
+                    GameDescriptionController gameController;
+
+                    for(int i = 0; i < updatedGamesList.size(); i++) {
+                        gameController = new GameDescriptionController(updatedGamesList.get(i), this::onJoinGameClick);
+                        this.setGameDataUIInParentView(gameController, i);
+                        this.muiGameDetailsFlowPane.getChildren().add(gameController.getRoot());
+                    }
                 }
         );
     }
@@ -131,5 +134,14 @@ public class LobbyController implements ILobbyClientLogicDelegate {
     @Override
     public void onLogoutFinish() {
         Platform.runLater(this.mOnLogout);
+    }
+
+    // UI
+
+    private void setGameDataUIInParentView(GameDescriptionController gameController, int index) {
+        FlowPane.setMargin(gameController.getRoot(), new Insets(5, 3, 5, 3));
+        ((HBox)gameController.getRoot()).setSpacing(10);
+        Color bgColor = index % 2 == 0 ? Color.LIGHTBLUE : Color.MEDIUMPURPLE;
+        ((HBox)gameController.getRoot()).setBackground(new Background(new BackgroundFill(bgColor, CornerRadii.EMPTY, Insets.EMPTY)));
     }
 }

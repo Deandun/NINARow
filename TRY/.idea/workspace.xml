@@ -70,24 +70,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="LogoutServlet.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/NinaRowWeb/src/chat/servlets/LogoutServlet.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="306">
-              <caret line="51" column="5" lean-forward="true" selection-start-line="17" selection-start-column="3" selection-end-line="51" selection-end-column="5" />
-              <folding>
-                <element signature="e#2904#2905#0" expanded="true" />
-                <element signature="e#2946#2947#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="javaFXLogoutServlet.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/NinaRowWeb/src/chat/servlets/javafxClient/javaFXLogoutServlet.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="148">
-              <caret line="20" column="62" selection-start-line="20" selection-start-column="62" selection-end-line="20" selection-end-column="62" />
+            <state relative-caret-position="350">
+              <caret line="24" column="27" lean-forward="true" selection-start-line="24" selection-start-column="27" selection-end-line="24" selection-end-column="27" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -95,14 +82,12 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="JavaFXLoginServlet.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/NinaRowWeb/src/chat/servlets/javafxClient/JavaFXLoginServlet.java">
+      <file leaf-file-name="Lobby.fxml" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/UI/src/UI/Lobby.fxml">
+          <provider editor-type-id="JavaFX-Scene-Builder" />
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="197">
-              <caret line="18" column="29" lean-forward="true" selection-start-line="18" selection-start-column="29" selection-end-line="18" selection-end-column="41" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
+            <state relative-caret-position="477">
+              <caret line="37" column="52" selection-start-line="37" selection-start-column="52" selection-end-line="37" selection-end-column="52" />
             </state>
           </provider>
         </entry>
@@ -110,8 +95,8 @@
       <file leaf-file-name="LoginClientLogic.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/UI/src/NinaRowHTTPClient/Login/LoginClientLogic.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="12">
-              <caret line="12" lean-forward="true" selection-start-line="12" selection-end-line="12" />
+            <state relative-caret-position="153">
+              <caret line="12" selection-start-line="12" selection-end-line="12" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -122,12 +107,10 @@
       <file leaf-file-name="LobbyClientLogic.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/UI/src/NinaRowHTTPClient/Lobby/LobbyClientLogic.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="259">
-              <caret line="27" column="18" lean-forward="true" selection-start-line="27" selection-start-column="18" selection-end-line="27" selection-end-column="18" />
+            <state relative-caret-position="374">
+              <caret line="27" column="18" selection-start-line="27" selection-start-column="18" selection-end-line="27" selection-end-column="18" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#962#963#0" expanded="true" />
-                <element signature="e#1038#1039#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -136,7 +119,7 @@
       <file leaf-file-name="LobbyClientCommunicationHandler.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/UI/src/NinaRowHTTPClient/Lobby/LobbyClientCommunicationHandler.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="253">
+            <state relative-caret-position="578">
               <caret line="39" column="17" selection-start-line="39" selection-start-column="17" selection-end-line="39" selection-end-column="17" />
               <folding>
                 <element signature="imports" expanded="true" />
@@ -154,42 +137,34 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="LoginServlet.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/NinaRowWeb/src/chat/servlets/LoginServlet.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="272">
-              <caret line="46" column="72" selection-start-line="46" selection-start-column="64" selection-end-line="46" selection-end-column="72" />
-              <folding>
-                <element signature="e#3621#3740#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="LobbyController.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="LobbyController.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/UI/src/UI/Controllers/LobbyController.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="187">
-              <caret line="54" column="73" selection-start-line="54" selection-start-column="73" selection-end-line="54" selection-end-column="73" />
+            <state relative-caret-position="486">
+              <caret line="143" column="77" selection-start-line="143" selection-start-column="77" selection-end-line="143" selection-end-column="77" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="GameDescriptionController.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/UI/src/UI/Controllers/GameDescriptionController.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="428">
+              <caret line="78" column="142" lean-forward="true" selection-start-line="78" selection-start-column="142" selection-end-line="78" selection-end-column="142" />
               <folding>
-                <element signature="e#1565#1566#0" expanded="true" />
-                <element signature="e#1630#1631#0" expanded="true" />
-                <element signature="e#1731#1732#0" expanded="true" />
-                <element signature="e#1785#1786#0" expanded="true" />
-                <element signature="e#1831#1832#0" expanded="true" />
-                <element signature="e#1884#1885#0" expanded="true" />
-                <element signature="e#5007#5008#0" expanded="true" />
-                <element signature="e#5056#5057#0" expanded="true" />
+                <element signature="imports" expanded="true" />
+                <element signature="e#1134#1135#0" expanded="true" />
+                <element signature="e#1171#1172#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="UIGameHandler.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="UIGameHandler.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/UI/src/UI/UIGameHandler.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="323">
-              <caret line="64" column="67" selection-start-line="64" selection-start-column="67" selection-end-line="64" selection-end-column="67" />
+            <state relative-caret-position="867">
+              <caret line="63" column="20" selection-start-line="63" selection-start-column="20" selection-end-line="63" selection-end-column="20" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -214,11 +189,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>signup</find>
-      <find>GameSettings.getInstance</find>
-      <find>class gamestatus</find>
-      <find>mytimertask</find>
-      <find>mytim</find>
       <find>GameSettings.getInstance()</find>
       <find>mGameSettings.getPlayers()</find>
       <find>gameinfo</find>
@@ -244,6 +214,11 @@
       <find>name</find>
       <find>playername</find>
       <find>lobby</find>
+      <find>initia</find>
+      <find>initi</find>
+      <find>javafx</find>
+      <find>java.awt</find>
+      <find>purple</find>
     </findStrings>
     <replaceStrings>
       <replace>GUYRONEN</replace>
@@ -264,7 +239,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/NinaRowWeb/web/pages/loginerror/login_attempt_after_error.jsp" />
         <option value="$PROJECT_DIR$/NinaRowWeb/web/WEB-INF/web.xml" />
         <option value="$PROJECT_DIR$/NinaRowWeb/src/chat/servlets/UsersListServlet.java" />
         <option value="$PROJECT_DIR$/NinaRowWeb/src/chat/servlets/ChatServlet.java" />
@@ -306,15 +280,16 @@
         <option value="$PROJECT_DIR$/UI/src/Tasks/ReadGameFileTask.java" />
         <option value="$PROJECT_DIR$/UI/src/NinaRowHTTPClient/GeneralCommunication/CommunicationHandler.java" />
         <option value="$PROJECT_DIR$/UI/src/NinaRowHTTPClient/GeneralCommunication/AddressBuilder.java" />
-        <option value="$PROJECT_DIR$/UI/src/UI/Controllers/GameDescriptionController.java" />
         <option value="$PROJECT_DIR$/NinaRowWeb/src/chat/servlets/LogoutServlet.java" />
         <option value="$PROJECT_DIR$/NinaRowWeb/src/chat/servlets/javafxClient/javaFXLogoutServlet.java" />
         <option value="$PROJECT_DIR$/NinaRowWeb/src/chat/servlets/javafxClient/JavaFXLoginServlet.java" />
         <option value="$PROJECT_DIR$/UI/src/NinaRowHTTPClient/Login/LoginClientLogic.java" />
         <option value="$PROJECT_DIR$/UI/src/NinaRowHTTPClient/Lobby/LobbyClientCommunicationHandler.java" />
         <option value="$PROJECT_DIR$/UI/src/NinaRowHTTPClient/Lobby/LobbyClientLogic.java" />
-        <option value="$PROJECT_DIR$/UI/src/UI/Controllers/LobbyController.java" />
         <option value="$PROJECT_DIR$/UI/src/UI/UIGameHandler.java" />
+        <option value="$PROJECT_DIR$/UI/src/UI/Lobby.fxml" />
+        <option value="$PROJECT_DIR$/UI/src/UI/Controllers/GameDescriptionController.java" />
+        <option value="$PROJECT_DIR$/UI/src/UI/Controllers/LobbyController.java" />
       </list>
     </option>
   </component>
@@ -342,8 +317,8 @@
   </component>
   <component name="PhpWorkspaceProjectConfiguration" backward_compatibility_performed="true" />
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="width" value="804" />
-    <option name="height" value="870" />
+    <option name="width" value="670" />
+    <option name="height" value="725" />
   </component>
   <component name="ProjectReloadState">
     <option name="STATE" value="0" />
@@ -353,48 +328,14 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="AndroidView" />
+      <pane id="PackagesPane" />
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
             <path>
               <item name="TRY" type="b2602c69:ProjectViewProjectNode" />
               <item name="TRY" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="TRY" type="b2602c69:ProjectViewProjectNode" />
-              <item name="TRY" type="462c0819:PsiDirectoryNode" />
-              <item name="NinaRowWeb" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="TRY" type="b2602c69:ProjectViewProjectNode" />
-              <item name="TRY" type="462c0819:PsiDirectoryNode" />
-              <item name="NinaRowWeb" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="TRY" type="b2602c69:ProjectViewProjectNode" />
-              <item name="TRY" type="462c0819:PsiDirectoryNode" />
-              <item name="NinaRowWeb" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="chat" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="TRY" type="b2602c69:ProjectViewProjectNode" />
-              <item name="TRY" type="462c0819:PsiDirectoryNode" />
-              <item name="NinaRowWeb" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="chat" type="462c0819:PsiDirectoryNode" />
-              <item name="servlets" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="TRY" type="b2602c69:ProjectViewProjectNode" />
-              <item name="TRY" type="462c0819:PsiDirectoryNode" />
-              <item name="NinaRowWeb" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="chat" type="462c0819:PsiDirectoryNode" />
-              <item name="servlets" type="462c0819:PsiDirectoryNode" />
-              <item name="javafxClient" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="TRY" type="b2602c69:ProjectViewProjectNode" />
@@ -453,12 +394,18 @@
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="Tasks" type="462c0819:PsiDirectoryNode" />
             </path>
+            <path>
+              <item name="TRY" type="b2602c69:ProjectViewProjectNode" />
+              <item name="TRY" type="462c0819:PsiDirectoryNode" />
+              <item name="UI" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="UI" type="462c0819:PsiDirectoryNode" />
+            </path>
           </expand>
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
-      <pane id="PackagesPane" />
+      <pane id="AndroidView" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -503,7 +450,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Tomcat Server.Tomcat 8.5.34">
+  <component name="RunManager" selected="Application.Main">
     <configuration default="true" type="Applet" factoryName="Applet">
       <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
     </configuration>
@@ -728,12 +675,13 @@
       <workItem from="1537115771735" duration="2625000" />
       <workItem from="1537512205489" duration="11732000" />
       <workItem from="1537525896189" duration="13798000" />
-      <workItem from="1537600303237" duration="22916000" />
+      <workItem from="1537600303237" duration="23265000" />
+      <workItem from="1537685133995" duration="2726000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="327080000" />
+    <option name="totallyTimeSpent" value="330155000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -745,8 +693,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-6" y="-6" width="1292" height="700" extended-state="6" />
-    <editor active="true" />
+    <frame x="-7" y="-7" width="1550" height="840" extended-state="6" />
     <layout>
       <window_info anchor="right" id="Palette" order="3" />
       <window_info anchor="bottom" id="Event Log" order="7" side_tool="true" />
@@ -759,7 +706,7 @@
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info id="UI Designer" order="2" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.32386363" />
       <window_info anchor="bottom" id="TODO" order="6" weight="0.32982457" />
       <window_info anchor="bottom" id="Messages" order="9" weight="0.32105264" />
       <window_info anchor="right" id="Palette&#9;" order="4" />
@@ -769,9 +716,8 @@
       <window_info anchor="bottom" id="Version Control" order="10" show_stripe_button="false" />
       <window_info anchor="bottom" id="Run" order="2" weight="0.47719297" />
       <window_info anchor="bottom" id="Terminal" order="15" weight="0.32982457" />
-      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.6703755" visible="true" weight="0.1993517" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.6703755" visible="true" weight="0.20939597" />
       <window_info id="Web" order="3" side_tool="true" />
-      <window_info anchor="bottom" id="Find" order="1" weight="0.40482953" />
       <window_info id="Learn" order="3" />
       <window_info anchor="right" id="Theme Preview" order="4" />
       <window_info id="Favorites" order="2" side_tool="true" />
@@ -783,6 +729,7 @@
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="bottom" id="Problems" order="12" />
       <window_info anchor="bottom" id="Profiler" order="13" />
+      <window_info anchor="bottom" id="Find" order="1" weight="0.40482953" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="bottom" id="Message" order="0" />
     </layout>
@@ -836,14 +783,6 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/NinaRowWeb/src/chat/servlets/javafxClient/javaFXLogoutServlet.java</url>
-          <line>20</line>
-          <properties />
-          <option name="timeStamp" value="265" />
-        </line-breakpoint>
-      </breakpoints>
       <option name="time" value="266" />
     </breakpoint-manager>
     <watches-manager>
@@ -1010,20 +949,6 @@
     </expressions>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/Logic/src/Logic/SequenceSearchers/Strategy/RightSequenceSearcherStrategy.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="323">
-          <caret line="25" column="46" selection-start-line="25" selection-start-column="46" selection-end-line="25" selection-end-column="46" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Logic/src/Logic/SequenceSearchers/Strategy/TopLeftSequenceSearcherStrategy.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="68">
-          <caret line="4" column="13" selection-start-line="4" selection-start-column="13" selection-end-line="4" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Logic/src/Logic/SequenceSearchers/Strategy/TopRightSequenceSearcherStrategy.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="340">
@@ -1126,12 +1051,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="386">
           <caret line="78" column="25" lean-forward="true" selection-start-line="78" selection-start-column="25" selection-end-line="78" selection-end-column="25" />
-          <folding>
-            <element signature="e#1728#1729#0" expanded="true" />
-            <element signature="e#1777#1778#0" expanded="true" />
-            <element signature="e#1895#1896#0" expanded="true" />
-            <element signature="e#1937#1938#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1139,11 +1058,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="115">
           <caret line="119" selection-start-line="119" selection-end-line="119" />
-          <folding>
-            <element signature="e#2555#2556#0" expanded="true" />
-            <element signature="e#2582#2583#0" expanded="true" />
-            <element signature="e#3029#3030#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1158,9 +1072,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="170">
           <caret line="14" column="39" selection-start-line="14" selection-start-column="16" selection-end-line="14" selection-end-column="39" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1168,9 +1079,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="34">
           <caret line="2" column="60" selection-start-line="2" selection-start-column="51" selection-end-line="2" selection-end-column="60" />
-          <folding>
-            <element signature="n#!!block;n#onFormSubmit#0" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1185,9 +1093,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="192">
           <caret line="104" column="26" selection-start-line="104" selection-start-column="26" selection-end-line="104" selection-end-column="26" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1213,9 +1118,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="267">
           <caret line="46" lean-forward="true" selection-start-line="46" selection-end-line="46" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1290,10 +1192,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="140">
           <caret line="57" column="22" selection-start-line="57" selection-start-column="22" selection-end-line="57" selection-end-column="22" />
-          <folding>
-            <element signature="e#1283#1284#0" expanded="true" />
-            <element signature="e#1339#1340#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1359,27 +1257,16 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/UI/src/UI/Controllers/GameDescriptionController.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="68">
-          <caret line="11" column="22" selection-start-line="11" selection-start-column="22" selection-end-line="11" selection-end-column="22" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/NinaRowWeb/src/chat/servlets/LogoutServlet.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="306">
-          <caret line="51" column="5" lean-forward="true" selection-start-line="17" selection-start-column="3" selection-end-line="51" selection-end-column="5" />
-          <folding>
-            <element signature="e#2904#2905#0" expanded="true" />
-            <element signature="e#2946#2947#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="714">
+          <caret line="51" column="5" selection-start-line="17" selection-start-column="3" selection-end-line="51" selection-end-column="5" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/NinaRowWeb/src/chat/servlets/LoginServlet.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="272">
+        <state relative-caret-position="578">
           <caret line="46" column="72" selection-start-line="46" selection-start-column="64" selection-end-line="46" selection-end-column="72" />
           <folding>
             <element signature="e#3621#3740#0" expanded="true" />
@@ -1389,8 +1276,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/NinaRowWeb/src/chat/servlets/javafxClient/JavaFXLoginServlet.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="197">
-          <caret line="18" column="29" lean-forward="true" selection-start-line="18" selection-start-column="29" selection-end-line="18" selection-end-column="41" />
+        <state relative-caret-position="68">
+          <caret line="18" column="29" selection-start-line="18" selection-start-column="29" selection-end-line="18" selection-end-column="41" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -1399,8 +1286,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/UI/src/NinaRowHTTPClient/Login/LoginClientLogic.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="12">
-          <caret line="12" lean-forward="true" selection-start-line="12" selection-end-line="12" />
+        <state relative-caret-position="153">
+          <caret line="12" selection-start-line="12" selection-end-line="12" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -1414,19 +1301,9 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/NinaRowWeb/src/chat/servlets/javafxClient/javaFXLogoutServlet.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="148">
-          <caret line="20" column="62" selection-start-line="20" selection-start-column="62" selection-end-line="20" selection-end-column="62" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/UI/src/NinaRowHTTPClient/Lobby/LobbyClientCommunicationHandler.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="253">
+        <state relative-caret-position="578">
           <caret line="39" column="17" selection-start-line="39" selection-start-column="17" selection-end-line="39" selection-end-column="17" />
           <folding>
             <element signature="imports" expanded="true" />
@@ -1436,40 +1313,65 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/UI/src/NinaRowHTTPClient/Lobby/LobbyClientLogic.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="259">
-          <caret line="27" column="18" lean-forward="true" selection-start-line="27" selection-start-column="18" selection-end-line="27" selection-end-column="18" />
+        <state relative-caret-position="374">
+          <caret line="27" column="18" selection-start-line="27" selection-start-column="18" selection-end-line="27" selection-end-column="18" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#962#963#0" expanded="true" />
-            <element signature="e#1038#1039#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/UI/src/UI/Controllers/LobbyController.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="187">
-          <caret line="54" column="73" selection-start-line="54" selection-start-column="73" selection-end-line="54" selection-end-column="73" />
-          <folding>
-            <element signature="e#1565#1566#0" expanded="true" />
-            <element signature="e#1630#1631#0" expanded="true" />
-            <element signature="e#1731#1732#0" expanded="true" />
-            <element signature="e#1785#1786#0" expanded="true" />
-            <element signature="e#1831#1832#0" expanded="true" />
-            <element signature="e#1884#1885#0" expanded="true" />
-            <element signature="e#5007#5008#0" expanded="true" />
-            <element signature="e#5056#5057#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/UI/src/UI/UIGameHandler.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="323">
-          <caret line="64" column="67" selection-start-line="64" selection-start-column="67" selection-end-line="64" selection-end-column="67" />
+        <state relative-caret-position="867">
+          <caret line="63" column="20" selection-start-line="63" selection-start-column="20" selection-end-line="63" selection-end-column="20" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/NinaRowWeb/src/chat/servlets/javafxClient/javaFXLogoutServlet.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="350">
+          <caret line="24" column="27" lean-forward="true" selection-start-line="24" selection-start-column="27" selection-end-line="24" selection-end-column="27" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/UI/src/UI/Lobby.fxml">
+      <provider editor-type-id="JavaFX-Scene-Builder" />
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="477">
+          <caret line="37" column="52" selection-start-line="37" selection-start-column="52" selection-end-line="37" selection-end-column="52" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://C:/Program Files/Java/jdk1.8.0_171/javafx-src.zip!/javafx/scene/layout/BorderStroke.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="34">
+          <caret line="25" column="14" selection-start-line="25" selection-start-column="8" selection-end-line="25" selection-end-column="14" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/UI/src/UI/Controllers/GameDescriptionController.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="428">
+          <caret line="78" column="142" lean-forward="true" selection-start-line="78" selection-start-column="142" selection-end-line="78" selection-end-column="142" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#1134#1135#0" expanded="true" />
+            <element signature="e#1171#1172#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/UI/src/UI/Controllers/LobbyController.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="486">
+          <caret line="143" column="77" selection-start-line="143" selection-start-column="77" selection-end-line="143" selection-end-column="77" />
         </state>
       </provider>
     </entry>

@@ -5,7 +5,9 @@ import UI.UIMisc.GameDescriptionData;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.HBox;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 
 import java.util.function.Consumer;
 
@@ -26,6 +28,9 @@ public class GameDescriptionController {
 
     public GameDescriptionController(GameDescriptionData data, Consumer<GameDescriptionData> onJoinGame) {
         this.setData(data);
+        this.handleGameState();
+        this.addChildren();
+        this.setUI();
         this.mJoinGameBtn.setOnMouseClicked(
                 (e) -> onJoinGame.accept(this.mGameDescriptionData)
         );
@@ -47,8 +52,6 @@ public class GameDescriptionController {
         this.mTargetLabel.setText(Integer.toString(data.getmTarget()));
         this.mGameNameLabel.setText(data.getmGameName());
         this.mUploaderNameLabel.setText(data.getmUploaderName());
-        this.handleGameState();
-        this.addChildren();
     }
 
     private void addChildren() {
@@ -63,11 +66,16 @@ public class GameDescriptionController {
     }
 
     private void handleGameState() {
-        // TODO: if in progress, paint in red. else, in green. Also, uncomment when game state is no longer sent as null
+        // TODO: if in progress, paint in red. else, in green.
+        // TODO: uncomment when game state is no longer sent as null
 //        if(this.mGameState.equals(eGameState.Ready)) {
 //            this.mJoinGameBtn.setDisable(false);
 //        } else {
 //            this.mJoinGameBtn.setDisable(true);
 //        }
+    }
+
+    private void setUI() {
+        this.mRootHbox.setBorder(new Border(new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderWidths.DEFAULT)));
     }
 }
