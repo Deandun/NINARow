@@ -70,12 +70,9 @@ public class GamesManager {
     }
 
     public List<PlayedTurnData> getTurnHistoryForGame(String gameName, int currentTurnForClient) {
-        //TODO implement
-        // get the delta of played turn data.
-        List<PlayedTurnData> playedTurnsDataHistory = new ArrayList<>();
+        //TODO check
+        Game game = this.mGameNameToGame.get(gameName);
 
-
-
-        return null;
+        return game.getTurnHistory();
     }
 }

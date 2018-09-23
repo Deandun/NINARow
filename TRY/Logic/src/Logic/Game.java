@@ -272,6 +272,10 @@ public class Game {
         }
     }
 
+    public List<PlayedTurnData> getTurnHistory() {
+        return mHistoryManager.GetGameHistory();
+    }
+
     public class GameStatus implements IGameStatus {
         private eGameState mGameState = eGameState.Inactive;
         private Player mCurrentPlayer;

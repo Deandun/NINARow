@@ -11,7 +11,13 @@ table{
     width:100%;
     table-layout: fixed;
 }
-.tbl-header{
+header{
+    background-color: rgba(255,255,255,0.3);
+}
+.tbl-header-users{
+    background-color: rgba(255,255,255,0.3);
+}
+.tbl-header-games{
     background-color: rgba(255,255,255,0.3);
 }
 .tbl-content{
