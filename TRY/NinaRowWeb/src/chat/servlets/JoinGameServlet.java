@@ -18,6 +18,8 @@ import java.io.PrintWriter;
 @WebServlet(urlPatterns = {"/joingame"})
 public class JoinGameServlet extends HttpServlet {
 
+    private static final String GAME_ROOM_URL = "/pages/game_room/game_room.html";
+
     private static final int GENERAL_ERROR = 499;
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
@@ -30,14 +32,14 @@ public class JoinGameServlet extends HttpServlet {
 
         if (usernameFromSession != null) {
             String gameName = request.getParameter(Constants.GAME_NAME_PARAM);
-            this.handleJoinGame(usernameFromSession, gameName, response);
+            this.handleJoinGame(usernameFromSession, gameName, response, request.getContextPath());
         } else {
             // Unidentified user. Send back to login screen.
             response.sendRedirect(request.getContextPath() + "/index.html");
         }
     }
 
-    private void handleJoinGame(String userName, String gameName, HttpServletResponse response) {
+    private void handleJoinGame(String userName, String gameName, HttpServletResponse response, String contextPath) {
         String errorMessage = null;
         PrintWriter out = null;
 
@@ -50,6 +52,7 @@ public class JoinGameServlet extends HttpServlet {
             try {
                 out = response.getWriter();
                 gamesManager.addUserToGame(gameName, player);
+                response.sendRedirect(contextPath + GAME_ROOM_URL);
             } catch(IOException e) {
                 response.setStatus(GENERAL_ERROR);
             } catch (Exception e) {
