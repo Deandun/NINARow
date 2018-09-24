@@ -52,6 +52,7 @@ public class JoinGameServlet extends HttpServlet {
             try {
                 out = response.getWriter();
                 gamesManager.addUserToGame(gameName, player);
+                response.addHeader("gamename", gameName);
                 response.sendRedirect(contextPath + GAME_ROOM_URL);
             } catch(IOException e) {
                 response.setStatus(GENERAL_ERROR);

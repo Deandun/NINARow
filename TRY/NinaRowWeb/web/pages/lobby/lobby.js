@@ -3,7 +3,6 @@ var UPLOAD_FILE_URL = buildUrlWithContextPath("upload");
 var PULL_GAMES_DATA_URL = buildUrlWithContextPath("gamesdata");
 var JOIN_GAME_URL = buildUrlWithContextPath("joingame");
 
-
 $(function() {
     var pullTimer = 1500;
     window.setInterval(pullUserNames, pullTimer);
@@ -101,6 +100,7 @@ function joinGame(gameName, userName) {
     console.log("Join " + gameName);
     var url = JOIN_GAME_URL + '?gamename=' + gameName;
     window.location = url.replace(' ', '+');
+
 
     return true;
 }
