@@ -3,10 +3,7 @@ package MultiGamesLogic;
 import Logic.Exceptions.InvalidFileInputException;
 import Logic.Game;
 import Logic.Managers.FileManager;
-import Logic.Models.GameDescriptionData;
-import Logic.Models.GameSettings;
-import Logic.Models.PlayTurnParameters;
-import Logic.Models.PlayedTurnData;
+import Logic.Models.*;
 
 import javax.xml.bind.JAXBException;
 import java.io.IOException;
@@ -19,17 +16,18 @@ public class GamesManager {
 
     // User actions.
 
-    public void addGame(InputStream fileContentStream, String uploaderName) throws InterruptedException, IOException, JAXBException, InvalidFileInputException {
+    public synchronized void addGame(InputStream gameContentStream, String uploaderName) throws InterruptedException, IOException, JAXBException, InvalidFileInputException {
         GameSettings gameSettingsFromFile;
 
-        gameSettingsFromFile = this.mFileManager.LoadGameFile(fileContentStream);
+        gameSettingsFromFile = this.mFileManager.LoadGameFile(gameContentStream);
         gameSettingsFromFile.setUploaderName(uploaderName);
 
+        //TODO: check if game name contains "+"
         if(!this.isGameNameAlreadyExist(gameSettingsFromFile.getmGameName())) {
             Game newGame = new Game(gameSettingsFromFile);
             this.mGameNameToGame.put(gameSettingsFromFile.getmGameName(), newGame);
         } else {
-                throw new InvalidFileInputException("Invalid game file! Game name is already exists.");
+            throw new InvalidFileInputException("Invalid game file! Game name is already exists.");
         }
     }
 
@@ -37,12 +35,14 @@ public class GamesManager {
         return this.mGameNameToGame.keySet().stream().anyMatch(name -> name.equals(gameName));
     }
 
-    public void userJoinedGame(String gameName, String playerName) {
-        // get relevant game from map.
+    public void addUserToGame(String gameName, Player joiningPlayer) throws Exception {
+        Game game = this.mGameNameToGame.get(gameName);
 
-        // create player with new name.
+        game.addPlayer(joiningPlayer);
 
-        // check if game should start - start game.
+        if(game.shouldStartGame()) {
+            game.StartGame();
+        }
     }
 
     public void userLeftGame(String gameName, String playerName) {
@@ -70,7 +70,6 @@ public class GamesManager {
     }
 
     public List<PlayedTurnData> getTurnHistoryForGame(String gameName, int currentTurnForClient) {
-        //TODO check
         Game game = this.mGameNameToGame.get(gameName);
 
         return game.getTurnHistory();

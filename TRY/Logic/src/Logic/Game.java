@@ -31,6 +31,10 @@ public class Game {
     private List<Player> mPlayerList;
     private GameSettings mGameSettings;
 
+    // Locks
+    private Object mPlayersLock = new Object();
+    private Object mTurnsLock = new Object();
+
     public Game(GameSettings gameSettings) {
         this.mHistoryManager = new HistoryManager();
         this.mGameStatus = new GameStatus();
@@ -151,30 +155,32 @@ public class Game {
     }
 
     private void currentPlayerQuit(PlayTurnParameters turnParameters) {
-        PlayedTurnData playedTurnData = new PlayedTurnData();
-        eGameState gameState = eGameState.Active;
+        synchronized (this.mPlayersLock) {
+            PlayedTurnData playedTurnData = new PlayedTurnData();
+            eGameState gameState = eGameState.Active;
 
-        // If there are more than 2 players, the game will go on after player quits.
-        Collection<Cell> updatedCells = this.mGameBoard.RemoveAllPlayerDiscsFromBoardAndGetUpdatedCells(this.mGameStatus.getPlayer());
-        playedTurnData.setUpdatedCellsCollection(updatedCells);
+            // If there are more than 2 players, the game will go on after player quits.
+            Collection<Cell> updatedCells = this.mGameBoard.RemoveAllPlayerDiscsFromBoardAndGetUpdatedCells(this.mGameStatus.getPlayer());
+            playedTurnData.setUpdatedCellsCollection(updatedCells);
 
-        if(this.mPlayerList.size() > 2) {
-            if (this.mSequenceSearcher.CheckEntireBoardForWinningSequences()){  //run all over board and check if someone won
+            if (this.mPlayerList.size() > 2) {
+                if (this.mSequenceSearcher.CheckEntireBoardForWinningSequences()) {  //run all over board and check if someone won
+                    gameState = eGameState.Won;
+                } else if (this.isDrawForNextPlayer()) {
+                    gameState = eGameState.Draw;
+                }
+            } else {
                 gameState = eGameState.Won;
-            } else if(this.isDrawForNextPlayer()) {
-                gameState = eGameState.Draw;
             }
-        } else {
-            gameState = eGameState.Won;
+
+            this.mGameStatus.CurrentPlayerQuitGame();
+
+            playedTurnData.setGameState(gameState);
+            playedTurnData.setTurnType(turnParameters.getmTurnType());
+
+            // Don't update game status, it was done in GameStatus.CurrentPlayerQuit.
+            this.finishedPlayingTurn(playedTurnData, false);
         }
-
-        this.mGameStatus.CurrentPlayerQuitGame();
-
-        playedTurnData.setGameState(gameState);
-        playedTurnData.setTurnType(turnParameters.getmTurnType());
-
-        // Don't update game status, it was done in GameStatus.CurrentPlayerQuit.
-        this.finishedPlayingTurn(playedTurnData, false);
     }
 
     public boolean isGameActive(){
@@ -274,6 +280,25 @@ public class Game {
 
     public List<PlayedTurnData> getTurnHistory() {
         return mHistoryManager.GetGameHistory();
+    }
+
+    public void addPlayer(Player player) {
+
+        synchronized (this.mPlayersLock) {
+            if(this.isGameActive()) {
+                //TODO: exception
+            } else if(this.mPlayerList.size()  >= this.mGameSettings.getGameNumberOfPlayers()) {
+                //TODO: exception
+            } else if (this.mPlayerList.contains(player)) {
+                //TODO: exception
+            }
+
+            this.mPlayerList.add(player);
+        }
+    }
+
+    public boolean shouldStartGame() {
+        return this.mPlayerList.size() == this.mGameSettings.getGameNumberOfPlayers();
     }
 
     public class GameStatus implements IGameStatus {

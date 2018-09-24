@@ -1,5 +1,6 @@
 package chat.servlets;
 
+import ChatLogicEngine.users.PlayerManager;
 import ChatLogicEngine.users.UserManager;
 import chat.utils.ServletUtils;
 import chat.utils.SessionUtils;
@@ -18,11 +19,11 @@ public class LogoutServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String usernameFromSession = SessionUtils.getUsername(request);
-        UserManager userManager = ServletUtils.getUserManager(getServletContext());
+        PlayerManager playerManager = ServletUtils.getPlayerManager(getServletContext());
 
         if (usernameFromSession != null) {
             System.out.println("Clearing session for " + usernameFromSession);
-            userManager.removeUser(usernameFromSession);
+            playerManager.removePlayerWithName(usernameFromSession);
             SessionUtils.clearSession(request);
 
             /*

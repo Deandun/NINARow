@@ -1,5 +1,6 @@
 package chat.servlets.javafxClient;
 
+import ChatLogicEngine.users.PlayerManager;
 import ChatLogicEngine.users.UserManager;
 import chat.constants.Constants;
 import chat.utils.ServletUtils;
@@ -28,7 +29,7 @@ public class JavaFXLoginServlet  extends HttpServlet {
         System.out.println("Entered login servlet.");
 
         String usernameFromSession = SessionUtils.getUsername(request);
-        UserManager userManager = ServletUtils.getUserManager(getServletContext());
+        PlayerManager playerManager = ServletUtils.getPlayerManager(getServletContext());
 
         PrintWriter out = response.getWriter();
 
@@ -44,15 +45,14 @@ public class JavaFXLoginServlet  extends HttpServlet {
                 usernameFromParameter = usernameFromParameter.trim();
 
                 synchronized (this) {
-                    if (userManager.isUserExists(usernameFromParameter)) {
+                    if (playerManager.isUserExists(usernameFromParameter)) {
                         response.setStatus(USER_NAME_ALREADY_EXISTS);
                         out.println("Username already exists.");
                         System.out.println("Username already exists" + usernameFromParameter);
                     } else {
-                        userManager.addUser(usernameFromParameter);
+                        //TODO: check if player ishuman. Also, send ishuman from javafx client
+                        playerManager.addPlayer(usernameFromParameter, true);
 
-                        //add the new user to the users list
-                        userManager.addUser(usernameFromParameter);
                         // start session with user.
                         request.getSession(true).setAttribute(Constants.USERNAME, usernameFromParameter);
                         //redirect the request to the chat room - in order to actually change the URL

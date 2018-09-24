@@ -1,5 +1,6 @@
 package chat.servlets;
 
+import ChatLogicEngine.users.PlayerManager;
 import ChatLogicEngine.users.UserManager;
 import chat.utils.ServletUtils;
 import com.google.gson.Gson;
@@ -22,8 +23,8 @@ public class UsersListServlet extends HttpServlet {
         response.setContentType("application/json");
         try (PrintWriter out = response.getWriter()) {
             Gson gson = new Gson();
-            UserManager userManager = ServletUtils.getUserManager(getServletContext());
-            Set<String> usersList = userManager.getUsers();
+            PlayerManager playerManager = ServletUtils.getPlayerManager(getServletContext());
+            Set<String> usersList = playerManager.getAllPlayerNames();
             String json = gson.toJson(usersList);
             out.println(json);
             out.flush();
