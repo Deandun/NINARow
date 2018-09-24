@@ -41,11 +41,18 @@ public class UploadGameFileServlet extends HttpServlet {
         InputStream fileContentStream = new ByteArrayInputStream( fileContent.toString().getBytes("UTF-8"));
 
         //TODO: if an exception is thrown - send error with response (and error message).
-        this.initNewGameFromFileContent(fileContentStream);
+        this.initNewGameFromFileContent(fileContentStream, request, response);
 
     }
 
-    private void initNewGameFromFileContent(InputStream fileContentStream) {
+    private void initNewGameFromFileContent(InputStream fileContentStream, HttpServletRequest request, HttpServletResponse response) {
+        PrintWriter out = null;
+        try {
+            out = response.getWriter();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         GamesManager gamesManager = ServletUtils.getGamesManager(getServletContext());
         try {
             gamesManager.addGame(fileContentStream, SessionUtils.getUsername(request));
