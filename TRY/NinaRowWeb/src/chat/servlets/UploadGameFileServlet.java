@@ -22,52 +22,47 @@ import java.util.Scanner;
 @MultipartConfig(fileSizeThreshold = 1024 * 1024, maxFileSize = 1024 * 1024 * 5, maxRequestSize = 1024 * 1024 * 5 * 5)
 public class UploadGameFileServlet extends HttpServlet {
 
+    private static final int GENERAL_ERROR = 499;
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        //TODO: get uploader name from session.
-        response.setContentType("text/html");
-        PrintWriter out = response.getWriter();
+        String userName = SessionUtils.getUsername(request);
 
-        Collection<Part> parts = request.getParts();
-        out.println("Total parts : " + parts.size() + " ");
+        if(userName != null) {
+            response.setContentType("text/html");
 
-        StringBuilder fileContent = new StringBuilder();
+            Collection<Part> parts = request.getParts();
 
-        for (Part part : parts) {
-            //to write the content of the file to a string
-            fileContent.append(readFromInputStream(part.getInputStream()));
+            StringBuilder fileContent = new StringBuilder();
+
+            for (Part part : parts) {
+                //to write the content of the file to a string
+                fileContent.append(readFromInputStream(part.getInputStream()));
+            }
+
+            InputStream fileContentStream = new ByteArrayInputStream(fileContent.toString().getBytes("UTF-8"));
+
+            this.initNewGameFromFileContent(fileContentStream, userName, response);
+        } else {
+            response.setStatus(GENERAL_ERROR);
+            PrintWriter out = response.getWriter();
+            out.append("Unidentified user. Please log in.");
         }
-
-        InputStream fileContentStream = new ByteArrayInputStream( fileContent.toString().getBytes("UTF-8"));
-
-        //TODO: if an exception is thrown - send error with response (and error message).
-        this.initNewGameFromFileContent(fileContentStream, request, response);
-
     }
 
-    private void initNewGameFromFileContent(InputStream fileContentStream, HttpServletRequest request, HttpServletResponse response) {
+    private void initNewGameFromFileContent(InputStream fileContentStream, String userName, HttpServletResponse response) {
         PrintWriter out = null;
+        GamesManager gamesManager = ServletUtils.getGamesManager(getServletContext());
+
         try {
             out = response.getWriter();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+            gamesManager.addGame(fileContentStream, userName);
+        } catch(Exception e) {
+            if(out != null) {
+                out.append(e.getMessage());
+            }
 
-        GamesManager gamesManager = ServletUtils.getGamesManager(getServletContext());
-        try {
-            gamesManager.addGame(fileContentStream, SessionUtils.getUsername(request));
-            //TODO: take care of exceptions.
-        } catch (InterruptedException e) {
-			out.append(e.getMessage());
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }  catch (InvalidFileInputException e) {
-            response.setStatus(HttpServletResponse.SC_CONFLICT);
-            out.append(e.getMessage());
-            e.printStackTrace();
-        }  catch (JAXBException e) {
-            e.printStackTrace();
+            response.setStatus(GENERAL_ERROR);
         }
     }
 

@@ -1,5 +1,6 @@
 package chat.servlets.javafxClient;
 
+import ChatLogicEngine.users.PlayerManager;
 import ChatLogicEngine.users.UserManager;
 import chat.utils.ServletUtils;
 import chat.utils.SessionUtils;
@@ -19,11 +20,11 @@ public class javaFXLogoutServlet extends HttpServlet {
             throws ServletException, IOException {
         // The javafx client passes the username through the http params.
         String usernameFromSession = request.getParameter(USERNAME);
-        UserManager userManager = ServletUtils.getUserManager(getServletContext());
+        PlayerManager playerManager = ServletUtils.getPlayerManager(getServletContext());
 
         if (usernameFromSession != null) {
             System.out.println("Clearing session for " + usernameFromSession);
-            userManager.removeUser(usernameFromSession);
+            playerManager.removePlayerWithName(usernameFromSession);
         }
     }
 

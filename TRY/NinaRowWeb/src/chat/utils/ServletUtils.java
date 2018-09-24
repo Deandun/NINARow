@@ -1,6 +1,7 @@
 package chat.utils;
 
 import ChatLogicEngine.ChatManager;
+import ChatLogicEngine.users.PlayerManager;
 import ChatLogicEngine.users.UserManager;
 import MultiGamesLogic.GamesManager;
 
@@ -11,7 +12,7 @@ import static chat.constants.Constants.INT_PARAMETER_ERROR;
 
 public class ServletUtils {
 
-	private static final String USER_MANAGER_ATTRIBUTE_NAME = "userManager";
+	private static final String PLAYER_MANAGER_ATTRIBUTE_NAME = "playerManager";
 	private static final String CHAT_MANAGER_ATTRIBUTE_NAME = "chatManager";
     private static final String GAMES_MANAGER_ATTRIBUTE_NAME = "gamesManager";
 
@@ -19,18 +20,18 @@ public class ServletUtils {
 	Note how the synchronization is done only on the question and\or creation of the relevant managers and once they exists -
 	the actual fetch of them is remained unchronicled for performance POV
 	 */
-	private static final Object userManagerLock = new Object();
+	private static final Object playerManagerLock = new Object();
 	private static final Object chatManagerLock = new Object();
 	private static final Object gamesManagerLock = new Object();
 
-	public static UserManager getUserManager(ServletContext servletContext) {
+	public static PlayerManager getPlayerManager(ServletContext servletContext) {
 
-		synchronized (userManagerLock) {
-			if (servletContext.getAttribute(USER_MANAGER_ATTRIBUTE_NAME) == null) {
-				servletContext.setAttribute(USER_MANAGER_ATTRIBUTE_NAME, new UserManager());
+		synchronized (playerManagerLock) {
+			if (servletContext.getAttribute(PLAYER_MANAGER_ATTRIBUTE_NAME) == null) {
+				servletContext.setAttribute(PLAYER_MANAGER_ATTRIBUTE_NAME, new PlayerManager());
 			}
 		}
-		return (UserManager) servletContext.getAttribute(USER_MANAGER_ATTRIBUTE_NAME);
+		return (PlayerManager) servletContext.getAttribute(PLAYER_MANAGER_ATTRIBUTE_NAME);
 	}
 
 	public static ChatManager getChatManager(ServletContext servletContext) {

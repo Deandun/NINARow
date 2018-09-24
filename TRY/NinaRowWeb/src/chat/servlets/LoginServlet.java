@@ -40,7 +40,7 @@ public class LoginServlet extends HttpServlet {
         System.out.println("Entered login servlet.");
 
         String usernameFromSession = SessionUtils.getUsername(request);
-        UserManager userManager = ServletUtils.getUserManager(getServletContext());
+        PlayerManager playerManager = ServletUtils.getPlayerManager(getServletContext());
 
         if (usernameFromSession == null) {
             //user is not logged in yet
@@ -55,13 +55,12 @@ public class LoginServlet extends HttpServlet {
                 usernameFromParameter = usernameFromParameter.trim();
 
                 synchronized (this) {
-                    if (userManager.isUserExists(usernameFromParameter)) {
+                    if (playerManager.isUserExists(usernameFromParameter)) {
                         getServletContext().getRequestDispatcher(LOGIN_ERROR_URL).forward(request, response);
                     } else {
-                        userManager.addUser(usernameFromParameter);
+                        //TODO: get isHuman from parameter. Also send isHuman parameter from html.
+                        playerManager.addPlayer(usernameFromParameter, true);
 
-                        //add the new user to the users list
-                        userManager.addUser(usernameFromParameter);
                         // start session with user.
                         request.getSession(true).setAttribute(Constants.USERNAME, usernameFromParameter);
                         //redirect the request to the chat room - in order to actually change the URL
