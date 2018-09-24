@@ -57,6 +57,13 @@ public class GamesManager {
         // play turn with params.
     }
 
+
+    public GameDescriptionData getGameDescriptionForGameName(String gameName) {
+        Game game = this.mGameNameToGame.get(gameName);
+
+        return game.getGameDescriptionData();
+    }
+
     // Pull
 
     public List<GameDescriptionData> getAllGamesInfo() {

@@ -1,7 +1,6 @@
 package chat.servlets.javafxClient;
 
 import ChatLogicEngine.users.PlayerManager;
-import ChatLogicEngine.users.UserManager;
 import chat.constants.Constants;
 import chat.utils.ServletUtils;
 import chat.utils.SessionUtils;

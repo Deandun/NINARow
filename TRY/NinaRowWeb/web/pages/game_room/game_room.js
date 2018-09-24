@@ -5,7 +5,6 @@ $(function() {
     var pullTimer = 1500;
     //window.setInterval(pullTurnsDelta, pullTimer);
     //window.setInterval(pullPlayersData, pullTimer);
-
     //TODO: getGameDataAndSetUI();
     initUI();
 });

@@ -101,6 +101,5 @@ function joinGame(gameName, userName) {
     var url = JOIN_GAME_URL + '?gamename=' + gameName;
     window.location = url.replace(' ', '+');
 
-
     return true;
 }
