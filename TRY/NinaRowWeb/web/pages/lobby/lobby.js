@@ -1,6 +1,8 @@
 var USER_LIST_URL = buildUrlWithContextPath("userslist");
 var UPLOAD_FILE_URL = buildUrlWithContextPath("upload");
 var PULL_GAMES_DATA_URL = buildUrlWithContextPath("gamesdata");
+var JOIN_GAME_URL = buildUrlWithContextPath("joingame");
+
 
 $(function() {
     var pullTimer = 1500;
@@ -46,12 +48,9 @@ function onFormSubmit() {
         timeout: 4000,
         error: function(e) {
             if (e.status === 409) {
-                $("#result").text("ERROR: Duplicate game name !");
-            } else {
-                $("#result").text("Failed to get result from server " + e);
-            }
-            console.error("Failed to submit");
-        },
+                $("#result").text("Failed to submit. " + e.message());
+                console.error("Failed to submit. " + e.message());
+            }},
         success: function(r) {
             $("#result").text("Success uploading file: " + r);
             console.log(r);
@@ -88,18 +87,20 @@ function addGameDetails(index, dataJson) {
     tableRow.append("<td>" + dataJson.mRows + "X" + dataJson.mColumns+ "</td>");
     tableRow.append("<td>" + dataJson.mTarget+ "</td>");
     tableRow.append("<td>" + dataJson.mUploader+ "</td>");
-    tableRow.append("<td><button onclick='joinGame(\"" + dataJson.mGameName + "\")'>Join Game</button></td>");
 
+    if (dataJson.mGameState === "Inactive"){
+        tableRow.append("<td><button onclick='joinGame(\"" + dataJson.mGameName + "\")'>Join Game</button></td>");
+    } else {
+        tableRow.append("<td><button disabled='true'(\"" + dataJson.mGameName + "\")'>Join Game</button></td>");
+    }
 
     $('#game-details').append(tableRow);
 }
 
 function joinGame(gameName, userName) {
-    console.log("Join " + gameName)
+    console.log("Join " + gameName);
+    var url = JOIN_GAME_URL + '?gamename=' + gameName;
+    window.location = url.replace(' ', '+');
 
-    //check if game is inactive
-
-    //check if there is a free place for user to join the game
-
-    //update the game that new user has joined the game
+    return true;
 }

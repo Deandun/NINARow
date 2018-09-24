@@ -25,7 +25,7 @@ public class GamesManager {
         gameSettingsFromFile = this.mFileManager.LoadGameFile(fileContentStream);
         gameSettingsFromFile.setUploaderName(uploaderName);
 
-        if(!this.isGameNameAlreadyExist(gameSettingsFromFile.getmGameName())) {
+        if (!this.isGameNameAlreadyExist(gameSettingsFromFile.getmGameName())) {
             Game newGame = new Game(gameSettingsFromFile);
             this.mGameNameToGame.put(gameSettingsFromFile.getmGameName(), newGame);
         } else {
