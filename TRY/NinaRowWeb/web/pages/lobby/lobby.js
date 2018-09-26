@@ -5,6 +5,7 @@ var JOIN_GAME_URL = buildUrlWithContextPath("joingame");
 
 $(function() {
     var pullTimer = 1500;
+    console.log(window.loggedInUserName);
     window.setInterval(pullUserNames, pullTimer);
     window.setInterval(pullGames, pullTimer);
     $("#uploadForm").submit(onFormSubmit);
@@ -80,7 +81,7 @@ var currentGameData;
 
 // dataJson = { mGameName = "", mGameState = "", mCurrentNumberOfPlayers = 0, mMaxPlayers = 4, mRows = 7, mColumns = 8, mTarget = 4, mUploaderName = "" }
 function addGameDetails(index, dataJson) {
-    gameNameToGameData.set(dataJson.mGameName, dataJson);
+    window.gameNameToGameData.set(dataJson.mGameName, dataJson);
 
     var tableRow = $("<tr>");
 

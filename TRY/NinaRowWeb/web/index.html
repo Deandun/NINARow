@@ -3,6 +3,8 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Online Chat</title>
+        <script src="common/jquery-2.0.3.min.js"></script>
+        <script src="index.js"></script>
 
         <link rel="stylesheet" href="pages/game_room/game_room.css">
 
@@ -12,8 +14,8 @@
             <h1>Welcome to the N in a Row game</h1>
             <br/>
             <h2>Please enter a unique user name:</h2>
-            <form method="GET" action="lobby">
-                <input type="text" name="username" class=""/>
+            <form id="loginInput" method="GET" action="lobby">
+                <input id="userNameText" type="text" name="username" class=""/>
                 <input type="submit" value="Login"/>
             </form>
         </div>
