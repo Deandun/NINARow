@@ -2,7 +2,6 @@ package chat.utils;
 
 import ChatLogicEngine.ChatManager;
 import ChatLogicEngine.users.PlayerManager;
-import ChatLogicEngine.users.UserManager;
 import MultiGamesLogic.GamesManager;
 
 import javax.servlet.ServletContext;

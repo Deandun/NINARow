@@ -1,6 +1,5 @@
 package chat.servlets;
 
-import ChatLogicEngine.users.UserManager;
 import Logic.Models.GameDescriptionData;
 import MultiGamesLogic.GamesManager;
 import chat.utils.ServletUtils;

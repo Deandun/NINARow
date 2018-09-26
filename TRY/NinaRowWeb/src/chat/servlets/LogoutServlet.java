@@ -1,7 +1,6 @@
 package chat.servlets;
 
 import ChatLogicEngine.users.PlayerManager;
-import ChatLogicEngine.users.UserManager;
 import chat.utils.ServletUtils;
 import chat.utils.SessionUtils;
 
