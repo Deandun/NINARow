@@ -22,18 +22,17 @@ table{
 
 .column{
     position: absolute;
-
 }
-#game-board-container{
+.center{
     width: 60%;
     left: 0;
 }
-#game-player-names{
+.right{
     width: 20%;
     right: 0;
 }
 
-#gameDetails{
+.left{
     width: 20%;
     left: 0;
 }

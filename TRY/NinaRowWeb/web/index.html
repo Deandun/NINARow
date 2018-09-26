@@ -2,22 +2,26 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Online Chat</title>
+        <title>DeaNoy N-IN-A-ROW Game</title>
         <script src="common/jquery-2.0.3.min.js"></script>
         <script src="index.js"></script>
 
-        <link rel="stylesheet" href="pages/game_room/game_room.css">
+        <link rel="stylesheet" href="index.css">
+        <div id ="Title">
+            <img src="images/WelcomeTitle.png" alt="Welcome to DeaNoy's Game">
+        </div>
+        <br/>
 
     </head>
     <body>
         <div class="container">
-            <h1>Welcome to the N in a Row game</h1>
-            <br/>
-            <h2>Please enter a unique user name:</h2>
-            <form id="loginInput" method="GET" action="lobby">
-                <input id="userNameText" type="text" name="username" class=""/>
-                <input type="submit" value="Login"/>
-            </form>
+            <div id="getPlayerName">
+                <h2>Please enter a unique user name:</h2>
+                <form id="loginInput" class="playerName" method="GET" action="lobby">
+                    <input id="userNameText" type="text" name="username"/>
+                    <input type="submit" class="btn" value="Login"/>
+                </form>
+            </div>
         </div>
     </body>
 </html>

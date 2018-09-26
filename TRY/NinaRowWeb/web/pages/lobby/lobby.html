@@ -15,21 +15,24 @@
 </head>
 
 <body>
-<div id="lobbyConfigs" class = "up">
-    <ul>
+<div id ="Title" class="row">
+    <img src="../../images/LobbyTitle.png" alt="DeaNoy Lobby">
+</div>
+<div id="lobbyConfigs" class="row">
+    <ul id="horizontal-list">
         <li>
             <a href="../logout" class="btn btn-info btn-lg active" role="button">Logout</a>
         </li>
         <li>
             <form id="uploadForm" action="/upload" enctype="multipart/form-data" method="POST">
-                <input type="file" name="gamefile" value="Add Game"><br>
-                <input type="Submit" value="Hidden submit"><br>
+                <input type="file" class="btn" name="gamefile" value="Load File Game"><br>
+                <input type="Submit" class="btn" value="Submit"><br>
             </form>
         </li>
     </ul>
 </div>
 
-<div id="centered">
+<div id="centered" class="row">
     <div id="onlineUsers" class = "right table">
         <h2>Online Users</h2>
         <div class="tbl-content">
