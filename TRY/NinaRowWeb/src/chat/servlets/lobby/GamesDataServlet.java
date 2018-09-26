@@ -1,5 +1,8 @@
-package chat.servlets;
+package chat.servlets.lobby;
 
+import Logic.Models.GameDescriptionData;
+import MultiGamesLogic.GamesManager;
+import chat.utils.ServletUtils;
 import com.google.gson.Gson;
 
 import javax.servlet.ServletException;
@@ -9,21 +12,22 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.List;
+import java.util.Set;
 
-@WebServlet(urlPatterns = {"/playerslist"})
-public class PlayersListServlet extends HttpServlet {
-
-
+@WebServlet(urlPatterns = {"/gamesdata"})
+public class GamesDataServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         //returning JSON objects, not HTML
         response.setContentType("application/json");
         try (PrintWriter out = response.getWriter()) {
+
             Gson gson = new Gson();
-           // UserManager userManager = ServletUtils.getUserManager(getServletContext());
-           // Set<String> usersList = userManager.getUsers();
-           // String json = gson.toJson(usersList);
-           // out.println(json);
+            GamesManager gamesManager = ServletUtils.getGamesManager(getServletContext());
+            List<GameDescriptionData> gameDescriptionDataSet = gamesManager.getAllGamesInfo();
+            String json = gson.toJson(gameDescriptionDataSet);
+            out.println(json);
             out.flush();
         }
     }
@@ -42,28 +46,4 @@ public class PlayersListServlet extends HttpServlet {
             throws ServletException, IOException {
         processRequest(request, response);
     }
-
-    /**
-     * Handles the HTTP <code>POST</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        processRequest(request, response);
-    }
-
-    /**
-     * Returns a short description of the servlet.
-     *
-     * @return a String containing servlet description
-     */
-    @Override
-    public String getServletInfo() {
-        return "Short description";
-    }// </editor-fold>
 }

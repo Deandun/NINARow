@@ -1,4 +1,4 @@
-package chat.servlets;
+package chat.servlets.login;
 
 import ChatLogicEngine.users.*;
 import chat.constants.Constants;

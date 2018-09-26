@@ -15,6 +15,8 @@ public class ServletUtils {
 	private static final String CHAT_MANAGER_ATTRIBUTE_NAME = "chatManager";
     private static final String GAMES_MANAGER_ATTRIBUTE_NAME = "gamesManager";
 
+    private static final String GAME_NAME_PARAM = "gamename";
+
     /*
 	Note how the synchronization is done only on the question and\or creation of the relevant managers and once they exists -
 	the actual fetch of them is remained unchronicled for performance POV
@@ -61,5 +63,10 @@ public class ServletUtils {
         }
 
         return (GamesManager) servletContext.getAttribute(GAMES_MANAGER_ATTRIBUTE_NAME);
+    }
+
+    public static String getGameNameFromRequest(HttpServletRequest request) {
+        String gameName = request.getParameter(GAME_NAME_PARAM);
+        return gameName.replace("+", " ");
     }
 }
