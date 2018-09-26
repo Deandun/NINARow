@@ -9,6 +9,8 @@ public class Constants {
 
     public static final String GAME_NAME_PARAM = "gamename";
 
+    public static final String GAME_NAME_SEPORATOR = "+";
+
     public static final int INT_PARAMETER_ERROR = Integer.MIN_VALUE;
 
 }

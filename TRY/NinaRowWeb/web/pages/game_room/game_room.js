@@ -44,22 +44,23 @@ function getGameDataAndSetUI() {
 
 
 // TODO: move to UI JS file.
-function initUI(currentGameData) {
-    //initGameDetailsUI(currentGameData);
-    initBoard(currentGameData);
+function initUI() {
+    var data = window.currentGameData;
+    initGameDetailsUI(data);
+    initBoard(data);
 }
 
 function initGameDetailsUI(gameData) {
-    $('#tdGameType').append(currentGameData.mVariant);
-    $('#tdTarget').append(currentGameData.mTarget);
-    $('#tdBoardSize').append(currentGameData.mRows + "X" + currentGameData.mColumns);
-    $('#tdGameUploader').append(currentGameData.mUploaderName);
-    $('#tdGameState').append(currentGameData.mGameState);
+    $('#tdGameType').append(gameData.mVariant);
+    $('#tdTarget').append(gameData.mTarget);
+    $('#tdBoardSize').append(gameData.mRows + "X" + gameData.mColumns);
+    $('#tdGameUploader').append(gameData.mUploaderName);
+    $('#tdGameState').append(gameData.mGameState);
 }
 
 function initBoard(gameData) {
-    var rows = 7//gameData.mRows;
-    var columns = 5//gameData.mColumns;
+    var rows = gameData.mRows;
+    var columns = gameData.mColumns;
     var boardTable = $("#game-board-table");
 
     for(var i = 0; i < rows; i++) {

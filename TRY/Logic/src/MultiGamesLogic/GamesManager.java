@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
+
 public class GamesManager {
     private Map<String, Game> mGameNameToGame = new HashMap<>();
     private FileManager mFileManager = new FileManager();
@@ -22,12 +23,15 @@ public class GamesManager {
         gameSettingsFromFile = this.mFileManager.LoadGameFile(gameContentStream);
         gameSettingsFromFile.setUploaderName(uploaderName);
 
-        //TODO: check if game name contains "+"
-        if(!this.isGameNameAlreadyExist(gameSettingsFromFile.getmGameName())) {
-            Game newGame = new Game(gameSettingsFromFile);
-            this.mGameNameToGame.put(gameSettingsFromFile.getmGameName(), newGame);
+        if(!gameSettingsFromFile.getmGameName().contains("+")) { // Game name does not contain seporator - valid name.
+            if (!this.isGameNameAlreadyExist(gameSettingsFromFile.getmGameName())) {
+                Game newGame = new Game(gameSettingsFromFile);
+                this.mGameNameToGame.put(gameSettingsFromFile.getmGameName(), newGame);
+            } else {
+                throw new InvalidFileInputException("Invalid game file! Game name is already exists.");
+            }
         } else {
-            throw new InvalidFileInputException("Invalid game file! Game name is already exists.");
+            throw new InvalidFileInputException("Invalid game name! Game name must not contain '+'."); // Game contains seporator - invalid name.
         }
     }
 

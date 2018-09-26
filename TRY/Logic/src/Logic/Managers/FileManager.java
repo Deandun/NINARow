@@ -73,8 +73,10 @@ public class FileManager {
         checkIfDynamicPlayersDataIsValid(gameDescriptor.getDynamicPlayers());
     }
 
-    private void checkIfDynamicPlayersDataIsValid(DynamicPlayers dynamicPlayers) {
-        //TODO
+    private void checkIfDynamicPlayersDataIsValid(DynamicPlayers dynamicPlayers) throws InvalidFileInputException {
+        if(dynamicPlayers.getTotalPlayers() < GameSettings.MIN_NUM_OF_PLAYERS || dynamicPlayers.getTotalPlayers() > GameSettings.MAX_NUM_OF_PLAYERS) {
+            throw new InvalidFileInputException("Number of players in file is invalid. Must be between " + GameSettings.MIN_NUM_OF_PLAYERS + " and " + GameSettings.MAX_NUM_OF_PLAYERS);
+        }
     }
 
     private void checkIfGameDataIsValid(Game gameInfo) throws InvalidFileInputException {
