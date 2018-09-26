@@ -301,6 +301,10 @@ public class Game {
         return this.mPlayerList.size() == this.mGameSettings.getGameNumberOfPlayers();
     }
 
+    public List<Player> getPlayers() {
+        return this.mPlayerList;
+    }
+
     public class GameStatus implements IGameStatus {
         private eGameState mGameState = eGameState.Inactive;
         private Player mCurrentPlayer;

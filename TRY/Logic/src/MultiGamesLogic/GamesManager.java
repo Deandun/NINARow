@@ -1,5 +1,6 @@
 package MultiGamesLogic;
 
+import Logic.Enums.eGameState;
 import Logic.Exceptions.InvalidFileInputException;
 import Logic.Game;
 import Logic.Managers.FileManager;
@@ -84,5 +85,15 @@ public class GamesManager {
         Game game = this.mGameNameToGame.get(gameName);
 
         return game.getTurnHistory();
+    }
+
+    public Collection<Player> getPlayersForGame(String gameName) {
+        Game game = this.mGameNameToGame.get(gameName);
+        return game.getPlayers();
+    }
+
+    public eGameState getGameState(String gameName) {
+        Game game = this.mGameNameToGame.get(gameName);
+        return game.GetGameState();
     }
 }

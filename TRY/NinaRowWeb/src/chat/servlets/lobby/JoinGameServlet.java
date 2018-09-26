@@ -1,4 +1,4 @@
-package chat.servlets;
+package chat.servlets.lobby;
 
 import ChatLogicEngine.users.PlayerManager;
 import Logic.Models.Player;

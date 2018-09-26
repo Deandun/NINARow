@@ -6,8 +6,9 @@
     <link rel="stylesheet" href="game_room.css">
 
     <script src="../../common/jquery-2.0.3.min.js"></script>
+    <script src="JS/board.js"></script>
+    <script src="JS/playersDetails.js"></script>
     <script src="../../common/context-path-helper.js"></script>
-
     <script src="game_room.js"></script>
 
 </head>
@@ -60,9 +61,11 @@
             <h2>Players</h2>
             <div class="tbl-body">
                 <table id=playerDetailsTbl" cellpadding="0" cellspacing="0" border="0">
-                    <tr>
-                        <td>Dummy Player</td>
-                    </tr>
+                    <tbody id="player-details-tbody">
+                        <tr>
+                            <td>Dummy Player</td>
+                        </tr>
+                    </tbody>
                 </table>
             </div>
         </section>

@@ -1,4 +1,4 @@
-package chat.servlets;
+package chat.servlets.chat;
 
 import ChatLogicEngine.ChatManager;
 import ChatLogicEngine.SingleChatEntry;

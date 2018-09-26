@@ -1,4 +1,4 @@
-package chat.servlets;
+package chat.servlets.lobby;
 
 import Logic.Exceptions.InvalidFileInputException;
 import MultiGamesLogic.GamesManager;
