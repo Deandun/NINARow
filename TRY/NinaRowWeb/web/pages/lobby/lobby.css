@@ -4,8 +4,19 @@
     display: table-row;
 }
 
+
 .btn{
-    border-radius: 12px;
+    background-image: linear-gradient(to bottom left, darkgrey, white);
+    color: black;
+    border: none;
+    text-align: center;
+    font-size: 15px;
+    margin: 15px 15px;
+    padding: 8px 12px;
+    text-decoration: none;
+    display: block;
+    width : 90px;
+
 }
 .row img {
     display: block;

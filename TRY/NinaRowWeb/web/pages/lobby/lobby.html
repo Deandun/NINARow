@@ -19,17 +19,11 @@
     <img src="../../images/LobbyTitle.png" alt="DeaNoy Lobby">
 </div>
 <div id="lobbyConfigs" class="row">
-    <ul id="horizontal-list">
-        <li>
-            <a href="../logout" class="btn btn-info btn-lg active" role="button">Logout</a>
-        </li>
-        <li>
-            <form id="uploadForm" action="/upload" enctype="multipart/form-data" method="POST">
-                <input type="file" class="btn" name="gamefile" value="Load File Game"><br>
-                <input type="Submit" class="btn" value="Submit"><br>
-            </form>
-        </li>
-    </ul>
+    <a href="../logout" class="btn btn-info btn-lg active" role="button">Logout</a>
+    <form id="uploadForm" action="/upload" enctype="multipart/form-data" method="POST">
+        <input type="file" name="gamefile" value="Load File Game"><br>
+        <input type="Submit" class="btn" value="Submit"><br>
+    </form>
 </div>
 
 <div id="centered" class="row">
@@ -46,7 +40,7 @@
     <div id="existingGamesTable" class = "left table">
         <h2>Existing Games</h2>
         <div class="tbl-header">
-            <table cellpadding="0" cellspacing="0" border="0">
+            <table cellpadding="0" cellspacing="0" border="0" width="100%">
                 <thead>
                 <tr>
                     <th scope="col">Name</th>
