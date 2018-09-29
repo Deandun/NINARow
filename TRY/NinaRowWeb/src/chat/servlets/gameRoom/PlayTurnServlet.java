@@ -1,8 +1,8 @@
 package chat.servlets.gameRoom;
 
-import ChatLogicEngine.users.PlayerManager;
-import Logic.Enums.eGameState;
-import Logic.Models.Player;
+import Logic.Exceptions.InvalidInputException;
+import Logic.Models.GameDescriptionData;
+import Logic.Models.PlayTurnParameters;
 import MultiGamesLogic.GamesManager;
 import chat.utils.ServletUtils;
 import chat.utils.SessionUtils;
@@ -15,25 +15,37 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Set;
+import java.util.stream.Collectors;
 
-@WebServlet(urlPatterns = {"/gamestate"})
-public class GameStateServlet extends HttpServlet {
+@WebServlet(urlPatterns = {"/playturn"})
 
+public class PlayTurnServlet extends HttpServlet {
+
+    private static final int GENERAL_ERROR = 499;
+    private static final int INPUT_ERROR = 498;
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String gameName = ServletUtils.getGameNameFromRequest(request);
 
-        //returning JSON objects, not HTML
-        response.setContentType("application/json");
-        try (PrintWriter out = response.getWriter()) {
+        if(gameName != null) {
+            String requestBody = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
             Gson gson = new Gson();
+
+            PlayTurnParameters turnParameters = gson.fromJson(requestBody, PlayTurnParameters.class);
             GamesManager gamesManager = ServletUtils.getGamesManager(getServletContext());
-            eGameState gameState = gamesManager.getGameState(gameName);
-            String json = gson.toJson(gameState);
-            out.println(json);
-            out.flush();
+
+            PrintWriter out = null;
+
+            try {
+                out = response.getWriter();
+                gamesManager.playTurn(gameName, turnParameters);
+            } catch (IOException e) {
+                response.setStatus(GENERAL_ERROR);
+            } catch (InvalidInputException e) {
+                response.setStatus(INPUT_ERROR);
+                out.println(e.getMessage());
+            }
         }
     }
 

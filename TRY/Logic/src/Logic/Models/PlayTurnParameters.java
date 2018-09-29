@@ -7,6 +7,16 @@ public class PlayTurnParameters {
     private int mSelectedColumn;
     private eTurnType mTurnType;
 
+    public String getmPlayerName() {
+        return mPlayerName;
+    }
+
+    public void setmPlayerName(String mPlayerName) {
+        this.mPlayerName = mPlayerName;
+    }
+
+    private String mPlayerName;
+
     public PlayTurnParameters(eTurnType turnType) {
         this.mTurnType = turnType;
     }

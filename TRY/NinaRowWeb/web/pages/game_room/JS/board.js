@@ -1,6 +1,6 @@
 function initBoard(gameData) {
-    var rows = 6//gameData.mRows;
-    var columns = 8//gameData.mColumns;
+    var rows = gameData.mRows;
+    var columns = gameData.mColumns;
     var boardTable = $("#game-board-table");
 
     for(var i = 0; i < rows; i++) {

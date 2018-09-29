@@ -1,12 +1,17 @@
+var GAME_DATA_URL = buildUrlWithContextPath("gamedata");
 var GAME_STATE_URL = buildUrlWithContextPath("gamestate");
+var PLAYER_LIST_URL = buildUrlWithContextPath("playerslist");
+var pullTimer = 1500;
+
+
+var currentGameData;
+var currentPlayerName;
+var gameState = "InActive";
+var gameNameForPullingData;
 
 $(function() {
-    var pullTimer = 1500;
     init();
-    //window.setInterval(pullTurnsDelta, pullTimer);
-    window.setInterval(pullGameState, pullTimer);
-    window.setInterval(pullPlayersData, pullTimer);
-    initUI();
+    getGameData();
 });
 
 function init() {
@@ -16,25 +21,36 @@ function pullTurnsDelta() {
     //TODO
 }
 
-// we need this function only if we can't get game data from lobby.js
-// function getGameDataAndSetUI() {
-//     $.ajax({
-//         url: GAME_DATA_URL,
-//         timeout: 2000,
-//         error: function(e) {
-//             console.error("Failed to send ajax");
-//         },
-//         success: function(playersData) {
-//             $('#').children().remove();
-//             initPlayersUI(playersData);
-//         }
-//     });
-// }
+function getGameData() {
+    $.ajax({
+        url: GAME_DATA_URL,
+        timeout: 2000,
+        error: function(e) {
+            console.error("Failed to send ajax");
+        },
+        success: onFetchedGameData
+    });
+}
 
-function initUI() {
-    //var data = window.currentGameData;
-    //initGameDetailsUI(data); //TODO
-    initBoard();
+function startPullingIntervals() {
+    gameNameForPullingData = currentGameData.mGameName.replace(' ', '+');
+    window.setInterval(pullGameState, pullTimer);
+    window.setInterval(pullPlayersData, pullTimer);
+    //window.setInterval(pullTurnsDelta, pullTimer);
+}
+
+// gameDataJson = { mLoggedInPlayerName = "", mGameDescriptionData = { mGameName = "", mGameState = "", mCurrentNumberOfPlayers = 0, mMaxPlayers = 4, mRows = 7, mColumns = 8, mTarget = 4, mUploaderName = "" }}
+function onFetchedGameData(gameDataJson) {
+    currentPlayerName = gameDataJson.mCurrentPlayerName;
+    currentGameData = gameDataJson.mGameDescriptionData;
+    startPullingIntervals();
+
+    initUI(currentGameData);
+}
+
+function initUI(gameData) {
+    initGameDetailsUI(gameData);
+    initBoard(gameData);
 }
 
 function initGameDetailsUI(gameData) {
@@ -48,19 +64,22 @@ function initGameDetailsUI(gameData) {
 function pullGameState() {
     $.ajax({
         url: GAME_STATE_URL,
-        data: { "gamename": "Small+Game" }, //TODO: remove dummy game name - use game name from data.
+        data: { "gamename": gameNameForPullingData },
         timeout: 2000,
         error: function(e) {
             console.error("Failed to send ajax");
         },
-        success: function(gameState) {
-            handleGameState(gameState);
-            console.log("Fetched game state: " + gameState);
+        success: function(newGameState) {
+            if(newGameState !== gameState) {
+                gameState = newGameState;
+                console.log("Game state changed to " + newGameState);
+                handleGameStateChanged(gameState);
+            }
         }
     });
 }
 
-function handleGameState(gameState) {
+function handleGameStateChanged(gameState) {
     if (gameState === "Active") {
         //TODO: cancel pull game state interval
         //TODO: update tdGameState to be "active"

@@ -1,9 +1,8 @@
-var PLAYER_LIST_URL = buildUrlWithContextPath("playerslist");
 
 function pullPlayersData() {
     $.ajax({
         url: PLAYER_LIST_URL,
-        data: { "gamename": "Small+Game" }, //TODO: remove dummy game name - use game name from data.
+        data: { "gamename": gameNameForPullingData },
         timeout: 2000,
         error: function(e) {
             console.error("Failed to send ajax");

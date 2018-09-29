@@ -76,13 +76,9 @@ function pullGames() {
     });
 }
 
-var gameNameToGameData = new Map();
-var currentGameData;
 
 // dataJson = { mGameName = "", mGameState = "", mCurrentNumberOfPlayers = 0, mMaxPlayers = 4, mRows = 7, mColumns = 8, mTarget = 4, mUploaderName = "" }
 function addGameDetails(index, dataJson) {
-    window.gameNameToGameData.set(dataJson.mGameName, dataJson);
-
     var tableRow = $("<tr>");
 
     tableRow.append("<td>" + dataJson.mGameName + "</td>");
@@ -104,7 +100,6 @@ function addGameDetails(index, dataJson) {
 
 function joinGame(gameName) {
     console.log("Join " + gameName);
-    window.currentGameData = gameNameToGameData.get(gameName);
     var url = JOIN_GAME_URL + '?gamename=' + gameName;
     window.location = url.replace(' ', '+');
 

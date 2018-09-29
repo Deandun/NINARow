@@ -66,6 +66,7 @@ public class ServletUtils {
     }
 
     public static String getGameNameFromRequest(HttpServletRequest request) {
+	    //TODO: fix this function to return null if game name not found or game name is empty.
         String gameName = request.getParameter(GAME_NAME_PARAM);
         return gameName.replace("+", " ");
     }

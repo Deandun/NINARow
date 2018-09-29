@@ -2,6 +2,7 @@ package MultiGamesLogic;
 
 import Logic.Enums.eGameState;
 import Logic.Exceptions.InvalidFileInputException;
+import Logic.Exceptions.InvalidInputException;
 import Logic.Game;
 import Logic.Managers.FileManager;
 import Logic.Models.*;
@@ -10,10 +11,11 @@ import javax.xml.bind.JAXBException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 public class GamesManager {
-    private Map<String, Game> mGameNameToGame = new HashMap<>();
+    private Map<String, Game> mGameNameToGame = new ConcurrentHashMap<>(); // ConcurrentHashMap for thread safety
     private FileManager mFileManager = new FileManager();
 
     // User actions.
@@ -42,11 +44,13 @@ public class GamesManager {
 
     public void addUserToGame(String gameName, Player joiningPlayer) throws Exception {
         Game game = this.mGameNameToGame.get(gameName);
+        //TODO: how does syncronizing on a local variable work? Sync what ever else we need to sync.
+        synchronized (game.getmGameLock()) {
+            game.addPlayer(joiningPlayer);
 
-        game.addPlayer(joiningPlayer);
-
-        if(game.shouldStartGame()) {
-            game.StartGame();
+            if(game.shouldStartGame()) {
+                game.StartGame();
+            }
         }
     }
 
@@ -56,17 +60,28 @@ public class GamesManager {
         // remove player from game.
     }
 
-    public void playTurn(String gameName, PlayTurnParameters params) {
-        // get relevant game from map.
+    public void playTurn(String gameName, PlayTurnParameters params) throws InvalidInputException {
+        Game game = this.mGameNameToGame.get(gameName);
 
-        // play turn with params.
+        if(game.doesContainPlayerWithName(params.getmPlayerName())) {
+            synchronized (game.getmGameLock()) {
+                game.playTurn(params);
+            }
+        } else {
+            throw new InvalidInputException("Player " + params.getmPlayerName() + " is not playing in game " + gameName);
+        }
     }
 
 
     public GameDescriptionData getGameDescriptionForGameName(String gameName) {
         Game game = this.mGameNameToGame.get(gameName);
+        GameDescriptionData gameData;
 
-        return game.getGameDescriptionData();
+        synchronized (game.getmGameLock()) {
+            gameData = game.getGameDescriptionData();
+        }
+
+        return gameData;
     }
 
     // Pull
@@ -74,8 +89,13 @@ public class GamesManager {
     public List<GameDescriptionData> getAllGamesInfo() {
         List<GameDescriptionData> gameDescriptionDataList = new ArrayList<>();
 
+        // Map is thread safe. No need to worry about concurrency issues.
         this.mGameNameToGame.values().forEach(
-                (game) -> gameDescriptionDataList.add(game.getGameDescriptionData())
+                (game) ->  {
+                    synchronized (game.getmGameLock()) {
+                        gameDescriptionDataList.add(game.getGameDescriptionData());
+                    }
+                }
         );
 
         return gameDescriptionDataList;
@@ -83,17 +103,61 @@ public class GamesManager {
 
     public List<PlayedTurnData> getTurnHistoryForGame(String gameName, int currentTurnForClient) {
         Game game = this.mGameNameToGame.get(gameName);
+        List<PlayedTurnData> gameHistory;
 
-        return game.getTurnHistory();
+        synchronized (game.getmGameLock()) {
+            gameHistory = game.getTurnHistory().subList(currentTurnForClient, game.getTurnHistory().size() - 1);
+        }
+
+        return gameHistory;
     }
 
     public Collection<Player> getPlayersForGame(String gameName) {
         Game game = this.mGameNameToGame.get(gameName);
-        return game.getPlayers();
+        Collection<Player> players;
+
+        synchronized (game.getmGameLock()) {
+            players = game.getPlayers();
+        }
+
+        return players;
     }
 
     public eGameState getGameState(String gameName) {
         Game game = this.mGameNameToGame.get(gameName);
-        return game.GetGameState();
+        eGameState gameState;
+
+        synchronized (game.getmGameLock()) {
+            gameState = game.GetGameState();
+        }
+
+        return gameState;
+    }
+
+    public String getGameNameForPlayerName(String username) {
+        String gameName = null;
+
+        // Map is thread safe. No need to worry about concurrency issues.
+       for(Game game: this.mGameNameToGame.values()) {
+           synchronized (game.getmGameLock()) {
+               if(game.doesContainPlayerWithName(username)) {
+                   gameName = game.getGameDescriptionData().getmGameName();
+                   break;
+               }
+           }
+       }
+
+        return gameName;
+    }
+
+    public String getCurrentPlayerName(String gameName) {
+        Game game = this.mGameNameToGame.get(gameName);
+        String currentPlayerName;
+
+        synchronized (game.getmGameLock()) {
+            currentPlayerName = game.getCurrentPlayerName();
+        }
+
+        return currentPlayerName;
     }
 }

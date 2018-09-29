@@ -5,19 +5,14 @@ import Logic.Enums.eGameState;
 import Logic.Enums.ePlayerType;
 import Logic.Enums.eTurnType;
 import Logic.Enums.eVariant;
-import Logic.Exceptions.InvalidFileInputException;
 import Logic.Exceptions.InvalidInputException;
 import Logic.Exceptions.InvalidUserInputException;
 import Logic.Interfaces.IComputerPlayerAlgo;
 import Logic.Interfaces.IGameStatus;
-import Logic.Managers.FileManager;
 import Logic.Managers.HistoryManager;
 import Logic.Models.*;
 import Logic.SequenceSearchers.SequenceSearcher;
 
-import javax.xml.bind.JAXBException;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
@@ -31,9 +26,7 @@ public class Game {
     private List<Player> mPlayerList;
     private GameSettings mGameSettings;
 
-    // Locks
-    private Object mPlayersLock = new Object();
-    private Object mTurnsLock = new Object();
+    private final Object mGameLock = new Object();
 
     public Game(GameSettings gameSettings) {
         this.mHistoryManager = new HistoryManager();
@@ -44,6 +37,12 @@ public class Game {
         this.mGameSettings = gameSettings;
         this.mGameBoard = new Board(mGameSettings.getRows(), mGameSettings.getColumns());
     }
+
+    // Concurrency.
+    public Object getmGameLock() {
+        return mGameLock;
+    }
+
 
     // ILogic interface implementation.
 
@@ -155,32 +154,31 @@ public class Game {
     }
 
     private void currentPlayerQuit(PlayTurnParameters turnParameters) {
-        synchronized (this.mPlayersLock) {
-            PlayedTurnData playedTurnData = new PlayedTurnData();
-            eGameState gameState = eGameState.Active;
+        PlayedTurnData playedTurnData = new PlayedTurnData();
+        eGameState gameState = eGameState.Active;
 
-            // If there are more than 2 players, the game will go on after player quits.
-            Collection<Cell> updatedCells = this.mGameBoard.RemoveAllPlayerDiscsFromBoardAndGetUpdatedCells(this.mGameStatus.getPlayer());
-            playedTurnData.setUpdatedCellsCollection(updatedCells);
+        // If there are more than 2 players, the game will go on after player quits.
+        Collection<Cell> updatedCells = this.mGameBoard.RemoveAllPlayerDiscsFromBoardAndGetUpdatedCells(this.mGameStatus.getPlayer());
+        playedTurnData.setUpdatedCellsCollection(updatedCells);
 
-            if (this.mPlayerList.size() > 2) {
-                if (this.mSequenceSearcher.CheckEntireBoardForWinningSequences()) {  //run all over board and check if someone won
-                    gameState = eGameState.Won;
-                } else if (this.isDrawForNextPlayer()) {
-                    gameState = eGameState.Draw;
-                }
-            } else {
+        if (this.mPlayerList.size() > 2) {
+            if (this.mSequenceSearcher.CheckEntireBoardForWinningSequences()) {  //run all over board and check if someone won
                 gameState = eGameState.Won;
+            } else if (this.isDrawForNextPlayer()) {
+                gameState = eGameState.Draw;
             }
-
-            this.mGameStatus.CurrentPlayerQuitGame();
-
-            playedTurnData.setGameState(gameState);
-            playedTurnData.setTurnType(turnParameters.getmTurnType());
-
-            // Don't update game status, it was done in GameStatus.CurrentPlayerQuit.
-            this.finishedPlayingTurn(playedTurnData, false);
+        } else {
+            gameState = eGameState.Won;
         }
+
+        this.mGameStatus.CurrentPlayerQuitGame();
+
+        playedTurnData.setGameState(gameState);
+        playedTurnData.setTurnType(turnParameters.getmTurnType());
+
+        // Don't update game status, it was done in GameStatus.CurrentPlayerQuit.
+        this.finishedPlayingTurn(playedTurnData, false);
+
     }
 
     public boolean isGameActive(){
@@ -263,7 +261,7 @@ public class Game {
 
     public void playTurn(PlayTurnParameters playedTurnParams) throws InvalidInputException {
         // Check if game is active.
-        if(this.mGameStatus.getGameState().equals(eGameState.Active)) {
+        if (this.mGameStatus.getGameState().equals(eGameState.Active)) {
             // Check turn type
             if (playedTurnParams.getmTurnType().equals(eTurnType.PlayerQuit)) {
                 this.currentPlayerQuit(playedTurnParams);
@@ -276,6 +274,7 @@ public class Game {
                 this.playComputerAlgoTurn();
             }
         }
+
     }
 
     public List<PlayedTurnData> getTurnHistory() {
@@ -284,17 +283,16 @@ public class Game {
 
     public void addPlayer(Player player) {
 
-        synchronized (this.mPlayersLock) {
-            if(this.isGameActive()) {
-                //TODO: exception
-            } else if(this.mPlayerList.size()  >= this.mGameSettings.getGameNumberOfPlayers()) {
-                //TODO: exception
-            } else if (this.mPlayerList.contains(player)) {
-                //TODO: exception
-            }
-
-            this.mPlayerList.add(player);
+        if(this.isGameActive()) {
+            //TODO: exception
+        } else if(this.mPlayerList.size()  >= this.mGameSettings.getGameNumberOfPlayers()) {
+            //TODO: exception
+        } else if (this.mPlayerList.contains(player)) {
+            //TODO: exception
         }
+
+        this.mPlayerList.add(player);
+
     }
 
     public boolean shouldStartGame() {
@@ -303,6 +301,23 @@ public class Game {
 
     public List<Player> getPlayers() {
         return this.mPlayerList;
+    }
+
+    public boolean doesContainPlayerWithName(String username) {
+        boolean doesContainPlayerWithName = false;
+
+        for(Player player: this.mPlayerList) {
+            if(player.getName().equals(username)) {
+                doesContainPlayerWithName = true;
+                break;
+            }
+        }
+
+        return doesContainPlayerWithName;
+    }
+
+    public String getCurrentPlayerName() {
+        return this.mGameStatus.mCurrentPlayer.getName();
     }
 
     public class GameStatus implements IGameStatus {
