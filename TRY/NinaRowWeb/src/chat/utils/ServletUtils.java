@@ -70,4 +70,16 @@ public class ServletUtils {
         String gameName = request.getParameter(GAME_NAME_PARAM);
         return gameName.replace("+", " ");
     }
+
+	public static boolean getBoolParamFromRadioButtonInput(HttpServletRequest request, String paramKey) {
+		//TODO: fix function to handle not having a parameter with the name "paramkey", or having a bad value in it.
+	    String value = request.getParameter(paramKey);
+        boolean boolValue = false;
+
+		if(value != null && value.equals("on")) {
+            boolValue = true;
+        }
+
+		return boolValue;
+	}
 }

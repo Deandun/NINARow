@@ -56,6 +56,14 @@ public class Game {
         this.mComputerPlayerAlgo.Init(this.mGameBoard, this.mGameSettings, isPopoutMode);
         this.mHistoryManager.Clear();
         this.mGameStatus.StartNewGame();
+
+        if(this.mGameStatus.mCurrentPlayer.getType().equals(ePlayerType.Computer)) {
+            try {
+                this.playComputerAlgoTurn();
+            } catch (InvalidInputException e) { // This exception should never happen. If it does, print stack trace.
+                e.printStackTrace();
+            }
+        }
     }
 
     public Map<Player, Collection<Cell>> getPlayerToWinningSequencesMap() {
@@ -132,6 +140,7 @@ public class Game {
 
     private PlayedTurnData addDisc(int column) throws InvalidUserInputException {
         Cell chosenCell = this.mGameBoard.UpdateBoard(column, this.mGameStatus.getPlayer()); // send parameter to logic board
+        System.out.println("#$# Entering disc to cell " + chosenCell.getRowIndex() + "," + chosenCell.getColumnIndex());
         return this.updateGameStatusAfterDiscAdded(chosenCell);
     }
 
@@ -235,8 +244,8 @@ public class Game {
         this.mSequenceSearcher.Clear();
     }
 
-    public List<Integer> getAvailablePopoutColumnsForCurrentPlayer() {
-        return mGameBoard.getAvailablePopoutColumnsForCurrentPlayer(mGameStatus.mCurrentPlayer);
+    public Collection<Integer> getAvailablePopoutColumnsForPlayer(Player player) {
+        return mGameBoard.getAvailablePopoutColumnsForCurrentPlayer(player);
     }
 
     private boolean isDrawForNextPlayer() {
@@ -260,8 +269,8 @@ public class Game {
     }
 
     public void playTurn(PlayTurnParameters playedTurnParams) throws InvalidInputException {
-        // Check if game is active.
-        if (this.mGameStatus.getGameState().equals(eGameState.Active)) {
+        // Check if game is active and if play was made by current player.
+        if (this.isGameActive() && playedTurnParams.getmPlayerName().equals(this.mGameStatus.mCurrentPlayer.getName())) {
             // Check turn type
             if (playedTurnParams.getmTurnType().equals(eTurnType.PlayerQuit)) {
                 this.currentPlayerQuit(playedTurnParams);
@@ -274,7 +283,6 @@ public class Game {
                 this.playComputerAlgoTurn();
             }
         }
-
     }
 
     public List<PlayedTurnData> getTurnHistory() {
@@ -285,7 +293,7 @@ public class Game {
 
         if(this.isGameActive()) {
             //TODO: exception
-        } else if(this.mPlayerList.size()  >= this.mGameSettings.getGameNumberOfPlayers()) {
+        } else if(this.mPlayerList.size() >= this.mGameSettings.getGameNumberOfPlayers()) {
             //TODO: exception
         } else if (this.mPlayerList.contains(player)) {
             //TODO: exception
@@ -317,7 +325,12 @@ public class Game {
     }
 
     public String getCurrentPlayerName() {
-        return this.mGameStatus.mCurrentPlayer.getName();
+        return this.isGameActive() ? this.mGameStatus.mCurrentPlayer.getName() : null;
+    }
+
+    public void playerQuitWhileGameIsNotActive(Player quittingPlayer) {
+        // Game is not active yet. Remove player without any consequences.
+        this.mPlayerList.remove(quittingPlayer);
     }
 
     public class GameStatus implements IGameStatus {

@@ -52,4 +52,13 @@ public class Cell implements Serializable {
 
         return copyCell;
     }
+
+    @Override
+    public String toString() {
+        return "Cell{" +
+                "mPlayer=" + mPlayer +
+                ", mColumnIndex=" + mColumnIndex +
+                ", mRowIndex=" + mRowIndex +
+                '}';
+    }
 }

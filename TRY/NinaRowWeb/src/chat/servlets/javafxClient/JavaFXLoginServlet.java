@@ -21,6 +21,7 @@ public class JavaFXLoginServlet  extends HttpServlet {
     private static final int NO_USER_NAME_ERROR = 497;
     private static final int USER_NAME_ALREADY_EXISTS = 498;
 
+    private final String USER_TYPE_PARAM = "usertype";
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -49,8 +50,8 @@ public class JavaFXLoginServlet  extends HttpServlet {
                         out.println("Username already exists.");
                         System.out.println("Username already exists" + usernameFromParameter);
                     } else {
-                        //TODO: check if player ishuman. Also, send ishuman from javafx client
-                        playerManager.addPlayer(usernameFromParameter, true);
+                        boolean isComputer = ServletUtils.getBoolParamFromRadioButtonInput(request, USER_TYPE_PARAM);
+                        playerManager.addPlayer(usernameFromParameter, isComputer);
 
                         // start session with user.
                         request.getSession(true).setAttribute(Constants.USERNAME, usernameFromParameter);

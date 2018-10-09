@@ -44,7 +44,7 @@ public class GamesManager {
 
     public void addUserToGame(String gameName, Player joiningPlayer) throws Exception {
         Game game = this.mGameNameToGame.get(gameName);
-        //TODO: how does syncronizing on a local variable work? Sync what ever else we need to sync.
+
         synchronized (game.getmGameLock()) {
             game.addPlayer(joiningPlayer);
 
@@ -60,12 +60,17 @@ public class GamesManager {
         // remove player from game.
     }
 
-    public void playTurn(String gameName, PlayTurnParameters params) throws InvalidInputException {
+    public void playTurn(String gameName, PlayTurnParameters params, Player playingPlayer) throws InvalidInputException {
         Game game = this.mGameNameToGame.get(gameName);
 
         if(game.doesContainPlayerWithName(params.getmPlayerName())) {
             synchronized (game.getmGameLock()) {
-                game.playTurn(params);
+                if(game.isGameActive()) {
+                    // Player quits in the middle of an active game
+                    game.playTurn(params);
+                } else {
+                    game.playerQuitWhileGameIsNotActive(playingPlayer);
+                }
             }
         } else {
             throw new InvalidInputException("Player " + params.getmPlayerName() + " is not playing in game " + gameName);
@@ -106,7 +111,7 @@ public class GamesManager {
         List<PlayedTurnData> gameHistory;
 
         synchronized (game.getmGameLock()) {
-            gameHistory = game.getTurnHistory().subList(currentTurnForClient, game.getTurnHistory().size() - 1);
+            gameHistory = game.getTurnHistory().subList(currentTurnForClient, game.getTurnHistory().size());
         }
 
         return gameHistory;
@@ -159,5 +164,27 @@ public class GamesManager {
         }
 
         return currentPlayerName;
+    }
+
+    public Map<Player, Collection<Cell>> getPlayerToWinningSequenceMap(String gameName) {
+        Game game = this.mGameNameToGame.get(gameName);
+        Map<Player, Collection<Cell>> playerToWinningSequenceMap;
+
+        synchronized (game.getmGameLock()) {
+            playerToWinningSequenceMap = game.getPlayerToWinningSequencesMap();
+        }
+
+        return playerToWinningSequenceMap;
+    }
+
+    public Collection<Integer> getAailablePopoutColumnsForPlayer(String gameName, Player player) {
+        Game game = this.mGameNameToGame.get(gameName);
+        Collection<Integer> availablePopoutColumns;
+
+        synchronized (game.getmGameLock()) {
+            availablePopoutColumns = game.getAvailablePopoutColumnsForPlayer(player);
+        }
+
+        return availablePopoutColumns;
     }
 }

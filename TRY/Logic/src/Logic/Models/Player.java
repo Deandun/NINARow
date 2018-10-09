@@ -17,12 +17,6 @@ public class Player implements Serializable {
     }
 
     @Override
-    public String toString(){
-        return "Name: " + mName +
-                " Type: " + mType.name();
-    }
-
-    @Override
     public boolean equals(Object otherPlayer) {
         // Check if other player is not null and IDs match.
         return otherPlayer != null && mName.contentEquals(((Player)otherPlayer).mName);
@@ -52,5 +46,14 @@ public class Player implements Serializable {
 
     public void setType(ePlayerType mType) {
         this.mType = mType;
+    }
+
+    @Override
+    public String toString() {
+        return "Player{" +
+                "mTurnCounter=" + mTurnCounter +
+                ", mName='" + mName + '\'' +
+                ", mType=" + mType +
+                '}';
     }
 }

@@ -15,11 +15,11 @@ public class PlayerManager {
         mPlayerSet = new HashSet<>();
     }
 
-    public synchronized void addPlayer(String username, boolean isHuman) {
+    public synchronized void addPlayer(String username, boolean isComputer) {
         Player newPlayer = new Player();
 
         newPlayer.setName(username);
-        newPlayer.setType(isHuman ? ePlayerType.Human : ePlayerType.Computer);
+        newPlayer.setType(isComputer ? ePlayerType.Computer : ePlayerType.Human);
 
         mPlayerSet.add(newPlayer);
     }

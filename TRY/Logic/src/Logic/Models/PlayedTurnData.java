@@ -50,4 +50,13 @@ public class PlayedTurnData implements Serializable {
 
     public Player getPlayerTurn(){ return this.mPlayer;}
 
+    @Override
+    public String toString() {
+        return "PlayedTurnData{" +
+                "mUpdatedCellsCollection=" + mUpdatedCellsCollection +
+                ", mPlayer=" + mPlayer +
+                ", mGameStateAfterTurn=" + mGameStateAfterTurn +
+                ", mTurnType=" + mTurnType +
+                '}';
+    }
 }

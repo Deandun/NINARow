@@ -3,6 +3,7 @@ package chat.servlets.gameRoom;
 import Logic.Exceptions.InvalidInputException;
 import Logic.Models.GameDescriptionData;
 import Logic.Models.PlayTurnParameters;
+import Logic.Models.Player;
 import MultiGamesLogic.GamesManager;
 import chat.utils.ServletUtils;
 import chat.utils.SessionUtils;
@@ -34,12 +35,12 @@ public class PlayTurnServlet extends HttpServlet {
 
             PlayTurnParameters turnParameters = gson.fromJson(requestBody, PlayTurnParameters.class);
             GamesManager gamesManager = ServletUtils.getGamesManager(getServletContext());
-
+            Player playingPlayer = ServletUtils.getPlayerManager(getServletContext()).getPlayerForName(turnParameters.getmPlayerName());
             PrintWriter out = null;
 
             try {
                 out = response.getWriter();
-                gamesManager.playTurn(gameName, turnParameters);
+                gamesManager.playTurn(gameName, turnParameters, playingPlayer);
             } catch (IOException e) {
                 response.setStatus(GENERAL_ERROR);
             } catch (InvalidInputException e) {

@@ -63,7 +63,7 @@ public class Board{
         return chosenCell;
     }
 
-    public List<Integer> getAvailablePopoutColumnsForCurrentPlayer(Player mPlayer) {
+    public Collection<Integer> getAvailablePopoutColumnsForCurrentPlayer(Player mPlayer) {
         List<Integer> popoutAvailableColumnSortedList = new ArrayList<>();
         int lastRowIndex = mBoard.length - 1;
 

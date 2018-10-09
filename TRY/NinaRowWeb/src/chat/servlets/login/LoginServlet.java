@@ -25,6 +25,8 @@ public class LoginServlet extends HttpServlet {
     private final String LOBBY_URL = "pages/lobby/lobby.html";
     private final String LOGIN_URL = "/index.html";
     private final String LOGIN_ERROR_URL = "/pages/loginerror/login_error.html";  // must start with '/' since will be used in request dispatcher...
+
+    private final String USER_TYPE_PARAM = "usertype";
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -45,7 +47,8 @@ public class LoginServlet extends HttpServlet {
         if (usernameFromSession == null) {
             //user is not logged in yet
             String usernameFromParameter = request.getParameter(USERNAME);
-            if (usernameFromParameter == null) {
+
+            if (usernameFromParameter == null || usernameFromParameter.isEmpty()) {
                 //no username in session and no username in parameter -
                 //redirect back to the index page
                 //this return an HTTP code back to the browser telling it to load
@@ -58,8 +61,8 @@ public class LoginServlet extends HttpServlet {
                     if (playerManager.isUserExists(usernameFromParameter)) {
                         getServletContext().getRequestDispatcher(LOGIN_ERROR_URL).forward(request, response);
                     } else {
-                        //TODO: get isHuman from parameter. Also send isHuman parameter from html.
-                        playerManager.addPlayer(usernameFromParameter, true);
+                        boolean isComputer = ServletUtils.getBoolParamFromRadioButtonInput(request, USER_TYPE_PARAM);
+                        playerManager.addPlayer(usernameFromParameter, isComputer);
 
                         // start session with user.
                         request.getSession(true).setAttribute(Constants.USERNAME, usernameFromParameter);

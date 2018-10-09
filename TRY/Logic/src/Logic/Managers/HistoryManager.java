@@ -20,6 +20,4 @@ public class HistoryManager {
     public void Clear() {
         mPlayedTurnData.clear();
     }
-
-
 }

@@ -36,7 +36,11 @@ public class ComputerPlayerAlgo implements IComputerPlayerAlgo {
             turnType = eTurnType.AddDisc;
         }
 
-        return new PlayTurnParameters(selectedColumn, turnType);
+        PlayTurnParameters turnData = new PlayTurnParameters(selectedColumn, turnType);
+
+        turnData.setmPlayerName(playingPlayer.getName());
+
+        return turnData;
     }
 
     @Override
