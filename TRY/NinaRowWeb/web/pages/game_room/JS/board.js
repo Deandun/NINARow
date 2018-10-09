@@ -1,12 +1,3 @@
-function initOnColumnClicks() {
-    var createClickHandler = function(column) {
-        return function() {
-            var cell = row.getElementsByTagName("td")[0];
-            var id = cell.innerHTML;
-            alert("id:" + id);
-        };
-    };
-};
 
 function initBoard(gameData) {
     var rows = gameData.mRows;
@@ -18,9 +9,25 @@ function initBoard(gameData) {
         boardTable.append(row);
     }
 
-    initOnColumnClicks();
+    initOnColumnClicks(columns);
 
     //initPopoutIfNeeded();
+}
+
+function initOnColumnClicks(numberOfColumns) {
+
+    $("#game-board-table").onclick = function() {
+        console.log("Hi!");
+    }
+    // for(var i = 0; i < numberOfColumns; i++) {
+    //     var createClickHandler = function(column) {
+    //         return function() {
+    //             console.log("Column " + column + " clicked");
+    //         };
+    //     };
+    //
+    //     $("cell-at-column-" + i).onclick = createClickHandler(i);
+    // }
 }
 
 function createRow(rowIndex, columns) {
@@ -41,12 +48,14 @@ function createRow(rowIndex, columns) {
 }
 
 function createCell(rowIndex, columnIndex) {
-    var cell = $("<td>")
-        .addClass("cell-at-row-" + rowIndex).addClass("cell-at-column-" + columnIndex).addClass("board-cell").append();
+    var cell = $("<td>").click(function() {
+        onCellClick(rowIndex, columnIndex); // Call onclick function with row and column.
+    }).addClass("cell-at-row-" + rowIndex).addClass("cell-at-column-" + columnIndex).addClass("board-cell").append();
 
     return cell;
 }
 
-function onCellClick(cell) {
-    console.log("Cell clicked!");
+function onCellClick(row, column) {
+    console.log("Cell clicked! row: " + row + " column: " + column);
+    onColumnClick(column);
 }
