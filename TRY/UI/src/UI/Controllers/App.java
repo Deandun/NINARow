@@ -269,6 +269,7 @@ public class App implements IBoardControllerDelegate, IGameClientLogicDelegate {
         Platform.runLater(
                 () -> {
                     this.showAlert("The game has begun!", "Best of luck.");
+                    this.mGameClientLogic.resetCurrentTurnCounter();
                     this.mBoardController.getBoardPane().setDisable(false);
                     this.mBoardController.ResetBoard();
                     this.initImageManagerWithPlayerImages(); // Do this when game starts because that's when all players are present.

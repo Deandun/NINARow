@@ -1,16 +1,12 @@
-var GAME_DATA_URL = buildUrlWithContextPath("gamedata");
-var GAME_STATE_URL = buildUrlWithContextPath("gamestate");
-var FETCH_USER_NAME_URL = buildUrlWithContextPath("getname");
-var PLAY_TURN_URL = buildUrlWithContextPath("playturn");
-var PLAYER_LIST_URL = buildUrlWithContextPath("playerslist");
 var pullTimer = 1500;
-
 
 var currentGameData;
 var currentPlayerName;
-var loggedInPlayerName; //TODO: get this name from a new servlet.
+var loggedInPlayerName;
 var gameState = "InActive";
-var gameNameForPullingData;
+var gameName;
+var isMyTurn = false;
+var turnNumber = 0;
 
 $(function() {
     init();
@@ -19,50 +15,14 @@ $(function() {
 });
 
 function init() {
-}
-
-function pullTurnsDelta() {
-    //TODO
-}
-
-function fetchLoggedInPlayerName() {
-    $.ajax({
-        url: FETCH_USER_NAME_URL,
-        timeout: 2000,
-        error: function(e) {
-            console.error("Failed to send ajax");
-        },
-        success: function(username) {
-            loggedInPlayerName = username;
-        }
-    });
-}
-
-function getGameData() {
-    $.ajax({
-        url: GAME_DATA_URL,
-        timeout: 2000,
-        error: function(e) {
-            console.error("Failed to send ajax");
-        },
-        success: onFetchedGameData
-    });
+    $('#leaveGameBtn').click(onLeaveGame);
 }
 
 function startPullingIntervals() {
-    gameNameForPullingData = currentGameData.mGameName.replace(' ', '+');
+    gameName = currentGameData.mGameName.replace(' ', '+');
     window.setInterval(pullGameState, pullTimer);
     window.setInterval(pullPlayersData, pullTimer);
-    //window.setInterval(pullTurnsDelta, pullTimer);
-}
-
-// gameDataJson = { mLoggedInPlayerName = "", mGameDescriptionData = { mGameName = "", mGameState = "", mCurrentNumberOfPlayers = 0, mMaxPlayers = 4, mRows = 7, mColumns = 8, mTarget = 4, mUploaderName = "" }}
-function onFetchedGameData(gameDataJson) {
-    currentPlayerName = gameDataJson.mCurrentPlayerName;
-    currentGameData = gameDataJson.mGameDescriptionData;
-    startPullingIntervals();
-
-    initUI(currentGameData);
+    window.setInterval(pullTurnsDelta, pullTimer);
 }
 
 function initUI(gameData) {
@@ -70,78 +30,103 @@ function initUI(gameData) {
     initBoard(gameData);
 }
 
-function initGameDetailsUI(gameData) {
-    $('#tdGameType').append(gameData.mVariant);
-    $('#tdTarget').append(gameData.mTarget);
-    $('#tdBoardSize').append(gameData.mRows + "X" + gameData.mColumns);
-    $('#tdGameUploader').append(gameData.mUploaderName);
-    $('#tdGameState').append(gameData.mGameState);
-}
-
-function pullGameState() {
-    $.ajax({
-        url: GAME_STATE_URL,
-        data: { "gamename": gameNameForPullingData },
-        timeout: 2000,
-        error: function(e) {
-            console.error("Failed to send ajax");
-        },
-        success: function(newGameState) {
-            if(newGameState !== gameState) {
-                gameState = newGameState;
-                console.log("Game state changed to " + newGameState);
-                handleGameStateChanged(gameState);
-            }
-        }
-    });
-}
-
-function handleGameStateChanged(gameState) {
-    if (gameState === "Active") {
-        //TODO: cancel pull game state interval
-        //TODO: update tdGameState to be "active"
-        hadleGameStarted();
-    } else {
-        //TODO: update tdGameState to be "inactive"
-    }
-}
-
-function hadleGameStarted() {
-    //TODO:
-    // 1. Alert participants that game has started.
-    // 2. Start pulling game turns delta.
-
-}
-
-// User events from board
-
-//Turn types
-var ADD_DISC = "AddDisc";
-var POPOUT = "AddDisc";
-var PLAYER_QUIT = "AddDisc";
-
-function PlayTurnParameters(turnType, column, playerName) {
-    this.mTurnType = turnType;
-    this.mColumn = column;
-    this.mPlayerName = playerName;
-}
-
 function onColumnClick(column) {
-    var playTurnParams = new PlayTurnParameters(ADD_DISC, column, currentPlayerName); // TODO: use a final var for turn types
+    var playTurnParams = new PlayTurnParameters(ADD_DISC, column, loggedInPlayerName);
     playTurnAsync(playTurnParams);
 }
 
-function playTurnAsync(playTurnParams) {
-    $.ajax({
-        url: PLAY_TURN_URL,
-        data: { "gamename": gameNameForPullingData },
-        body: playTurnParams,
-        timeout: 2000,
-        error: function(e) {
-            console.error("Failed to send ajax"); // TODO: handle error based on turn type (add disc in full column or popout when not allowed)
-        },
-        success: function() {
-            console.log("Successfully played turn " + playTurnParams);
+function onPopoutButtonClick(column) {
+    console.log("Popout clicked! column: " + column);
+    var playTurnParams = new PlayTurnParameters(POPOUT, column, loggedInPlayerName);
+    playTurnAsync(playTurnParams);
+}
+
+
+function onFetchedPlayedTurnsData(historyData) {
+    var historyDataObject = JSON.parse(historyData);
+    currentPlayerName = historyDataObject.mCurrentPlayerName;
+    checkIfMyTurn();
+
+    if(historyDataObject.mTurnHistoryDelta !== undefined && historyDataObject.mTurnHistoryDelta.length > 0) {
+        turnNumber += historyDataObject.mTurnHistoryDelta.length;
+        $.each(historyDataObject.mTurnHistoryDelta, handlePlayedTurnData);
+    }
+}
+
+function checkIfMyTurn() {
+    isMyTurn = currentPlayerName === loggedInPlayerName;
+
+    if(isMyTurn && isPopoutMode()) {
+        //fetchAvailablePopoutColumnsIfNeeded(); //TODO in comm
+    }
+}
+
+function handlePlayedTurnData(index, playedTurnData) {
+    updateBoardWithNewPlay(playedTurnData.mUpdatedCellsCollection);
+    var newGameState = playedTurnData.mGameStateAfterTurn;
+
+    if(newGameState !== gameState) {
+        gameState = newGameState;
+        handleGameStateChanged(gameState)
+    }
+}
+
+// For now, not handling winning sequences.
+function handlePlayerAndWinningSequence(index, playerAndWinningSequence) {
+    var player = playerAndWinningSequence.mPlayer;
+    var playerName = player.mName;
+
+    appendNotification(" -" + playerName + "- ");
+}
+
+// Helper functions
+
+function isGameActive() {
+    return gameState === "Active";
+}
+
+function isPopoutMode() {
+    return currentGameData.mVariant === POPOUT;
+}
+
+function onLeaveGame() {
+    console.log("Leave game clicked. Is game active: " + isGameActive());
+    if(isGameActive()) {
+        // Quit game in players turn.
+        var playTurnParams = new PlayTurnParameters(PLAYER_QUIT, null, loggedInPlayerName);
+        playTurnAsync(playTurnParams);
+
+        if(!isMyTurn) {
+            // Game is active and it is not the player's turn. Do not follow through with sending the get request from the leave game button default on click.
+            return false;
         }
-    });
+    } else {
+        // Quit game before/after game.
+        quitGame();
+    }
+}
+
+function writeError(message) {
+    setLabel(message, "red");
+}
+
+function writeNotification(message) {
+    setLabel(message, "white");
+}
+
+function appendNotification(message) {
+    $('#error-message-label').append(message);
+}
+
+function setLabel(text, color) {
+    var label = $('#error-message-label');
+
+    label.empty();
+    label.append(text).css('color', color);
+}
+
+function clearLabel() {
+    var label = $('#error-message-label');
+
+    label.empty();
 }

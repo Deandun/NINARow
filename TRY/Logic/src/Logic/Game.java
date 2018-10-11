@@ -101,7 +101,6 @@ public class Game {
     }
 
     private void executeTurn(PlayTurnParameters playTurnParameters) throws InvalidInputException {
-        // Handle human players turn.
         PlayedTurnData playedTurnData = playTurnParameters.getmTurnType().equals(eTurnType.AddDisc) ?
                 this.addDisc(playTurnParameters.getmSelectedColumn()) : this.popout(playTurnParameters.getmSelectedColumn());
 
@@ -138,13 +137,13 @@ public class Game {
         }
     }
 
-    private PlayedTurnData addDisc(int column) throws InvalidUserInputException {
+    private PlayedTurnData addDisc(int column) throws InvalidInputException {
         Cell chosenCell = this.mGameBoard.UpdateBoard(column, this.mGameStatus.getPlayer()); // send parameter to logic board
         System.out.println("#$# Entering disc to cell " + chosenCell.getRowIndex() + "," + chosenCell.getColumnIndex());
         return this.updateGameStatusAfterDiscAdded(chosenCell);
     }
 
-    private PlayedTurnData popout(int column) throws InvalidUserInputException {
+    private PlayedTurnData popout(int column) throws InvalidInputException {
         if(mGameBoard.CanPlayerPerformPopoutForColumn(this.mGameStatus.getPlayer(), column)) {
             PlayedTurnData playedTurnData = new PlayedTurnData();
             Collection<Cell> updatedCells = this.mGameBoard.PopoutAndGetUpdatedCells(column);
@@ -158,7 +157,7 @@ public class Game {
             // Check if there is a winning sequence starting from a cell in the selected column as a result of the Popout.
             return playedTurnData;
         } else {
-            throw new InvalidUserInputException("Player named " + this.mGameStatus.getPlayer().getName() + " cannot perform popout on column " + column);
+            throw new InvalidInputException("Player named " + this.mGameStatus.getPlayer().getName() + " cannot perform popout on column " + column);
         }
     }
 

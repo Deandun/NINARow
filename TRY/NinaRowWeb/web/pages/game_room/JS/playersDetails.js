@@ -1,19 +1,4 @@
-
-function pullPlayersData() {
-    $.ajax({
-        url: PLAYER_LIST_URL,
-        data: { "gamename": gameNameForPullingData },
-        timeout: 2000,
-        error: function(e) {
-            console.error("Failed to send ajax");
-        },
-        success: function(playersArray) {
-            console.log("Fetched players: " + playersArray);
-            $('#player-details-tbody').children().remove();
-            $.each(playersArray || [], addPlayerData);
-        }
-    });
-}
+var playersData;
 
 // dataJson = { mName = "", mType = "", mTurnCounter = 0 }
 function addPlayerData(index, dataJson) {
@@ -29,12 +14,24 @@ this.getPlayerRow = function(index, playerJson) {
     var playerTypeLabel = $("<h2>").addClass("player-type").append(playerJson.mType);
     var playerTurnLabel = $("<h2>").addClass("player-turn").append(playerJson.mTurnCounter);
 
-    //TODO
-    //var imageForPlayer = getImageForPlayer(playerJson.mName);
-    //var playerDiscImage = $("<image>").addClass("player-image").append(imageForPlayer);
+    var colorForPlayer;
+    var currentPlayerClass = undefined;
 
-    var playerDiv = $("<div>").addClass("playerDiv").addClass("player-" + index + "-div");
-    playerDiv.append(playerNameLabel).append(playerTypeLabel).append(playerTurnLabel); //TODO: append playerDiscImage
+    if(isGameActive()) {
+        colorForPlayer = getColorForPlayer(playerJson.mName);
+        if(currentPlayerName === playerJson.mName) {
+            currentPlayerClass = "currentPlayer";
+        }
+    } else {
+        colorForPlayer = "transparent";
+    }
+
+    var playerDiv = $("<div>").css('background-color', colorForPlayer).addClass("playerDiv").addClass("player-" + index + "-div");
+    playerDiv.append(playerNameLabel).append(playerTypeLabel).append(playerTurnLabel);
+
+    if(currentPlayerClass !== undefined) {
+        playerDiv.addClass(currentPlayerClass); //TODO: not working
+    }
 
     var tableData = $("<td>").addClass("playerData").append(playerDiv);
     var tableRow = $("<tr>").append(tableData);
@@ -42,6 +39,18 @@ this.getPlayerRow = function(index, playerJson) {
     return tableRow;
 };
 
-this.getImageForPlayer = function(playerName){
-    //TODO
+var playerNameToColor = new Map();
+var colorsArray = ["Purple", "Red", "Blue", "Yellow", "Orange", "Black"];
+var isPlayerColorsSet = false;
+
+function getColorForPlayer(playerName){
+    return playerNameToColor.get(playerName);
+}
+
+function initPlayerColors(playersData) {
+    for(var i = 0; i < playersData.length; i++) {
+        playerNameToColor.set(playersData[i].mName, colorsArray[i]);
+    }
+
+    isPlayerColorsSet = true;
 }

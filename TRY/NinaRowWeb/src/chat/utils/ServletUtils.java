@@ -2,6 +2,8 @@ package chat.utils;
 
 import ChatLogicEngine.ChatManager;
 import ChatLogicEngine.users.PlayerManager;
+import Logic.Enums.eTurnType;
+import Logic.Models.PlayTurnParameters;
 import MultiGamesLogic.GamesManager;
 
 import javax.servlet.ServletContext;
@@ -81,5 +83,28 @@ public class ServletUtils {
         }
 
 		return boolValue;
+	}
+
+	public static PlayTurnParameters getPlayTurnParamsFromRequest(HttpServletRequest request) {
+	    final String TURN_TYPE_PARAM = "turnType";
+	    final String SELECTED_COLUMN_PARAM = "column";
+	    final String PLAYER_NAME_PARAM = "playerName";
+
+        PlayTurnParameters params = null;
+
+
+        String turnTypeString = request.getParameter(TURN_TYPE_PARAM);
+
+        if(turnTypeString != null && !turnTypeString.isEmpty()) {
+            // Get the rest of the parameters
+            eTurnType turnType = eTurnType.valueOf(turnTypeString);
+            int selectedColumn = getIntParameter(request, SELECTED_COLUMN_PARAM);
+            String playerName = request.getParameter(PLAYER_NAME_PARAM);
+
+            params = new PlayTurnParameters(selectedColumn, turnType);
+            params.setmPlayerName(playerName);
+        }
+
+		return params;
 	}
 }

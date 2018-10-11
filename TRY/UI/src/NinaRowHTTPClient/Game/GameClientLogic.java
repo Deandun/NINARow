@@ -172,7 +172,7 @@ public class GameClientLogic {
 
         if(turnHistoryResponse.getmTurnHistoryDelta().size() > 0) {
             // Log
-            System.out.println("#$# Received turns data: " + turnHistoryResponse);
+            System.out.println("Received turns data: " + turnHistoryResponse);
             this.mPlayedTurnDataList.addAll(turnHistoryResponse.getmTurnHistoryDelta());
         }
 
@@ -277,6 +277,10 @@ public class GameClientLogic {
 
     public List<Player> getPlayers() {
         return this.mCachedPlayersList;
+    }
+
+    public void resetCurrentTurnCounter() {
+        this.mGameClientCommunicationHandler.setTurnCounter(0);
     }
 
     private Map<Player, Collection<Cell>> getPlayerToWinningSequenceMap(ArrayList<PlayerAndWinningSequence> playerAndWinningSequenceList) {

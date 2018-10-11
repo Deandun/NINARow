@@ -9,25 +9,9 @@ function initBoard(gameData) {
         boardTable.append(row);
     }
 
-    initOnColumnClicks(columns);
-
-    //initPopoutIfNeeded();
-}
-
-function initOnColumnClicks(numberOfColumns) {
-
-    $("#game-board-table").onclick = function() {
-        console.log("Hi!");
+    if(isPopoutMode()) {
+        initPopout(columns);
     }
-    // for(var i = 0; i < numberOfColumns; i++) {
-    //     var createClickHandler = function(column) {
-    //         return function() {
-    //             console.log("Column " + column + " clicked");
-    //         };
-    //     };
-    //
-    //     $("cell-at-column-" + i).onclick = createClickHandler(i);
-    // }
 }
 
 function createRow(rowIndex, columns) {
@@ -55,7 +39,51 @@ function createCell(rowIndex, columnIndex) {
     return cell;
 }
 
+function initPopout(numberOfComlumns) {
+    var popoutRow = $("<tr>").addClass("popout-row");
+
+    for(var i = 0; i < numberOfComlumns; i++) {
+        var popoutButton = createPopoutButton(i);
+        popoutRow.append(popoutButton);
+    }
+
+    var boardTable = $("#game-board-table");
+    boardTable.append(popoutRow);
+}
+
+function createPopoutButton(index) {
+    var popoutButton = $("<td> Popout </td>").click(function() {
+        onPopoutButtonClick(index); // Call onclick function with row and column.
+    }).addClass("popout-button").append();
+
+    return popoutButton;
+}
+
 function onCellClick(row, column) {
     console.log("Cell clicked! row: " + row + " column: " + column);
     onColumnClick(column);
+}
+
+function updateBoardWithNewPlay(updatedCells) {
+    for(var i = 0; i < updatedCells.length; i++) {
+        var cell = updatedCells[i];
+        var newCellBGColor = "";
+        var rowClass = getRowClassFromRow(cell.mRowIndex);
+        var columnClass = getColumnClassFromColumn(cell.mColumnIndex);
+
+        if(cell.mPlayer !== undefined && cell.mPlayer !== null && cell.mPlayer.mName !== undefined && cell.mPlayer.mName !== null) {
+            newCellBGColor = getColorForPlayer(cell.mPlayer.mName);
+        }
+
+        $('.' + rowClass + '.' + columnClass).css("background-color", newCellBGColor);
+    }
+
+}
+
+function getRowClassFromRow(rowIndex) {
+    return "cell-at-row-" + rowIndex;
+}
+
+function getColumnClassFromColumn(columnIndex) {
+    return "cell-at-column-" + columnIndex;
 }

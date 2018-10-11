@@ -8,7 +8,9 @@
     <script src="../../common/jquery-2.0.3.min.js"></script>
     <script src="JS/board.js"></script>
     <script src="JS/playersDetails.js"></script>
+    <script src="JS/gameDetails.js"></script>
     <script src="../../common/context-path-helper.js"></script>
+    <script src="JS/communicationWithServer.js"></script>
     <script src="game_room.js"></script>
 
 </head>
@@ -16,13 +18,16 @@
 <h1 id="gameNameTitle"></h1>
 <br/>
 <br/>
+<a id="leaveGameBtn" href="../lobby/lobby.html" class="btn btn-info btn-lg active" role="button">Leave Game</a>
+<h4 id="error-message-label"></h4>
+
 <div id="container">
 
     <div id="gameDetails" class = "column left">
         <section>
             <h2>Game Details</h2>
             <div class="tbl-body">
-                <table id=gameDetailsTbl" cellpadding="0" cellspacing="0" border="0">
+                <table id=gameDetailsTbl" >
                     <tr>
                         <th>Game Type</th>
                         <td id="tdGameType"></td>
@@ -48,23 +53,21 @@
         </section>
     </div>
 
-    <div id="game-board-container" class = "column center">
-        <table>
-            <tbody id="game-board-table">
-
-            </tbody>
-        </table>
+    <div id="game-board-container" class = "column center" >
+        <h2>Board Game</h2>
+        <section>
+            <table>
+                <tbody id="game-board-table"/>
+            </table>
+        </section>
     </div>
 
     <div id="game-player-names" class = "column right">
         <section>
             <h2>Players</h2>
             <div class="tbl-body">
-                <table id=playerDetailsTbl" cellpadding="0" cellspacing="0" border="0">
+                <table id=playerDetailsTbl">
                     <tbody id="player-details-tbody">
-                        <tr>
-                            <td>Dummy Player</td>
-                        </tr>
                     </tbody>
                 </table>
             </div>
