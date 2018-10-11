@@ -3,7 +3,7 @@ var pullTimer = 1500;
 var currentGameData;
 var currentPlayerName;
 var loggedInPlayerName;
-var gameState = "InActive";
+var gameState = "Inactive";
 var gameName;
 var isMyTurn = false;
 var turnNumber = 0;

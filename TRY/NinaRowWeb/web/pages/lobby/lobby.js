@@ -87,7 +87,7 @@ function addGameDetails(index, dataJson) {
     tableRow.append("<td>" + dataJson.mVariant + "</td>");
     tableRow.append("<td>" + dataJson.mRows + "X" + dataJson.mColumns+ "</td>");
     tableRow.append("<td>" + dataJson.mTarget+ "</td>");
-    tableRow.append("<td>" + dataJson.mUploader+ "</td>");
+    tableRow.append("<td>" + dataJson.mUploaderName + "</td>");
 
     if (dataJson.mGameState === "Inactive"){
         tableRow.append("<td><button onclick='joinGame(\"" + dataJson.mGameName + "\")'>Join Game</button></td>");

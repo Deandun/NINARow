@@ -80,6 +80,9 @@ function updateBoardWithNewPlay(updatedCells) {
 
 }
 
+function clearBoard() {
+}
+
 function getRowClassFromRow(rowIndex) {
     return "cell-at-row-" + rowIndex;
 }

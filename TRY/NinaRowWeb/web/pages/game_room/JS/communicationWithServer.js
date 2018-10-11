@@ -4,6 +4,7 @@ var FETCH_USER_NAME_URL = buildUrlWithContextPath("getname");
 var PLAY_TURN_URL = buildUrlWithContextPath("playturn");
 var PLAYER_LIST_URL = buildUrlWithContextPath("playerslist");
 var TURN_HISTORY_URL = buildUrlWithContextPath("turnhistory");
+var WINNING_SEQUENCE_URL = buildUrlWithContextPath("winningsequence");
 
 
 function fetchLoggedInPlayerName() {
@@ -96,15 +97,16 @@ function pullPlayersData() {
 
 function fetchPlayerToWinningSequenceMap() {
     $.ajax({
-        url: PLAYER_LIST_URL,
+        url: WINNING_SEQUENCE_URL,
         data: { "gamename": gameName },
         timeout: 2000,
         error: function(e) {
             console.error("Failed to send ajax");
         },
-        success: function(playerAndWinningSequenceArray) {
+        success: function(playerAndWinningSequenceResponse) {
             console.log("Fetched players and winning sequences");
             writeNotification("Game was won by:");
+            var playerAndWinningSequenceArray = JSON.parse(playerAndWinningSequenceResponse);
             $.each(playerAndWinningSequenceArray || [], handlePlayerAndWinningSequence);
         }
     });

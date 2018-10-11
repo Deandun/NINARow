@@ -30,7 +30,7 @@ public class Game {
 
     public Game(GameSettings gameSettings) {
         this.mHistoryManager = new HistoryManager();
-        this.mGameStatus = new GameStatus();
+        this.mGameStatus = new GameStatus(this);
         this.mSequenceSearcher = new SequenceSearcher();
         this.mComputerPlayerAlgo = new ComputerPlayerAlgo();
         this.mPlayerList = new ArrayList<>();
@@ -130,7 +130,7 @@ public class Game {
     // Second parameter should be true only when player quit. When a player has quit, game status is updated
     // Through another function.
     private void finishedPlayingTurn(PlayedTurnData playedTurnData, boolean shouldUpdateGameStatus) {
-        this.mGameStatus.mGameState = playedTurnData.getGameState();
+        this.mGameStatus.setGameState(playedTurnData.getGameState());
         this.mHistoryManager.SetCurrentTurn(playedTurnData);
         if(shouldUpdateGameStatus) {
             this.mGameStatus.FinishedTurn();
@@ -237,10 +237,11 @@ public class Game {
         return mGameStatus.getGameState();
     }
 
-    public void exitGame() {
+    public void reset() {
         this.mGameBoard.Clear();
         this.mHistoryManager.Clear();
         this.mSequenceSearcher.Clear();
+        this.mGameStatus.clear();
     }
 
     public Collection<Integer> getAvailablePopoutColumnsForPlayer(Player player) {
@@ -299,7 +300,6 @@ public class Game {
         }
 
         this.mPlayerList.add(player);
-
     }
 
     public boolean shouldStartGame() {
@@ -337,6 +337,11 @@ public class Game {
         private Player mCurrentPlayer;
         private ListIterator<Player> mPlayerIterator;
         private Instant mGameStart;
+        private Game mGame;
+
+        private GameStatus(Game game) {
+            this.mGame = game;
+        }
 
         // Getters/Setters
 
@@ -348,6 +353,29 @@ public class Game {
         public eGameState getGameState() { return mGameState; }
 
         @Override
+        public void setGameState(eGameState newGameState) {
+            if(!this.mGameState.equals(newGameState)) {
+                // Game state changed.
+                switch(newGameState) {
+                    case Inactive:
+                        // restart game.
+                        this.mGame.reset();
+                        break;
+                    case Draw:
+                        // Start timer until reset
+                        this.startRestartGameTimer();
+                        break;
+                    case Won:
+                        // Start timer until reset
+                        this.startRestartGameTimer();
+                        break;
+                }
+            }
+
+            this.mGameState = newGameState;
+        }
+
+        @Override
         public String getNameOfPlayerCurrentlyPlaying() {
             return mCurrentPlayer.getName();
         }
@@ -355,6 +383,14 @@ public class Game {
         @Override
         public Duration getGameDuration() {
             return Duration.between(mGameStart, Instant.now());
+        }
+
+        @Override
+        public void clear() {
+            this.mCurrentPlayer = null;
+            mPlayerList.forEach(
+                    (player) -> player.setTurnCounter(0) // Reset turn counter
+            );
         }
 
         // API
@@ -407,6 +443,33 @@ public class Game {
             }
 
             return nextPlayer;
+        }
+
+        private void startRestartGameTimer() {
+            Timer restartGameTimer = new Timer();
+            final int TIME_TIL_RESET = 30 * 1000; // wait 30 seconds.
+
+            restartGameTimer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    setGameState(eGameState.Inactive);
+                    startNewGameIfNeeded();
+                }
+            }, TIME_TIL_RESET);
+        }
+
+        private void startNewGameIfNeeded() {
+            Timer restartGameIfNeededTimer = new Timer();
+            final int TIME_TO_WAIT = 5 * 1000; // wait 5 seconds.
+
+            restartGameIfNeededTimer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    if(mGame.shouldStartGame()) {
+                        mGame.StartGame();
+                    }
+                }
+            }, TIME_TO_WAIT);
         }
     }
 }

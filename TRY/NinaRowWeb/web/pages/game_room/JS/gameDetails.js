@@ -10,13 +10,13 @@ function initGameDetailsUI(gameData) {
 function handleGameStateChanged(gameState) {
     $('#tdGameState').empty().append(gameState);
 
-    switch(gameState) { //TODO
+    switch(gameState) {
         case "Active":
-            hadleGameStarted();
             writeNotification("Game is active!");
             break;
         case "Inactive":
             writeNotification("Waiting for more players.");
+            resetGame();
             break;
         case "Won":
             fetchPlayerToWinningSequenceMap();
@@ -25,4 +25,12 @@ function handleGameStateChanged(gameState) {
             writeNotification("Game has ended in a draw!");
             break;
     }
+}
+
+function resetGame() {
+    isMyTurn = false;
+    turnNumber = 0;
+
+    // Clear board here because this JS file does not know 'board.js'
+    $(".board-cell").css("background-color", ""); // Remove cell's bg color, will revert back to row's bg color.
 }

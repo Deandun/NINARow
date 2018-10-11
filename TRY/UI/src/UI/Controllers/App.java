@@ -283,7 +283,7 @@ public class App implements IBoardControllerDelegate, IGameClientLogicDelegate {
     public void gameEnded(eGameState gameEndedState) {
         Platform.runLater(
                 () -> {
-                    this.mIsGameActiveProperty.set(false); //TODO: CHECK IF THIS IS OK.
+                    this.mIsGameActiveProperty.set(false);
                     this.handleGameStateEvents(gameEndedState);
                 }
 
@@ -468,13 +468,16 @@ public class App implements IBoardControllerDelegate, IGameClientLogicDelegate {
     }
 
     private void clear() {
-        this.mIsGameActiveProperty.setValue(false);
-        ImageManager.Clear();
-        this.mPlayerDetailsController.clear();
-        this.mCurrentTurnProperty.set(0);
-        this.mBoardController.ResetBoard();
-
-        this.mTheme.setAviadTheme();
+        Platform.runLater(
+                () -> {
+                    this.mIsGameActiveProperty.setValue(false);
+                    ImageManager.Clear();
+                    this.mPlayerDetailsController.clear();
+                    this.mCurrentTurnProperty.set(0);
+                    this.mBoardController.ResetBoard();
+                    this.mTheme.setAviadTheme();
+                }
+        );
     }
 
 
