@@ -8,15 +8,19 @@
     <script src="../../common/jquery-2.0.3.min.js"></script>
     <script src="JS/board.js"></script>
     <script src="JS/playersDetails.js"></script>
+    <script src="JS/gameDetails.js"></script>
     <script src="../../common/context-path-helper.js"></script>
+    <script src="JS/communicationWithServer.js"></script>
     <script src="game_room.js"></script>
 
-    <button type="button" class="btn">Leave Game</button>
 </head>
 <body>
 <h1 id="gameNameTitle"></h1>
 <br/>
 <br/>
+<a id="leaveGameBtn" href="../lobby/lobby.html" class="btn btn-info btn-lg active" role="button">Leave Game</a>
+<h4 id="error-message-label"></h4>
+
 <div id="container">
 
     <div id="gameDetails" class = "column left">
@@ -51,7 +55,7 @@
 
     <div id="game-board-container" class = "column center" >
         <h2>Board Game</h2>
-            <section>
+        <section>
             <table>
                 <tbody id="game-board-table"/>
             </table>
@@ -64,9 +68,6 @@
             <div class="tbl-body">
                 <table id=playerDetailsTbl">
                     <tbody id="player-details-tbody">
-                        <tr>
-                            <td>Dummy Player</td>
-                        </tr>
                     </tbody>
                 </table>
             </div>
