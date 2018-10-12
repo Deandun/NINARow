@@ -5,9 +5,8 @@
     width: 100%;
 }
 
-
 .btn{
-    background-image: linear-gradient(to bottom left, darkgrey, white);
+    background-image: linear-gradient(to bottom left, #868383, #e7e5e5);
     color: black;
     border: none;
     text-align: center;
@@ -15,9 +14,9 @@
     padding: 10px;
     text-decoration: none;
     display: block;
-    width : 90px;
-
+    width : 80px;
 }
+
 .row img {
     display: block;
     margin-left: auto;

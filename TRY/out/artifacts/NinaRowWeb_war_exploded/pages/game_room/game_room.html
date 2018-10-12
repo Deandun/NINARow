@@ -16,53 +16,52 @@
 </head>
 <body style="height: 100%">
 <div id="container" style="height: 100%">
-
     <table style="height: 100%; width: 100%; border: none">
         <tr><td></td><td><h1 id="gameNameTitle">Game Room</h1></td><td></td></tr>
         <tr>
-            <td style="width: 15%"><div id="gameDetails">
-                    <section>
-                        <h2>Game Details</h2>
-                        <div >
-                            <table id=gameDetailsTbl" >
-                                <tr>
-                                    <th>Game Type</th>
-                                    <td id="tdGameType"></td>
-                                </tr>
-                                <tr>
-                                    <th>Game Target</th>
-                                    <td id="tdTarget"></td>
-                                </tr>
-                                <tr>
-                                    <th>Board Size</th>
-                                    <td id="tdBoardSize"></td>
-                                </tr>
-                                <tr>
-                                    <th>Game Uploader</th>
-                                    <td id="tdGameUploader"></td>
-                                </tr>
-                                <tr>
-                                    <th>Game State</th>
-                                    <td id="tdGameState"></td>
-                                </tr>
-                            </table>
-                        </div>
-                    </section>
-                </div></td>
-            <td style="width: 70%; height: 100%"><div id="game-board-container" style="height: 100%">
-                <table id="game-board-table" style="height: 100%">
-                    <tbody />
-                </table>
-            </div></td>
-            <td style="width: 15%"><div id="game-player-names">
-                <div class="tbl-body">
+            <td style="width: 15%">
+                <div id="gameDetails">
+                    <h2>Game Details</h2>
+                    <table id=gameDetailsTbl" >
+                        <tr>
+                            <th>Game Type</th>
+                            <td id="tdGameType"></td>
+                        </tr>
+                        <tr>
+                            <th>Game Target</th>
+                            <td id="tdTarget"></td>
+                        </tr>
+                        <tr>
+                            <th>Board Size</th>
+                            <td id="tdBoardSize"></td>
+                        </tr>
+                        <tr>
+                            <th>Game Uploader</th>
+                            <td id="tdGameUploader"></td>
+                        </tr>
+                        <tr>
+                            <th>Game State</th>
+                            <td id="tdGameState"></td>
+                        </tr>
+                    </table>
+                </div>
+            </td>
+            <td style="width: 70%; height: 100%">
+                <div id="game-board-container" style="height: 100%">
+                    <table id="game-board-table" style="height: 100%">
+                        <tbody />
+                    </table>
+                </div>
+            </td>
+            <td style="width: 15%">
+                <div id="game-player-names" class="tbl-body">
                     <h2>Players</h2>
                     <table id=playerDetailsTbl">
                             <tbody id="player-details-tbody">
                         </tbody>
                     </table>
-                    </div>
-            </div></td>
+                </div>
+            </td>
         </tr>
         <tr><td><a id="leaveGameBtn" href="../lobby/lobby.html" class="btn btn-info btn-lg active" role="button">Leave Game</a></td>
             <td><h4 id="error-message-label"></h4></td>
