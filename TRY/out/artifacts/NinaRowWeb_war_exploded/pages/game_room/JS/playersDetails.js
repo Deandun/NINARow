@@ -40,7 +40,7 @@ this.getPlayerRow = function(index, playerJson) {
 };
 
 var playerNameToColor = new Map();
-var colorsArray = ["Purple", "Red", "Blue", "Yellow", "Orange", "Black"];
+var colorsArray = ["Purple", "Orange", "Pink", "Yellow", "Blue", "Green"];
 var isPlayerColorsSet = false;
 
 function getColorForPlayer(playerName){

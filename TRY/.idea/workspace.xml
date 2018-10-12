@@ -16,11 +16,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="game_room.css" pinned="false" current-in-tab="true">
+      <file leaf-file-name="game_room.css" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/NinaRowWeb/web/pages/game_room/game_room.css">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="240">
-              <caret line="99" column="1" lean-forward="true" selection-start-line="99" selection-start-column="1" selection-end-line="99" selection-end-column="1" />
+            <state relative-caret-position="172">
+              <caret line="94" column="16" lean-forward="true" selection-start-line="94" selection-start-column="16" selection-end-line="94" selection-end-column="16" />
             </state>
           </provider>
         </entry>
@@ -28,8 +28,8 @@
       <file leaf-file-name="game_room.html" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/NinaRowWeb/web/pages/game_room/game_room.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="253">
-              <caret line="66" column="65" selection-start-line="66" selection-start-column="64" selection-end-line="66" selection-end-column="65" />
+            <state relative-caret-position="185">
+              <caret line="20" column="62" lean-forward="true" selection-start-line="20" selection-start-column="25" selection-end-line="20" selection-end-column="62" />
               <folding>
                 <element signature="n#style#0;n#html#0;n#!!top" expanded="true" />
                 <element signature="n#style#0;n#body#0;n#html#0;n#!!top" expanded="true" />
@@ -39,28 +39,46 @@
                 <element signature="n#div#0;n#td#0;n#tr#0;n#table#0;n#div#0;n#body#0;n#html#0;n#!!top" />
                 <element signature="n#style#0;n#td#1;n#tr#0;n#table#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
                 <element signature="n#style#0;n#div#0;n#td#1;n#tr#1;n#table#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
-                <element signature="n#div#0;n#td#1;n#tr#1;n#table#0;n#div#0;n#body#0;n#html#0;n#!!top" />
                 <element signature="n#style#0;n#table#0;n#div#0;n#td#1;n#tr#1;n#table#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
                 <element signature="n#style#0;n#td#2;n#tr#0;n#table#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
+                <element signature="n#tr#3;n#table#0;n#div#0;n#body#0;n#html#0;n#!!top" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="playersDetails.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/NinaRowWeb/web/pages/game_room/JS/playersDetails.js">
+      <file leaf-file-name="game_room.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/NinaRowWeb/web/pages/game_room/game_room.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="157">
-              <caret line="41" column="34" lean-forward="true" selection-start-line="41" selection-start-column="34" selection-end-line="41" selection-end-column="34" />
+            <state relative-caret-position="34">
+              <caret line="2" selection-start-line="2" selection-end-line="2" />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="board.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/NinaRowWeb/web/pages/game_room/JS/board.js">
+      <file leaf-file-name="communicationWithServer.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/out/artifacts/NinaRowWeb_war_exploded/pages/game_room/JS/communicationWithServer.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="153">
-              <caret line="36" column="84" selection-start-line="36" selection-start-column="84" selection-end-line="36" selection-end-column="84" />
+            <state relative-caret-position="1207">
+              <caret line="71" column="12" selection-start-line="71" selection-start-column="12" selection-end-line="71" selection-end-column="12" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="GameDataServlet.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/NinaRowWeb/src/chat/servlets/gameRoom/GameDataServlet.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-716">
+              <caret line="18" column="13" selection-start-line="18" selection-start-column="13" selection-end-line="18" selection-end-column="13" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="GetLoggedInPlayerNameServlet.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/NinaRowWeb/src/chat/servlets/gameRoom/GetLoggedInPlayerNameServlet.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="85">
+              <caret line="17" column="13" selection-start-line="17" selection-start-column="13" selection-end-line="17" selection-end-column="13" />
             </state>
           </provider>
         </entry>
@@ -68,20 +86,13 @@
       <file leaf-file-name="lobby.html" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/NinaRowWeb/web/pages/lobby/lobby.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-22">
-              <caret line="33" column="64" lean-forward="true" selection-start-line="33" selection-start-column="64" selection-end-line="33" selection-end-column="64" />
+            <state relative-caret-position="204">
+              <caret line="18" column="33" selection-start-line="18" selection-start-column="33" selection-end-line="18" selection-end-column="33" />
               <folding>
-                <element signature="n#style#0;n#tbody#0;n#table#0;n#div#0;n#div#0;n#div#2;n#body#0;n#html#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#table#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
+                <element signature="n#style#0;n#tbody#0;n#table#0;n#div#0;n#div#0;n#td#0;n#tr#2;n#table#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="GameClientLogic.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/UI/src/NinaRowHTTPClient/Game/GameClientLogic.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="952">
-              <caret line="76" column="16" selection-start-line="76" selection-start-column="16" selection-end-line="76" selection-end-column="16" />
             </state>
           </provider>
         </entry>
@@ -89,8 +100,8 @@
       <file leaf-file-name="lobby.css" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/NinaRowWeb/web/pages/lobby/lobby.css">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="68">
-              <caret line="4" column="15" selection-start-line="4" selection-start-column="15" selection-end-line="4" selection-end-column="15" />
+            <state relative-caret-position="216">
+              <caret line="50" column="21" lean-forward="true" selection-start-line="50" selection-start-column="21" selection-end-line="50" selection-end-column="21" />
             </state>
           </provider>
         </entry>
@@ -98,17 +109,17 @@
       <file leaf-file-name="lobby_tables.css" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/NinaRowWeb/web/pages/lobby/lobby_tables.css">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="170">
-              <caret line="16" column="21" lean-forward="true" selection-start-line="16" selection-start-column="21" selection-end-line="16" selection-end-column="21" />
+            <state relative-caret-position="318">
+              <caret line="28" column="18" lean-forward="true" selection-start-line="28" selection-end-line="29" />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="games_table.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/NinaRowWeb/web/pages/lobby/games_table.js">
+      <file leaf-file-name="index.css" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/NinaRowWeb/web/index.css">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="85">
-              <caret line="5" column="12" selection-start-line="5" selection-start-column="12" selection-end-line="5" selection-end-column="12" />
+            <state relative-caret-position="182">
+              <caret line="15" column="17" selection-start-line="15" selection-start-column="17" selection-end-line="15" selection-end-column="17" />
             </state>
           </provider>
         </entry>
@@ -127,10 +138,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>Inac</find>
-      <find>inde</find>
-      <find>body</find>
-      <find>gamePlayers</find>
       <find>index.j</find>
       <find>uppercase</find>
       <find>UserManager</find>
@@ -157,6 +164,10 @@
       <find>mJoinGameBtn</find>
       <find>border-bottom</find>
       <find>curre</find>
+      <find>colo</find>
+      <find>currentPlayerName</find>
+      <find>onFetchedPlayedTurnsData</find>
+      <find>&lt;td</find>
     </findStrings>
     <replaceStrings>
       <replace />
@@ -179,21 +190,22 @@
         <option value="$PROJECT_DIR$/NinaRowWeb/web/pages/index.js" />
         <option value="$PROJECT_DIR$/NinaRowWeb/web/pages/lobby/lobby.js" />
         <option value="$PROJECT_DIR$/NinaRowWeb/web/index.js" />
-        <option value="$PROJECT_DIR$/NinaRowWeb/web/pages/game_room/game_room.js" />
         <option value="$PROJECT_DIR$/NinaRowWeb/src/chat/utils/ServletUtils.java" />
         <option value="$PROJECT_DIR$/NinaRowWeb/src/chat/servlets/GamesDataServlet.java" />
         <option value="$PROJECT_DIR$/NinaRowWeb/src/chat/servlets/LogoutServlet.java" />
         <option value="$PROJECT_DIR$/NinaRowWeb/src/chat/servlets/PlayersListServlet.java" />
         <option value="$PROJECT_DIR$/NinaRowWeb/src/chat/servlets/UsersListServlet.java" />
-        <option value="$PROJECT_DIR$/NinaRowWeb/web/pages/lobby/lobby_tables.css" />
         <option value="$PROJECT_DIR$/NinaRowWeb/web/index.html" />
         <option value="$PROJECT_DIR$/NinaRowWeb/web/index.css" />
         <option value="$PROJECT_DIR$/NinaRowWeb/src/chat/servlets/gameRoom/PopoutColumnsServlet.java" />
         <option value="$PROJECT_DIR$/NinaRowWeb/web/pages/game_room/JS/board.js" />
-        <option value="$PROJECT_DIR$/NinaRowWeb/web/pages/lobby/lobby.css" />
-        <option value="$PROJECT_DIR$/NinaRowWeb/web/pages/game_room/game_room.html" />
-        <option value="$PROJECT_DIR$/NinaRowWeb/web/pages/lobby/lobby.html" />
         <option value="$PROJECT_DIR$/NinaRowWeb/web/pages/game_room/game_room.css" />
+        <option value="$PROJECT_DIR$/NinaRowWeb/web/pages/game_room/JS/playersDetails.js" />
+        <option value="$PROJECT_DIR$/NinaRowWeb/web/pages/game_room/game_room.html" />
+        <option value="$PROJECT_DIR$/NinaRowWeb/web/pages/game_room/game_room.js" />
+        <option value="$PROJECT_DIR$/NinaRowWeb/web/pages/lobby/lobby.css" />
+        <option value="$PROJECT_DIR$/NinaRowWeb/web/pages/lobby/lobby_tables.css" />
+        <option value="$PROJECT_DIR$/NinaRowWeb/web/pages/lobby/lobby.html" />
       </list>
     </option>
   </component>
@@ -266,8 +278,7 @@
               <item name="NinaRowWeb" type="462c0819:PsiDirectoryNode" />
               <item name="web" type="462c0819:PsiDirectoryNode" />
               <item name="pages" type="462c0819:PsiDirectoryNode" />
-              <item name="game_room" type="462c0819:PsiDirectoryNode" />
-              <item name="JS" type="462c0819:PsiDirectoryNode" />
+              <item name="lobby" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="TRY" type="b2602c69:ProjectViewProjectNode" />
@@ -275,7 +286,7 @@
               <item name="NinaRowWeb" type="462c0819:PsiDirectoryNode" />
               <item name="web" type="462c0819:PsiDirectoryNode" />
               <item name="pages" type="462c0819:PsiDirectoryNode" />
-              <item name="lobby" type="462c0819:PsiDirectoryNode" />
+              <item name="loginerror" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -460,12 +471,12 @@
       <workItem from="1538115378881" duration="2716000" />
       <workItem from="1538310388196" duration="461000" />
       <workItem from="1539091377816" duration="5423000" />
-      <workItem from="1539329740096" duration="9275000" />
+      <workItem from="1539329740096" duration="12513000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="50514000" />
+    <option name="totallyTimeSpent" value="53752000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="-7" width="1295" height="695" extended-state="6" />
@@ -492,7 +503,7 @@
       <window_info anchor="bottom" id="Version Control" order="10" show_stripe_button="false" />
       <window_info anchor="bottom" id="Run" order="2" weight="0.36940297" />
       <window_info anchor="bottom" id="Terminal" order="7" />
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.20647773" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.20647773" />
       <window_info id="Web" order="6" side_tool="true" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.3291592" />
       <window_info anchor="right" id="Theme Preview" order="7" />
@@ -524,27 +535,6 @@
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/NinaRowWeb/web/pages/game_room/game_room.css">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="221">
-          <caret line="13" column="24" lean-forward="true" selection-start-line="13" selection-start-column="24" selection-end-line="13" selection-end-column="24" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/NinaRowWeb/web/index.css">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="85">
-          <caret line="5" column="1" lean-forward="true" selection-start-line="5" selection-start-column="1" selection-end-line="5" selection-end-column="1" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/NinaRowWeb/web/index.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="102">
-          <caret line="6" column="42" selection-start-line="6" selection-start-column="42" selection-end-line="6" selection-end-column="42" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/NinaRowWeb/web/pages/lobby/lobby.html">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="85">
@@ -717,13 +707,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/NinaRowWeb/web/index.css">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="255">
-          <caret line="15" column="17" selection-start-line="15" selection-start-column="17" selection-end-line="15" selection-end-column="17" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Logic/src/MultiGamesLogic/GamesManager.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1394">
@@ -756,24 +739,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/UI/src/NinaRowHTTPClient/Game/GameClientLogic.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="952">
-          <caret line="76" column="16" selection-start-line="76" selection-start-column="16" selection-end-line="76" selection-end-column="16" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/NinaRowWeb/web/pages/game_room/JS/board.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="153">
           <caret line="36" column="84" selection-start-line="36" selection-start-column="84" selection-end-line="36" selection-end-column="84" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/NinaRowWeb/web/pages/game_room/game_room.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="279">
-          <caret line="96" column="1" selection-start-line="96" selection-start-column="1" selection-end-line="96" selection-end-column="1" />
         </state>
       </provider>
     </entry>
@@ -784,13 +753,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/NinaRowWeb/web/pages/lobby/lobby.css">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="68">
-          <caret line="4" column="15" selection-start-line="4" selection-start-column="15" selection-end-line="4" selection-end-column="15" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/UI/src/UI/Controllers/GameDescriptionController.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="141">
@@ -798,34 +760,59 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/UI/src/NinaRowHTTPClient/Game/GameClientLogic.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="952">
+          <caret line="76" column="16" selection-start-line="76" selection-start-column="16" selection-end-line="76" selection-end-column="16" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/NinaRowWeb/web/pages/game_room/game_room.css">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="172">
+          <caret line="94" column="16" lean-forward="true" selection-start-line="94" selection-start-column="16" selection-end-line="94" selection-end-column="16" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/NinaRowWeb/web/pages/game_room/JS/playersDetails.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="157">
-          <caret line="41" column="34" lean-forward="true" selection-start-line="41" selection-start-column="34" selection-end-line="41" selection-end-column="34" />
+        <state relative-caret-position="174">
+          <caret line="42" column="71" selection-start-line="42" selection-start-column="71" selection-end-line="42" selection-end-column="71" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/NinaRowWeb/web/pages/lobby/lobby_tables.css">
+    <entry file="file://$PROJECT_DIR$/out/artifacts/NinaRowWeb_war_exploded/pages/game_room/JS/communicationWithServer.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="170">
-          <caret line="16" column="21" lean-forward="true" selection-start-line="16" selection-start-column="21" selection-end-line="16" selection-end-column="21" />
+        <state relative-caret-position="1207">
+          <caret line="71" column="12" selection-start-line="71" selection-start-column="12" selection-end-line="71" selection-end-column="12" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/NinaRowWeb/web/pages/lobby/lobby.html">
+    <entry file="file://$PROJECT_DIR$/NinaRowWeb/src/chat/servlets/gameRoom/GameDataServlet.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-22">
-          <caret line="33" column="64" lean-forward="true" selection-start-line="33" selection-start-column="64" selection-end-line="33" selection-end-column="64" />
-          <folding>
-            <element signature="n#style#0;n#tbody#0;n#table#0;n#div#0;n#div#0;n#div#2;n#body#0;n#html#0;n#!!top" expanded="true" />
-          </folding>
+        <state relative-caret-position="-716">
+          <caret line="18" column="13" selection-start-line="18" selection-start-column="13" selection-end-line="18" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/NinaRowWeb/src/chat/servlets/gameRoom/GetLoggedInPlayerNameServlet.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="85">
+          <caret line="17" column="13" selection-start-line="17" selection-start-column="13" selection-end-line="17" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/NinaRowWeb/web/pages/game_room/game_room.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="34">
+          <caret line="2" selection-start-line="2" selection-end-line="2" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/NinaRowWeb/web/pages/game_room/game_room.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="253">
-          <caret line="66" column="65" selection-start-line="66" selection-start-column="64" selection-end-line="66" selection-end-column="65" />
+        <state relative-caret-position="185">
+          <caret line="20" column="62" lean-forward="true" selection-start-line="20" selection-start-column="25" selection-end-line="20" selection-end-column="62" />
           <folding>
             <element signature="n#style#0;n#html#0;n#!!top" expanded="true" />
             <element signature="n#style#0;n#body#0;n#html#0;n#!!top" expanded="true" />
@@ -835,17 +822,43 @@
             <element signature="n#div#0;n#td#0;n#tr#0;n#table#0;n#div#0;n#body#0;n#html#0;n#!!top" />
             <element signature="n#style#0;n#td#1;n#tr#0;n#table#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
             <element signature="n#style#0;n#div#0;n#td#1;n#tr#1;n#table#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
-            <element signature="n#div#0;n#td#1;n#tr#1;n#table#0;n#div#0;n#body#0;n#html#0;n#!!top" />
             <element signature="n#style#0;n#table#0;n#div#0;n#td#1;n#tr#1;n#table#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
             <element signature="n#style#0;n#td#2;n#tr#0;n#table#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
+            <element signature="n#tr#3;n#table#0;n#div#0;n#body#0;n#html#0;n#!!top" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/NinaRowWeb/web/pages/game_room/game_room.css">
+    <entry file="file://$PROJECT_DIR$/NinaRowWeb/web/pages/lobby/lobby.css">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="240">
-          <caret line="99" column="1" lean-forward="true" selection-start-line="99" selection-start-column="1" selection-end-line="99" selection-end-column="1" />
+        <state relative-caret-position="216">
+          <caret line="50" column="21" lean-forward="true" selection-start-line="50" selection-start-column="21" selection-end-line="50" selection-end-column="21" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/NinaRowWeb/web/pages/lobby/lobby.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="204">
+          <caret line="18" column="33" selection-start-line="18" selection-start-column="33" selection-end-line="18" selection-end-column="33" />
+          <folding>
+            <element signature="n#style#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#table#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
+            <element signature="n#style#0;n#tbody#0;n#table#0;n#div#0;n#div#0;n#td#0;n#tr#2;n#table#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/NinaRowWeb/web/pages/lobby/lobby_tables.css">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="318">
+          <caret line="28" column="18" lean-forward="true" selection-start-line="28" selection-end-line="29" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/NinaRowWeb/web/index.css">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="182">
+          <caret line="15" column="17" selection-start-line="15" selection-start-column="17" selection-end-line="15" selection-end-column="17" />
         </state>
       </provider>
     </entry>

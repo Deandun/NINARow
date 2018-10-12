@@ -93,11 +93,9 @@ body{
 }
 
 .currentPlayer {
-    border-radius: 50%;
     border: 1px solid;
     padding: 10px;
     box-shadow: 5px 5px 8px #210603, 10px 10px 8px rgba(254, 68, 92, 0.71), 15px 15px 8px rgba(254, 253, 252, 0.47);
-
 }
 
 .board-cell {
