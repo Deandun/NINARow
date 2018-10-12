@@ -130,7 +130,6 @@ public class GameClientLogic {
 
     private void onFetchGameStateSuccess(String responseString) {
         eGameState gameState = this.mGson.fromJson(responseString, eGameState.class);
-        System.out.println("#$# received game state: " + gameState.name());
 
         if(!gameState.equals(this.mGameState)) {
             // Game state changed.
@@ -172,7 +171,7 @@ public class GameClientLogic {
 
         if(turnHistoryResponse.getmTurnHistoryDelta().size() > 0) {
             // Log
-            System.out.println("#$# Received turns data: " + turnHistoryResponse);
+            System.out.println("Received turns data: " + turnHistoryResponse);
             this.mPlayedTurnDataList.addAll(turnHistoryResponse.getmTurnHistoryDelta());
         }
 
@@ -244,6 +243,8 @@ public class GameClientLogic {
     }
 
     private void handleGameStateChanged() {
+        System.out.println("#$# Game state changed to: " + this.mGameState.name());
+
         switch(this.mGameState) {
             case Inactive:
                 // Game state changed from being active, to won/draw, to Inactive.
@@ -277,6 +278,10 @@ public class GameClientLogic {
 
     public List<Player> getPlayers() {
         return this.mCachedPlayersList;
+    }
+
+    public void resetCurrentTurnCounter() {
+        this.mGameClientCommunicationHandler.setTurnCounter(0);
     }
 
     private Map<Player, Collection<Cell>> getPlayerToWinningSequenceMap(ArrayList<PlayerAndWinningSequence> playerAndWinningSequenceList) {

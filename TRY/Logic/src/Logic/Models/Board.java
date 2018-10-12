@@ -1,5 +1,6 @@
 package Logic.Models;
 
+import Logic.Exceptions.InvalidInputException;
 import Logic.Exceptions.InvalidUserInputException;
 
 import java.util.*;
@@ -42,10 +43,10 @@ public class Board{
     }
 
 
-    public Cell UpdateBoard(int column, Player player) throws InvalidUserInputException {
+    public Cell UpdateBoard(int column, Player player) throws InvalidInputException {
         // Selected column is full
         if(IsColumnFull(column)) {
-            throw new InvalidUserInputException("Cannot insert to column " + column + " because it is full!");
+            throw new InvalidInputException("Cannot insert to column " + column + " because it is full!");
         }
 
         Cell chosenCell = null;
@@ -89,7 +90,7 @@ public class Board{
     public boolean CanPlayerPerformPopoutForColumn(Player player, int column) {
         int lastRowIndex = mBoard.length - 1;
         // Check the bottom most disc of the column.
-        return mBoard[lastRowIndex][column].getPlayer().equals(player);
+        return mBoard[lastRowIndex][column].getPlayer() != null && mBoard[lastRowIndex][column].getPlayer().equals(player);
     }
 
     public Collection<Cell> PopoutAndGetUpdatedCells(int column) {

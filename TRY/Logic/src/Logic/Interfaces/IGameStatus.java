@@ -10,4 +10,8 @@ public interface IGameStatus {
     Duration getGameDuration();
 
     eGameState getGameState();
+
+    void clear();
+
+    void setGameState(eGameState gameState);
 }

@@ -27,25 +27,32 @@ public class PlayTurnServlet extends HttpServlet {
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String gameName = ServletUtils.getGameNameFromRequest(request);
 
-        if(gameName != null) {
+        String gameName = ServletUtils.getGameNameFromRequest(request);
+        PlayTurnParameters playTurnParameters = ServletUtils.getPlayTurnParamsFromRequest(request);
+
+        if(playTurnParameters == null) {
+            // This means the play turn params are in the body.
             String requestBody = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
             Gson gson = new Gson();
+            playTurnParameters = gson.fromJson(requestBody, PlayTurnParameters.class);
+        }
 
-            PlayTurnParameters turnParameters = gson.fromJson(requestBody, PlayTurnParameters.class);
+        if(gameName != null) {
             GamesManager gamesManager = ServletUtils.getGamesManager(getServletContext());
-            Player playingPlayer = ServletUtils.getPlayerManager(getServletContext()).getPlayerForName(turnParameters.getmPlayerName());
+            Player playingPlayer = ServletUtils.getPlayerManager(getServletContext()).getPlayerForName(playTurnParameters.getmPlayerName());
             PrintWriter out = null;
 
             try {
                 out = response.getWriter();
-                gamesManager.playTurn(gameName, turnParameters, playingPlayer);
+                gamesManager.playTurn(gameName, playTurnParameters, playingPlayer);
             } catch (IOException e) {
                 response.setStatus(GENERAL_ERROR);
             } catch (InvalidInputException e) {
                 response.setStatus(INPUT_ERROR);
                 out.println(e.getMessage());
+            } catch (Exception e) {
+                System.out.println("General exception");
             }
         }
     }
@@ -62,6 +69,12 @@ public class PlayTurnServlet extends HttpServlet {
      */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        processRequest(request, response);
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         processRequest(request, response);
     }
