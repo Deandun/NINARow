@@ -8,20 +8,21 @@
 
 h1{
     text-transform: uppercase;
+    color: #fff;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+h2{
     font-weight: 300;
     text-align: center;
     margin-bottom: 15px;
 }
 
-h2{
-    color: #fff;
-    margin-bottom: 15px;
-    text-align: center;
-}
 table{
     border: 1px solid black;
-
 }
+
 * {
     box-sizing: border-box;
 }
@@ -64,7 +65,6 @@ td{
     text-align: left;
     font-size: 12px;
     color: #6E102F;
-    border-bottom: solid 1px rgba(255,255,255,0.1);
     min-width:20px;
     min-height:20px;
 }
@@ -93,16 +93,10 @@ body{
 }
 
 .currentPlayer {
-    border-radius: 50%;
-    box-shadow:
-            inset 0 0 50px #fff,
-            inset 20px 0 80px #f0f,
-            inset -20px 0 80px #0ff,
-            inset 20px 0 300px #f0f,
-            inset -20px 0 300px #0ff,
-            0 0 50px #fff,
-            -10px 0 80px #f0f,
-            10px 0 80px #0ff;
+    border: 1px solid;
+    padding: 10px;
+    box-shadow: 5px 5px 8px #210603, 10px 10px 8px rgba(254, 68, 92, 0.71), 15px 15px 8px rgba(254, 253, 252, 0.47);
+
 }
 
 .board-cell {

@@ -2,6 +2,7 @@
 .row {
     position: relative;
     display: table-row;
+    width: 100%;
 }
 
 

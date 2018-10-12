@@ -14,10 +14,5 @@
 			<Name>Menash</Name>
 			<Type>Human</Type>
 		</Player>
-		<Player id="456">
-			<Name>Nachtze</Name>
-			<Type>Computer</Type>
-		</Player>
-	</Players>
 	<DynamicPlayers game-title="sample game" total-players="3"/>
 </GameDescriptor>
