@@ -1,12 +1,3 @@
-function initOnColumnClicks() {
-    var createClickHandler = function(column) {
-        return function() {
-            var cell = row.getElementsByTagName("td")[0];
-            var id = cell.innerHTML;
-            alert("id:" + id);
-        };
-    };
-};
 
 function initBoard(gameData) {
     var rows = gameData.mRows;
@@ -18,9 +9,9 @@ function initBoard(gameData) {
         boardTable.append(row);
     }
 
-    initOnColumnClicks();
-
-    //initPopoutIfNeeded();
+    if(isPopoutMode()) {
+        initPopout(columns);
+    }
 }
 
 function createRow(rowIndex, columns) {
@@ -41,12 +32,61 @@ function createRow(rowIndex, columns) {
 }
 
 function createCell(rowIndex, columnIndex) {
-    var cell = $("<td>")
-        .addClass("cell-at-row-" + rowIndex).addClass("cell-at-column-" + columnIndex).addClass("board-cell").append();
+    var cell = $("<td>").click(function() {
+        onCellClick(rowIndex, columnIndex); // Call onclick function with row and column.
+    }).addClass("cell-at-row-" + rowIndex).addClass("cell-at-column-" + columnIndex).addClass("board-cell").append();
 
     return cell;
 }
 
-function onCellClick(cell) {
-    console.log("Cell clicked!");
+function initPopout(numberOfComlumns) {
+    var popoutRow = $("<tr>").addClass("popout-row");
+
+    for(var i = 0; i < numberOfComlumns; i++) {
+        var popoutButton = createPopoutButton(i);
+        popoutRow.append(popoutButton);
+    }
+
+    var boardTable = $("#game-board-table");
+    boardTable.append(popoutRow);
+}
+
+function createPopoutButton(index) {
+    var popoutButton = $("<td> Popout </td>").click(function() {
+        onPopoutButtonClick(index); // Call onclick function with row and column.
+    }).addClass("popout-button").append();
+
+    return popoutButton;
+}
+
+function onCellClick(row, column) {
+    console.log("Cell clicked! row: " + row + " column: " + column);
+    onColumnClick(column);
+}
+
+function updateBoardWithNewPlay(updatedCells) {
+    for(var i = 0; i < updatedCells.length; i++) {
+        var cell = updatedCells[i];
+        var newCellBGColor = "";
+        var rowClass = getRowClassFromRow(cell.mRowIndex);
+        var columnClass = getColumnClassFromColumn(cell.mColumnIndex);
+
+        if(cell.mPlayer !== undefined && cell.mPlayer !== null && cell.mPlayer.mName !== undefined && cell.mPlayer.mName !== null) {
+            newCellBGColor = getColorForPlayer(cell.mPlayer.mName);
+        }
+
+        $('.' + rowClass + '.' + columnClass).css("background-color", newCellBGColor);
+    }
+
+}
+
+function clearBoard() {
+}
+
+function getRowClassFromRow(rowIndex) {
+    return "cell-at-row-" + rowIndex;
+}
+
+function getColumnClassFromColumn(columnIndex) {
+    return "cell-at-column-" + columnIndex;
 }

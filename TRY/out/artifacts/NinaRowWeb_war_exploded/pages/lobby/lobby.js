@@ -47,8 +47,8 @@ function onFormSubmit() {
         contentType: false, // Set content type to false as jQuery will tell the server its a query string request
         timeout: 4000,
         error: function(e) {
-            if (e.status === 409) {
-                $("#result").text("Failed to submit. " + e.message());
+            if (e.status === 499) {
+                alert("Failed to submit. Reason: " + e.responseText);
                 console.error("Failed to submit. " + e.message());
             }},
         success: function(r) {
@@ -87,7 +87,7 @@ function addGameDetails(index, dataJson) {
     tableRow.append("<td>" + dataJson.mVariant + "</td>");
     tableRow.append("<td>" + dataJson.mRows + "X" + dataJson.mColumns+ "</td>");
     tableRow.append("<td>" + dataJson.mTarget+ "</td>");
-    tableRow.append("<td>" + dataJson.mUploader+ "</td>");
+    tableRow.append("<td>" + dataJson.mUploaderName + "</td>");
 
     if (dataJson.mGameState === "Inactive"){
         tableRow.append("<td><button onclick='joinGame(\"" + dataJson.mGameName + "\")'>Join Game</button></td>");
